@@ -11,7 +11,8 @@ import TemplateRenderer from '@/components/templates/TemplateRenderer';
 import { FiPlus, FiZap, FiMoreVertical, FiCopy, FiTrash2, FiEdit3, FiEye, FiEdit, FiSun, FiMoon } from 'react-icons/fi';
 import { useTheme } from '@/hooks/use-theme';
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
+import SyncNoticeModal from '@/components/builder/SyncNoticeModal';
 
 function BuilderContent() {
     const resumes = useResumeStore((s) => s.resumes);
@@ -23,6 +24,8 @@ function BuilderContent() {
     const duplicateResume = useResumeStore((s) => s.duplicateResume);
     const deleteResume = useResumeStore((s) => s.deleteResume);
     const loadFromCloud = useResumeStore((s) => s.loadFromCloud);
+    const syncToCloud = useResumeStore((s) => s.syncToCloud);
+    const cloudSyncId = useResumeStore((s) => s.cloudSyncId);
 
     const searchParams = useSearchParams();
     const cloudId = searchParams.get('id');
@@ -59,6 +62,17 @@ function BuilderContent() {
             setActiveResume(resumes[0].id);
         }
     }, [mounted, resumes.length, activeResumeId, setActiveResume, resumes]);
+
+    // Auto-sync Logic
+    useEffect(() => {
+        if (!mounted || !cloudSyncId || !resume) return;
+
+        const timer = setTimeout(() => {
+            syncToCloud(resume.id);
+        }, 2000); // 2 second debounce
+
+        return () => clearTimeout(timer);
+    }, [resume, cloudSyncId, syncToCloud, mounted]);
 
     if (!mounted) {
         return (
@@ -261,6 +275,8 @@ function BuilderContent() {
 
             {showATS && <ATSPanel onClose={() => setShowATS(false)} />}
             {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
+
+            <SyncNoticeModal />
 
             {/* Zoom Controls */}
             <div className="preview-controls">

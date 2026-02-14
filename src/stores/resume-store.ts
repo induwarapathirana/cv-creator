@@ -24,6 +24,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 interface ResumeState {
     resumes: Resume[];
     activeResumeId: string | null;
+    cloudSyncId: string | null; // Currently loaded cloud ID
     undoStack: Resume[];
     redoStack: Resume[];
 
@@ -132,6 +133,7 @@ export const useResumeStore = create<ResumeState>()(
         (set, get) => ({
             resumes: [],
             activeResumeId: null,
+            cloudSyncId: null,
             undoStack: [],
             redoStack: [],
 
@@ -603,10 +605,15 @@ export const useResumeStore = create<ResumeState>()(
 
                 try {
                     const docRef = doc(db, 'resumes', id);
+                    const now = new Date();
+                    const expiresAt = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString(); // 3 days
+
                     await setDoc(docRef, {
                         ...resume,
-                        updatedAt: new Date().toISOString()
+                        updatedAt: now.toISOString(),
+                        expiresAt: expiresAt
                     });
+                    set({ cloudSyncId: id });
                     return id;
                 } catch (error) {
                     console.error('Error syncing to cloud:', error);
@@ -630,14 +637,20 @@ export const useResumeStore = create<ResumeState>()(
                         if (exists) {
                             set((s) => ({
                                 activeResumeId: id,
-                                resumes: s.resumes.map(r => r.id === id ? sanitized : r)
+                                resumes: s.resumes.map(r => r.id === id ? sanitized : r),
+                                cloudSyncId: id
                             }));
                         } else {
                             set((s) => ({
                                 resumes: [...s.resumes, sanitized],
                                 activeResumeId: id,
+                                cloudSyncId: id
                             }));
                         }
+
+                        // Automatically update the expiration since they just "visited" it
+                        get().syncToCloud(id);
+
                         return id;
                     }
                     return null;
