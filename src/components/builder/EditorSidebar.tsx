@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useResumeStore } from '@/stores/resume-store';
+import { useActiveResume } from '@/hooks/use-active-resume';
 import { Resume } from '@/types/resume';
-import { FiChevronDown, FiEye, FiEyeOff, FiMenu, FiUser, FiBriefcase, FiBook, FiCode, FiFolder, FiAward, FiGlobe, FiStar } from 'react-icons/fi';
+import { FiChevronDown, FiEye, FiEyeOff, FiMenu, FiUser, FiBriefcase, FiBook, FiCode, FiFolder, FiAward, FiGlobe, FiStar, FiPlus } from 'react-icons/fi';
 import PersonalInfoForm from './sections/PersonalInfoForm';
 import ExperienceForm from './sections/ExperienceForm';
 import EducationForm from './sections/EducationForm';
@@ -12,8 +13,9 @@ import ProjectsForm from './sections/ProjectsForm';
 import CertificationsForm from './sections/CertificationsForm';
 import LanguagesForm from './sections/LanguagesForm';
 import AwardsForm from './sections/AwardsForm';
+import CustomSectionForm from './sections/CustomSectionForm';
 
-const sectionForms: Record<string, React.ComponentType> = {
+const sectionForms: Record<string, React.ComponentType<any>> = {
     personalInfo: PersonalInfoForm,
     summary: PersonalInfoForm,
     experience: ExperienceForm,
@@ -23,6 +25,7 @@ const sectionForms: Record<string, React.ComponentType> = {
     certifications: CertificationsForm,
     languages: LanguagesForm,
     awards: AwardsForm,
+    custom: CustomSectionForm,
 };
 
 const sectionIcons: Record<string, React.ComponentType<{ size?: number }>> = {
@@ -34,9 +37,10 @@ const sectionIcons: Record<string, React.ComponentType<{ size?: number }>> = {
     certifications: FiAward,
     languages: FiGlobe,
     awards: FiStar,
+    custom: FiMenu,
 };
 
-function getSectionSummary(type: string, resume: Resume): string {
+function getSectionSummary(type: string, resume: Resume, customSectionId?: string): string {
     switch (type) {
         case 'personalInfo': {
             const p = resume.personalInfo;
@@ -44,66 +48,84 @@ function getSectionSummary(type: string, resume: Resume): string {
             return parts.length > 0 ? parts.join(' — ') : 'Not filled in yet';
         }
         case 'experience': {
-            if (resume.experience.length === 0) return 'No entries added';
-            const items = resume.experience.slice(0, 3).map(e =>
+            const exp = Array.isArray(resume.experience) ? resume.experience : [];
+            if (exp.length === 0) return 'No entries added';
+            const items = exp.slice(0, 3).map(e =>
                 e.position && e.company ? `${e.position} at ${e.company}` :
                     e.position || e.company || 'Untitled'
             );
-            const more = resume.experience.length > 3 ? ` +${resume.experience.length - 3} more` : '';
+            const more = exp.length > 3 ? ` +${exp.length - 3} more` : '';
             return items.join(' · ') + more;
         }
         case 'education': {
-            if (resume.education.length === 0) return 'No entries added';
-            const items = resume.education.slice(0, 3).map(e =>
+            const edu = Array.isArray(resume.education) ? resume.education : [];
+            if (edu.length === 0) return 'No entries added';
+            const items = edu.slice(0, 3).map(e =>
                 e.degree && e.institution ? `${e.degree} — ${e.institution}` :
                     e.institution || e.degree || 'Untitled'
             );
-            const more = resume.education.length > 3 ? ` +${resume.education.length - 3} more` : '';
+            const more = edu.length > 3 ? ` +${edu.length - 3} more` : '';
             return items.join(' · ') + more;
         }
         case 'skills': {
-            if (resume.skills.length === 0) return 'No skills added';
-            const names = resume.skills.slice(0, 6).map(s => s.name);
-            const more = resume.skills.length > 6 ? ` +${resume.skills.length - 6} more` : '';
+            const skills = Array.isArray(resume.skills) ? resume.skills : [];
+            if (skills.length === 0) return 'No skills added';
+            const names = skills.slice(0, 6).map(s => s.name);
+            const more = skills.length > 6 ? ` +${skills.length - 6} more` : '';
             return names.join(', ') + more;
         }
         case 'projects': {
-            if (resume.projects.length === 0) return 'No projects added';
-            return resume.projects.map(p => p.name || 'Untitled').slice(0, 3).join(' · ');
+            const projects = Array.isArray(resume.projects) ? resume.projects : [];
+            if (projects.length === 0) return 'No projects added';
+            return projects.map(p => p.name || 'Untitled').slice(0, 3).join(' · ');
         }
         case 'certifications': {
-            if (resume.certifications.length === 0) return 'No certifications added';
-            return resume.certifications.map(c => c.name || 'Untitled').slice(0, 3).join(' · ');
+            const certs = Array.isArray(resume.certifications) ? resume.certifications : [];
+            if (certs.length === 0) return 'No certifications added';
+            return certs.map(c => c.name || 'Untitled').slice(0, 3).join(' · ');
         }
         case 'languages': {
-            if (resume.languages.length === 0) return 'No languages added';
-            return resume.languages.map(l => `${l.name} (${l.proficiency})`).join(', ');
+            const langs = Array.isArray(resume.languages) ? resume.languages : [];
+            if (langs.length === 0) return 'No languages added';
+            return langs.map(l => `${l.name} (${l.proficiency})`).join(', ');
         }
         case 'awards': {
-            if (resume.awards.length === 0) return 'No awards added';
-            return resume.awards.map(a => a.title || 'Untitled').slice(0, 3).join(' · ');
+            const awards = Array.isArray(resume.awards) ? resume.awards : [];
+            if (awards.length === 0) return 'No awards added';
+            return awards.map(a => a.title || 'Untitled').slice(0, 3).join(' · ');
+        }
+        case 'custom': {
+            const custom = resume.customSections.find(cs => cs.id === customSectionId);
+            if (!custom || custom.items.length === 0) return 'No entries added';
+            return custom.items.map(i => i.title || 'Untitled').slice(0, 3).join(' · ');
         }
         default:
             return '';
     }
 }
 
-function getItemCount(type: string, resume: Resume): number | null {
+function getItemCount(type: string, resume: Resume, customSectionId?: string): number | null {
     switch (type) {
-        case 'experience': return resume.experience.length;
-        case 'education': return resume.education.length;
-        case 'skills': return resume.skills.length;
-        case 'projects': return resume.projects.length;
-        case 'certifications': return resume.certifications.length;
-        case 'languages': return resume.languages.length;
-        case 'awards': return resume.awards.length;
+        case 'experience': return Array.isArray(resume.experience) ? resume.experience.length : 0;
+        case 'education': return Array.isArray(resume.education) ? resume.education.length : 0;
+        case 'skills': return Array.isArray(resume.skills) ? resume.skills.length : 0;
+        case 'projects': return Array.isArray(resume.projects) ? resume.projects.length : 0;
+        case 'certifications': return Array.isArray(resume.certifications) ? resume.certifications.length : 0;
+        case 'languages': return Array.isArray(resume.languages) ? resume.languages.length : 0;
+        case 'awards': return Array.isArray(resume.awards) ? resume.awards.length : 0;
+        case 'custom': {
+            const custom = resume.customSections.find(cs => cs.id === customSectionId);
+            return custom ? custom.items.length : 0;
+        }
         default: return null;
     }
 }
 
 export default function EditorSidebar() {
-    const resume = useResumeStore((s) => s.getActiveResume());
+    const resume = useActiveResume();
     const updateSectionConfig = useResumeStore((s) => s.updateSectionConfig);
+    const addCustomSection = useResumeStore((s) => s.addCustomSection);
+    const pushUndoState = useResumeStore((s) => s.pushUndoState);
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
     if (!resume) return null;
@@ -118,6 +140,7 @@ export default function EditorSidebar() {
     };
 
     const toggleVisibility = (id: string, visible: boolean) => {
+        pushUndoState();
         updateSectionConfig(id, { visible: !visible });
     };
 
@@ -129,8 +152,8 @@ export default function EditorSidebar() {
                     if (!FormComponent) return null;
                     const isOpen = openSections[section.id] ?? false;
                     const Icon = sectionIcons[section.type] || FiMenu;
-                    const summary = getSectionSummary(section.type, resume);
-                    const count = getItemCount(section.type, resume);
+                    const summary = getSectionSummary(section.type, resume, section.customSectionId);
+                    const count = getItemCount(section.type, resume, section.customSectionId);
 
                     return (
                         <div key={section.id} className={`editor-section ${isOpen ? 'editor-section-open' : ''} ${!section.visible ? 'editor-section-hidden' : ''}`}>
@@ -234,11 +257,23 @@ export default function EditorSidebar() {
                                 </div>
                             </div>
                             <div className={`section-body ${isOpen ? 'section-body-open' : ''}`}>
-                                {isOpen && <FormComponent />}
+                                {isOpen && <FormComponent id={section.customSectionId} />}
                             </div>
                         </div>
                     );
                 })}
+
+                <div className="add-section-container" style={{ padding: '0 20px 20px' }}>
+                    <button
+                        className="add-entry-btn"
+                        onClick={() => {
+                            pushUndoState();
+                            addCustomSection('Custom Section');
+                        }}
+                    >
+                        <FiPlus /> Add Custom Section
+                    </button>
+                </div>
             </div>
         </div>
     );

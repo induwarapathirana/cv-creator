@@ -159,7 +159,7 @@ export const useResumeStore = create<ResumeState>()(
                 const copy: Resume = {
                     ...JSON.parse(JSON.stringify(original)),
                     id: uuidv4(),
-                    title: `${original.title} (Copy)`,
+                    title: original.title ? `${original.title} (Copy)` : 'Untitled Resume (Copy)',
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                 };
@@ -573,15 +573,16 @@ export const useResumeStore = create<ResumeState>()(
 
             importResume: (json) => {
                 try {
-                    const resume: Resume = JSON.parse(json);
+                    const rawResume = JSON.parse(json);
+                    const resume = sanitizeResume(rawResume);
                     resume.id = uuidv4();
-                    resume.title = `${resume.title} (Imported)`;
-                    resume.createdAt = new Date().toISOString();
-                    resume.updatedAt = new Date().toISOString();
-                    set((state) => ({
-                        resumes: [...state.resumes, resume],
-                        activeResumeId: resume.id,
-                    }));
+                    resume.title = `${resume.title || 'Imported'} (Imported)`;
+                    resume.createdAt = new Date().toISOString(),
+                        resume.updatedAt = new Date().toISOString(),
+                        set((state) => ({
+                            resumes: [...state.resumes, resume],
+                            activeResumeId: resume.id,
+                        }));
                     return resume.id;
                 } catch {
                     return null;

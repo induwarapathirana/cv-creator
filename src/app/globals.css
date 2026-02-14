@@ -1840,3 +1840,48 @@ body {
     border-radius: 0;
   }
 }
+/* ═══════════════════════════════════
+   RICH TEXT RENDERING (.html-content)
+   ═══════════════════════════════════ */
+
+.html-content {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.html-content p {
+  margin-bottom: 0.5em;
+}
+
+.html-content p:last-child {
+  margin-bottom: 0;
+}
+
+.html-content ul, 
+.html-content ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0.5em;
+}
+
+.html-content li {
+  margin-bottom: 0.25em;
+}
+
+.html-content a {
+  color: var(--accent-primary);
+  text-decoration: underline;
+}
+
+/* Ensure resume columns don't overflow */
+.resume-template .section,
+.resume-template .entry {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.resume-template ul {
+  list-style-position: outside;
+}
