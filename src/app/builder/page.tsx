@@ -8,7 +8,7 @@ import BuilderToolbar from '@/components/builder/BuilderToolbar';
 import ATSPanel from '@/components/builder/ATSPanel';
 import SettingsPanel from '@/components/builder/SettingsPanel';
 import TemplateRenderer from '@/components/templates/TemplateRenderer';
-import { FiPlus, FiZap, FiMoreVertical, FiCopy, FiTrash2, FiEdit3 } from 'react-icons/fi';
+import { FiPlus, FiZap, FiMoreVertical, FiCopy, FiTrash2, FiEdit3, FiEye, FiEdit } from 'react-icons/fi';
 import { useTheme } from '@/hooks/use-theme';
 import { FiSun, FiMoon } from 'react-icons/fi';
 
@@ -28,6 +28,7 @@ export default function BuilderPage() {
     const [mounted, setMounted] = useState(false);
     const [showManager, setShowManager] = useState(false);
     const [menuOpen, setMenuOpen] = useState<string | null>(null);
+    const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
     const { theme, toggleTheme } = useTheme();
 
     useEffect(() => {
@@ -208,18 +209,37 @@ export default function BuilderPage() {
 
     // Builder View
     return (
-        <div className="builder-layout">
+        <div className={`builder-layout ${mobileView === 'preview' ? 'mobile-show-preview' : 'mobile-show-editor'}`}>
             <BuilderToolbar
                 onToggleATS={() => { setShowATS(!showATS); setShowSettings(false); }}
                 onToggleSettings={() => { setShowSettings(!showSettings); setShowATS(false); }}
+                onShowDashboard={() => setShowManager(true)}
             />
 
-            <EditorSidebar />
+            <div className="builder-main">
+                <EditorSidebar />
 
-            <div className="preview-panel">
-                <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top center' }}>
-                    <TemplateRenderer resume={resume} />
+                <div className="preview-panel">
+                    <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top center' }}>
+                        <TemplateRenderer resume={resume} />
+                    </div>
                 </div>
+            </div>
+
+            {/* Mobile View Toggle */}
+            <div className="mobile-view-toggle">
+                <button
+                    className={`mobile-toggle-btn ${mobileView === 'editor' ? 'active' : ''}`}
+                    onClick={() => setMobileView('editor')}
+                >
+                    <FiEdit /> Editor
+                </button>
+                <button
+                    className={`mobile-toggle-btn ${mobileView === 'preview' ? 'active' : ''}`}
+                    onClick={() => setMobileView('preview')}
+                >
+                    <FiEye /> Preview
+                </button>
             </div>
 
             {showATS && <ATSPanel onClose={() => setShowATS(false)} />}

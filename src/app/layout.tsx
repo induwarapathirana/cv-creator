@@ -9,6 +9,13 @@ export const metadata: Metadata = {
   description:
     "Create stunning, ATS-optimized resumes with real-time preview, 6+ templates, and built-in ATS score analyzer. Free, no sign-up required.",
   keywords: "resume builder, CV creator, ATS friendly, resume templates, job application",
+  manifest: "/manifest.json",
+  themeColor: "#6366f1",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+  },
 };
 
 export default function RootLayout({

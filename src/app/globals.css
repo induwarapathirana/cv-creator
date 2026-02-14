@@ -936,8 +936,17 @@ body {
 
 .builder-layout {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.builder-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
 }
 
 /* Builder Toolbar */
@@ -1019,9 +1028,9 @@ body {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  flex-direction: column;
   gap: 16px;
   padding-bottom: 40px;
+  z-index: 20;
 }
 
 .editor-sidebar-inner {
@@ -1405,6 +1414,35 @@ body {
   font-size: 12px;
 }
 
+/* Toolbar persistence indicator */
+.title-persistence-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.saved-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.saved-status svg {
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .saved-status {
+    display: none;
+  }
+}
+
 .keyword-tags {
   display: flex;
   flex-wrap: wrap;
@@ -1634,36 +1672,91 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 
+  /* Builder Mobile Layout */
   .builder-layout {
+    height: 100vh;
+  }
+
+  .builder-main {
     flex-direction: column;
+    height: calc(100vh - 120px);
+    /* Account for toolbar and mobile toggle */
   }
 
   .editor-sidebar {
     width: 100%;
     min-width: 100%;
-    height: auto;
-    max-height: 50vh;
+    height: 100%;
+    max-height: 100%;
+    border-right: none;
   }
 
   .preview-panel {
-    padding: 16px;
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    background: var(--bg-primary);
   }
 
-  .hero-mockup-inner {
-    grid-template-columns: 1fr;
-  }
-
-  .mockup-sidebar {
+  /* Mobile Toggle Logic */
+  .mobile-show-editor .preview-panel {
     display: none;
   }
 
-  .ats-panel {
-    width: 100%;
+  .mobile-show-preview .editor-sidebar {
+    display: none;
+  }
+
+  .builder-toolbar-center {
+    display: none;
+  }
+
+  .builder-toolbar-right .btn-ghost {
+    display: none;
+  }
+
+  .resume-title-input {
+    width: 120px;
   }
 
   .navbar-actions .btn-secondary {
     display: none;
   }
+
+  .mobile-view-toggle {
+    display: flex;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    padding: 4px;
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+  }
+
+  .mobile-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+  }
+
+  .mobile-toggle-btn.active {
+    background: var(--accent-primary);
+    color: #fff;
+  }
+}
+
+.mobile-view-toggle {
+  display: none;
 }
 
 /* ═══════════════════════════════════
@@ -1840,6 +1933,7 @@ body {
     border-radius: 0;
   }
 }
+
 /* ═══════════════════════════════════
    RICH TEXT RENDERING (.html-content)
    ═══════════════════════════════════ */
@@ -1860,7 +1954,7 @@ body {
   margin-bottom: 0;
 }
 
-.html-content ul, 
+.html-content ul,
 .html-content ol {
   margin-left: 1.25rem;
   margin-bottom: 0.5em;

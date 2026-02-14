@@ -9,6 +9,8 @@ import {
     FiRotateCcw,
     FiRotateCw,
     FiSettings,
+    FiGrid,
+    FiCheckCircle,
 } from 'react-icons/fi';
 import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
@@ -16,9 +18,10 @@ import Link from 'next/link';
 interface BuilderToolbarProps {
     onToggleATS: () => void;
     onToggleSettings: () => void;
+    onShowDashboard: () => void;
 }
 
-export default function BuilderToolbar({ onToggleATS, onToggleSettings }: BuilderToolbarProps) {
+export default function BuilderToolbar({ onToggleATS, onToggleSettings, onShowDashboard }: BuilderToolbarProps) {
     const resume = useResumeStore((s) => s.getActiveResume());
     const renameResume = useResumeStore((s) => s.renameResume);
     const exportResume = useResumeStore((s) => s.exportResume);
@@ -95,12 +98,20 @@ export default function BuilderToolbar({ onToggleATS, onToggleSettings }: Builde
                     <Link href="/" className="btn-icon" title="Back to Home">
                         <FiArrowLeft />
                     </Link>
+                    <button className="btn btn-ghost btn-sm" onClick={onShowDashboard} title="My Resumes">
+                        <FiGrid /> Dashboard
+                    </button>
                     <div className="toolbar-divider" />
-                    <input
-                        className="resume-title-input"
-                        value={resume.title}
-                        onChange={(e) => renameResume(resume.id, e.target.value)}
-                    />
+                    <div className="title-persistence-group">
+                        <input
+                            className="resume-title-input"
+                            value={resume.title}
+                            onChange={(e) => renameResume(resume.id, e.target.value)}
+                        />
+                        <div className="saved-status">
+                            <FiCheckCircle /> Saved
+                        </div>
+                    </div>
                 </div>
 
                 <div className="builder-toolbar-center">

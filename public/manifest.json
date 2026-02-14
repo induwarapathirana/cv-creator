@@ -1,0 +1,17 @@
+{
+    "name": "CV Creator",
+    "short_name": "CV Creator",
+    "description": "Build ATS-Friendly Resumes That Get You Hired",
+    "start_url": "/builder",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#6366f1",
+    "icons": [
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/942/942799.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
