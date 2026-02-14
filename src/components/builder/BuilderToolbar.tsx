@@ -125,9 +125,9 @@ export default function BuilderToolbar({ onToggleATS, onToggleSettings, onShowDa
                     <Link href="/" className="btn-icon" title="Back to Home">
                         <FiArrowLeft />
                     </Link>
-                    <button className="btn btn-ghost btn-sm" onClick={onShowDashboard} title="My Resumes">
+                    <Link href="/dashboard" className="btn btn-ghost btn-sm" title="My Resumes">
                         <FiGrid /> <span>Dashboard</span>
-                    </button>
+                    </Link>
                     <div className="toolbar-divider" />
                     <div className="title-persistence-group">
                         <input
