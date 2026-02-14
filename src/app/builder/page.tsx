@@ -8,11 +8,12 @@ import BuilderToolbar from '@/components/builder/BuilderToolbar';
 import ATSPanel from '@/components/builder/ATSPanel';
 import SettingsPanel from '@/components/builder/SettingsPanel';
 import TemplateRenderer from '@/components/templates/TemplateRenderer';
-import { FiPlus, FiZap, FiMoreVertical, FiCopy, FiTrash2, FiEdit3, FiEye, FiEdit } from 'react-icons/fi';
+import { FiPlus, FiZap, FiMoreVertical, FiCopy, FiTrash2, FiEdit3, FiEye, FiEdit, FiSun, FiMoon } from 'react-icons/fi';
 import { useTheme } from '@/hooks/use-theme';
-import { FiSun, FiMoon } from 'react-icons/fi';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function BuilderPage() {
+function BuilderContent() {
     const resumes = useResumeStore((s) => s.resumes);
     const activeResumeId = useResumeStore((s) => s.activeResumeId);
     const resume = useActiveResume();
@@ -21,6 +22,10 @@ export default function BuilderPage() {
     const setActiveResume = useResumeStore((s) => s.setActiveResume);
     const duplicateResume = useResumeStore((s) => s.duplicateResume);
     const deleteResume = useResumeStore((s) => s.deleteResume);
+    const loadFromCloud = useResumeStore((s) => s.loadFromCloud);
+
+    const searchParams = useSearchParams();
+    const cloudId = searchParams.get('id');
 
     const [showATS, setShowATS] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
@@ -34,6 +39,18 @@ export default function BuilderPage() {
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    // Handle Cloud Load
+    useEffect(() => {
+        if (mounted && cloudId) {
+            loadFromCloud(cloudId).then(id => {
+                if (id) {
+                    // Success, handled by store
+                    console.log('Loaded from cloud:', id);
+                }
+            });
+        }
+    }, [mounted, cloudId, loadFromCloud]);
 
     useEffect(() => {
         if (mounted && resumes.length === 0) {
@@ -252,5 +269,13 @@ export default function BuilderPage() {
                 <button className="btn-icon" style={{ width: 32, height: 32, fontSize: 14 }} onClick={() => setZoom(Math.min(1.5, zoom + 0.1))}>+</button>
             </div>
         </div>
+    );
+}
+
+export default function BuilderPage() {
+    return (
+        <Suspense fallback={<div className="h-screen flex items-center justify-center">Loading...</div>}>
+            <BuilderContent />
+        </Suspense>
     );
 }

@@ -18,6 +18,8 @@ import {
 import { createEmptyResume, sampleResume } from '@/utils/sample-data';
 import { sanitizeResume } from '@/utils/resume-sanitizer';
 import { v4 as uuidv4 } from 'uuid';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 interface ResumeState {
     resumes: Resume[];
@@ -98,6 +100,10 @@ interface ResumeState {
     exportResume: (id: string) => string;
     importResume: (json: string) => string | null;
     addResume: (resume: Resume) => string;
+
+    // Cloud Sync
+    syncToCloud: (id: string) => Promise<string | null>;
+    loadFromCloud: (id: string) => Promise<string | null>;
 }
 
 function updateActiveResume(
@@ -585,6 +591,58 @@ export const useResumeStore = create<ResumeState>()(
                         }));
                     return resume.id;
                 } catch {
+                    return null;
+                }
+            },
+
+            // Cloud Sync
+            syncToCloud: async (id: string) => {
+                const state = get();
+                const resume = state.resumes.find((r) => r.id === id);
+                if (!resume) return null;
+
+                try {
+                    const docRef = doc(db, 'resumes', id);
+                    await setDoc(docRef, {
+                        ...resume,
+                        updatedAt: new Date().toISOString()
+                    });
+                    return id;
+                } catch (error) {
+                    console.error('Error syncing to cloud:', error);
+                    return null;
+                }
+            },
+
+            loadFromCloud: async (id: string) => {
+                try {
+                    const docRef = doc(db, 'resumes', id);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        const cloudResume = docSnap.data() as Resume;
+                        const sanitized = sanitizeResume(cloudResume);
+
+                        // Check if we already have this resume (by ID)
+                        const state = get();
+                        const exists = state.resumes.find(r => r.id === id);
+
+                        if (exists) {
+                            set((s) => ({
+                                activeResumeId: id,
+                                resumes: s.resumes.map(r => r.id === id ? sanitized : r)
+                            }));
+                        } else {
+                            set((s) => ({
+                                resumes: [...s.resumes, sanitized],
+                                activeResumeId: id,
+                            }));
+                        }
+                        return id;
+                    }
+                    return null;
+                } catch (error) {
+                    console.error('Error loading from cloud:', error);
                     return null;
                 }
             },

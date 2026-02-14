@@ -11,6 +11,10 @@ import {
     FiSettings,
     FiGrid,
     FiCheckCircle,
+    FiCloud,
+    FiCopy,
+    FiLink,
+    FiX,
 } from 'react-icons/fi';
 import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
@@ -30,7 +34,10 @@ export default function BuilderToolbar({ onToggleATS, onToggleSettings, onShowDa
     const redo = useResumeStore((s) => s.redo);
     const undoStack = useResumeStore((s) => s.undoStack);
     const redoStack = useResumeStore((s) => s.redoStack);
+    const syncToCloud = useResumeStore((s) => s.syncToCloud);
     const [toast, setToast] = useState('');
+    const [syncLink, setSyncLink] = useState('');
+    const [isSyncing, setIsSyncing] = useState(false);
 
     const showToast = (msg: string) => {
         setToast(msg);
@@ -89,6 +96,26 @@ export default function BuilderToolbar({ onToggleATS, onToggleSettings, onShowDa
         showToast('PDF export started');
     };
 
+    const handleCloudSync = async () => {
+        if (!resume) return;
+        setIsSyncing(true);
+        const id = await syncToCloud(resume.id);
+        setIsSyncing(false);
+
+        if (id) {
+            const link = `https://openresume.top/builder?id=${id}`;
+            setSyncLink(link);
+            showToast('Resume synced to cloud!');
+        } else {
+            showToast('Error: Cloud sync failed. Check setup.');
+        }
+    };
+
+    const copySyncLink = () => {
+        navigator.clipboard.writeText(syncLink);
+        showToast('Link copied to clipboard!');
+    };
+
     if (!resume) return null;
 
     return (
@@ -142,6 +169,13 @@ export default function BuilderToolbar({ onToggleATS, onToggleSettings, onShowDa
                     <button className="btn btn-ghost btn-sm" onClick={onToggleATS} title="ATS Score">
                         <FiTarget /> ATS Score
                     </button>
+                    <button
+                        className={`btn btn-ghost btn-sm ${isSyncing ? 'animate-pulse' : ''}`}
+                        onClick={handleCloudSync}
+                        title="Sync to Cloud (Multi-device)"
+                    >
+                        <FiCloud /> Sync
+                    </button>
                     <div className="toolbar-divider" />
                     <button className="btn-icon" onClick={handleImportJSON} title="Import JSON">
                         <FiUpload />
@@ -155,11 +189,60 @@ export default function BuilderToolbar({ onToggleATS, onToggleSettings, onShowDa
                 </div>
             </div>
 
-            {toast && (
-                <div className="toast-container">
-                    <div className="toast toast-info">{toast}</div>
+            {syncLink && (
+                <div className="share-modal-overlay">
+                    <div className="share-modal">
+                        <div className="share-modal-header">
+                            <h3>Shareable Link</h3>
+                            <button className="btn-icon" onClick={() => setSyncLink('')}>
+                                <FiX />
+                            </button>
+                        </div>
+                        <p>Use this link to open your resume on another device (like your laptop):</p>
+                        <div className="share-link-group">
+                            <input readOnly value={syncLink} className="input" />
+                            <button className="btn btn-primary" onClick={copySyncLink}>
+                                <FiCopy /> Copy
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
+
+            <style jsx>{`
+                .share-modal-overlay {
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(0,0,0,0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                }
+                .share-modal {
+                    background: var(--bg-secondary);
+                    padding: 24px;
+                    border-radius: var(--radius-lg);
+                    width: 90%;
+                    max-width: 500px;
+                    box-shadow: var(--shadow-xl);
+                }
+                .share-modal-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 16px;
+                }
+                .share-link-group {
+                    display: flex;
+                    gap: 8px;
+                    margin-top: 16px;
+                }
+                .share-link-group input {
+                    flex: 1;
+                    font-size: 13px;
+                }
+            `}</style>
         </>
     );
 }
