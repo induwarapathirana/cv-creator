@@ -488,9 +488,22 @@ export const useResumeStore = create<ResumeState>()(
             },
 
             updateCustomSection: (id, data) => {
-                set((state) => updateActiveResume(state, (r) => ({
-                    customSections: r.customSections.map((s) => (s.id === id ? { ...s, ...data } : s)),
-                })));
+                set((state) => updateActiveResume(state, (r) => {
+                    const updatedCustomSections = r.customSections.map((s) => (s.id === id ? { ...s, ...data } : s));
+
+                    // Sync title with SectionConfig
+                    let updatedSections = r.sections;
+                    if (data.title) {
+                        updatedSections = r.sections.map((s) =>
+                            s.customSectionId === id ? { ...s, title: data.title as string } : s
+                        );
+                    }
+
+                    return {
+                        customSections: updatedCustomSections,
+                        sections: updatedSections,
+                    };
+                }));
             },
 
             removeCustomSection: (id) => {

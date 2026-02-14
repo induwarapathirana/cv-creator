@@ -126,7 +126,7 @@ export default function BuilderToolbar({ onToggleATS, onToggleSettings, onShowDa
                         <FiArrowLeft />
                     </Link>
                     <button className="btn btn-ghost btn-sm" onClick={onShowDashboard} title="My Resumes">
-                        <FiGrid /> Dashboard
+                        <FiGrid /> <span>Dashboard</span>
                     </button>
                     <div className="toolbar-divider" />
                     <div className="title-persistence-group">
@@ -167,14 +167,14 @@ export default function BuilderToolbar({ onToggleATS, onToggleSettings, onShowDa
                         <FiSettings />
                     </button>
                     <button className="btn btn-ghost btn-sm" onClick={onToggleATS} title="ATS Score">
-                        <FiTarget /> ATS Score
+                        <FiTarget /> <span>ATS Score</span>
                     </button>
                     <button
                         className={`btn btn-ghost btn-sm ${isSyncing ? 'animate-pulse' : ''}`}
                         onClick={handleCloudSync}
                         title="Sync to Cloud (Multi-device)"
                     >
-                        <FiCloud /> Sync
+                        <FiCloud /> <span>Sync</span>
                     </button>
                     <div className="toolbar-divider" />
                     <button className="btn-icon" onClick={handleImportJSON} title="Import JSON">

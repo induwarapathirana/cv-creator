@@ -158,8 +158,10 @@ function BuilderContent() {
                                     setShowManager(false);
                                 }}
                             >
-                                <div className="resume-card-preview" style={{ transform: 'scale(0.35)', transformOrigin: 'top left', width: '286%', height: '286%' }}>
-                                    <TemplateRenderer resume={r} scale={1} />
+                                <div className="resume-card-preview">
+                                    <div style={{ transform: 'scale(0.24)', transformOrigin: 'center' }}>
+                                        <TemplateRenderer resume={r} scale={1} />
+                                    </div>
                                 </div>
                                 <div className="resume-card-footer">
                                     <div>
