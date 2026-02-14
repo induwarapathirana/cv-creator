@@ -16,6 +16,7 @@ import {
     PersonalInfo,
 } from '@/types/resume';
 import { createEmptyResume, sampleResume } from '@/utils/sample-data';
+import { sanitizeResume } from '@/utils/resume-sanitizer';
 import { v4 as uuidv4 } from 'uuid';
 
 interface ResumeState {
@@ -96,6 +97,7 @@ interface ResumeState {
     // Import/Export
     exportResume: (id: string) => string;
     importResume: (json: string) => string | null;
+    addResume: (resume: Resume) => string;
 }
 
 function updateActiveResume(
@@ -559,6 +561,14 @@ export const useResumeStore = create<ResumeState>()(
                 const state = get();
                 const resume = state.resumes.find((r) => r.id === id);
                 return resume ? JSON.stringify(resume, null, 2) : '';
+            },
+
+            addResume: (resume: Resume) => {
+                set((state) => ({
+                    resumes: [...state.resumes, resume],
+                    activeResumeId: resume.id,
+                }));
+                return resume.id;
             },
 
             importResume: (json) => {

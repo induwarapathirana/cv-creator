@@ -1,6 +1,8 @@
 'use client';
 
 import { Resume } from '@/types/resume';
+import { defaultSettings } from '@/utils/sample-data';
+import HtmlRenderer from '@/components/ui/HtmlRenderer';
 
 interface TemplateProps {
     resume: Resume;
@@ -15,7 +17,8 @@ function formatDate(dateStr: string): string {
 }
 
 export default function TimelineTemplate({ resume, scale = 1 }: TemplateProps) {
-    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections, settings } = resume;
+    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections } = resume;
+    const settings = resume.settings || defaultSettings;
     const primaryColor = settings.colors.primary;
 
     const visibleSections = sections.filter(s => s.visible).sort((a, b) => a.order - b.order);
@@ -70,7 +73,7 @@ export default function TimelineTemplate({ resume, scale = 1 }: TemplateProps) {
                                             <span style={{ width: 4, height: 24, background: primaryColor }}></span>
                                             About Me
                                         </h2>
-                                        <p style={{ fontSize: '11pt', lineHeight: 1.6 }}>{personalInfo.summary}</p>
+                                        <HtmlRenderer html={personalInfo.summary} className="html-content" />
                                     </div>
                                 ) : null;
 
@@ -99,7 +102,7 @@ export default function TimelineTemplate({ resume, scale = 1 }: TemplateProps) {
                                                     <div style={{ fontSize: '13px', fontWeight: 600, color: '#555', marginBottom: 8 }}>
                                                         {exp.company}{exp.location ? `, ${exp.location}` : ''}
                                                     </div>
-                                                    <p style={{ fontSize: '10.5pt', marginBottom: 6 }}>{exp.description}</p>
+                                                    <HtmlRenderer html={exp.description} className="html-content" />
                                                     {exp.highlights.length > 0 && (
                                                         <ul style={{ paddingLeft: 18, margin: 0 }}>
                                                             {exp.highlights.filter(Boolean).map((h, i) => (
@@ -175,7 +178,7 @@ export default function TimelineTemplate({ resume, scale = 1 }: TemplateProps) {
                                                 <div key={item.id} style={{ background: '#f9f9f9', padding: 12, borderRadius: 6 }}>
                                                     <div style={{ fontWeight: 700, fontSize: '13px' }}>{item.name || item.title}</div>
                                                     {item.proficiency && <div style={{ fontSize: '12px', color: primaryColor }}>{item.proficiency}</div>}
-                                                    {item.description && <div style={{ fontSize: '12px', marginTop: 4 }}>{item.description}</div>}
+                                                    {item.description && <div style={{ fontSize: '12px', marginTop: 4 }}><HtmlRenderer html={item.description} /></div>}
                                                 </div>
                                             ))}
                                         </div>

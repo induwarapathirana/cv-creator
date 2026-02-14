@@ -108,7 +108,8 @@ export default function EditorSidebar() {
 
     if (!resume) return null;
 
-    const sortedSections = [...resume.sections]
+    const sections = Array.isArray(resume.sections) ? resume.sections : [];
+    const sortedSections = [...sections]
         .filter((s) => s.type !== 'summary')
         .sort((a, b) => a.order - b.order);
 
@@ -169,6 +170,48 @@ export default function EditorSidebar() {
                                     )}
                                 </div>
                                 <div className="section-header-actions">
+                                    <div className="section-column-toggle" style={{ display: 'flex', gap: 2, marginRight: 8, background: 'var(--bg-tertiary)', padding: 2, borderRadius: 4 }}>
+                                        <button
+                                            title="Move to Left Column"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                updateSectionConfig(section.id, { column: 'left' });
+                                            }}
+                                            style={{
+                                                padding: '2px 4px',
+                                                fontSize: 10,
+                                                fontWeight: 700,
+                                                borderRadius: 3,
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                background: section.column === 'left' ? 'var(--primary)' : 'transparent',
+                                                color: section.column === 'left' ? '#fff' : 'var(--text-tertiary)',
+                                                transition: 'all 0.2s'
+                                            }}
+                                        >
+                                            L
+                                        </button>
+                                        <button
+                                            title="Move to Right Column"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                updateSectionConfig(section.id, { column: 'right' });
+                                            }}
+                                            style={{
+                                                padding: '2px 4px',
+                                                fontSize: 10,
+                                                fontWeight: 700,
+                                                borderRadius: 3,
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                background: (section.column === 'right' || !section.column) ? 'var(--primary)' : 'transparent',
+                                                color: (section.column === 'right' || !section.column) ? '#fff' : 'var(--text-tertiary)',
+                                                transition: 'all 0.2s'
+                                            }}
+                                        >
+                                            R
+                                        </button>
+                                    </div>
                                     <button
                                         className="section-toggle"
                                         onClick={(e) => {

@@ -3,6 +3,7 @@
 import { useResumeStore } from '@/stores/resume-store';
 import { WorkExperience } from '@/types/resume';
 import { FiPlus, FiTrash2, FiX } from 'react-icons/fi';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 
 export default function ExperienceForm() {
     const resume = useResumeStore((s) => s.getActiveResume());
@@ -119,13 +120,11 @@ export default function ExperienceForm() {
                     </label>
 
                     <div className="input-group" style={{ marginTop: 8 }}>
-                        <label>Description</label>
-                        <textarea
-                            className="textarea"
-                            rows={2}
+                        <RichTextEditor
+                            label="Description"
                             value={exp.description}
-                            onChange={(e) => handleUpdate(exp.id, { description: e.target.value })}
-                            placeholder="Brief role description..."
+                            onChange={(val) => handleUpdate(exp.id, { description: val })}
+                            placeholder="Brief role description (supports rich text)..."
                         />
                     </div>
 

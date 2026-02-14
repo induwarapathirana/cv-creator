@@ -1,6 +1,8 @@
 'use client';
 
 import { Resume } from '@/types/resume';
+import { defaultSettings } from '@/utils/sample-data';
+import HtmlRenderer from '@/components/ui/HtmlRenderer';
 
 interface TemplateProps {
     resume: Resume;
@@ -14,7 +16,8 @@ function formatDate(dateStr: string): string {
 }
 
 export default function GridTemplate({ resume, scale = 1 }: TemplateProps) {
-    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections, settings } = resume;
+    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections } = resume;
+    const settings = resume.settings || defaultSettings;
     const primaryColor = settings.colors.primary;
 
     const visibleSections = sections.filter(s => s.visible).sort((a, b) => a.order - b.order);
@@ -56,7 +59,7 @@ export default function GridTemplate({ resume, scale = 1 }: TemplateProps) {
                     {personalInfo.summary && (
                         <div style={{ gridColumn: 'span 2', background: '#fff', padding: 20, borderRadius: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                             <h2 style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', color: '#888', marginBottom: 12 }}>About</h2>
-                            <p style={{ fontSize: '11pt', lineHeight: 1.5, color: '#333' }}>{personalInfo.summary}</p>
+                            <HtmlRenderer html={personalInfo.summary} className="html-content" />
                         </div>
                     )}
 
@@ -76,7 +79,7 @@ export default function GridTemplate({ resume, scale = 1 }: TemplateProps) {
                                                     <h3 style={{ fontSize: '14px', fontWeight: 700 }}>{exp.position}</h3>
                                                     <div style={{ fontSize: '12px', color: primaryColor, fontWeight: 600 }}>{exp.company}</div>
                                                     <div style={{ fontSize: '11px', color: '#999', marginBottom: 8 }}>{formatDate(exp.startDate)} — {exp.current ? 'Now' : formatDate(exp.endDate)}</div>
-                                                    <p style={{ fontSize: '11px', lineHeight: 1.5 }}>{exp.description}</p>
+                                                    <HtmlRenderer html={exp.description} className="html-content" />
                                                 </div>
                                             ))}
                                         </div>

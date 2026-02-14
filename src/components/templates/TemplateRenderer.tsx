@@ -1,6 +1,8 @@
 'use client';
 
 import { Resume } from '@/types/resume';
+import { defaultSettings } from '@/utils/sample-data';
+import { sanitizeResume } from '@/utils/resume-sanitizer';
 import ModernTemplate from './ModernTemplate';
 import ClassicTemplate from './ClassicTemplate';
 import MinimalTemplate from './MinimalTemplate';
@@ -15,8 +17,10 @@ interface TemplateRendererProps {
     scale?: number;
 }
 
-export default function TemplateRenderer({ resume, scale = 1 }: TemplateRendererProps) {
-    switch (resume.settings.template) {
+export default function TemplateRenderer({ resume: rawResume, scale = 1 }: TemplateRendererProps) {
+    const resume = sanitizeResume(rawResume);
+    const settings = resume.settings || defaultSettings;
+    switch (settings.template) {
         case 'classic':
             return <ClassicTemplate resume={resume} scale={scale} />;
         case 'minimal':

@@ -1,6 +1,8 @@
 'use client';
 
 import { Resume } from '@/types/resume';
+import { defaultSettings } from '@/utils/sample-data';
+import HtmlRenderer from '@/components/ui/HtmlRenderer';
 
 interface TemplateProps {
     resume: Resume;
@@ -15,7 +17,17 @@ function formatDate(dateStr: string): string {
 }
 
 export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
-    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections, settings } = resume;
+    const { personalInfo } = resume;
+    const experience = Array.isArray(resume.experience) ? resume.experience : [];
+    const education = Array.isArray(resume.education) ? resume.education : [];
+    const skills = Array.isArray(resume.skills) ? resume.skills : [];
+    const projects = Array.isArray(resume.projects) ? resume.projects : [];
+    const certifications = Array.isArray(resume.certifications) ? resume.certifications : [];
+    const languages = Array.isArray(resume.languages) ? resume.languages : [];
+    const awards = Array.isArray(resume.awards) ? resume.awards : [];
+    const sections = Array.isArray(resume.sections) ? resume.sections : [];
+
+    const settings = resume.settings || defaultSettings;
     const visibleSections = sections.filter(s => s.visible).sort((a, b) => a.order - b.order);
     const primaryColor = settings.colors.primary;
 
@@ -65,7 +77,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                             return personalInfo.summary ? (
                                 <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
                                     <h2 style={{ color: primaryColor, borderBottom: `2px solid ${primaryColor}` }}>{section.title}</h2>
-                                    <p style={{ fontSize: '10.5pt', lineHeight: 1.6, color: '#333' }}>{personalInfo.summary}</p>
+                                    <HtmlRenderer html={personalInfo.summary} className="html-content" />
                                 </div>
                             ) : null;
 
@@ -84,7 +96,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                                             <div className="entry-subtitle">
                                                 {exp.company}{exp.location ? `, ${exp.location}` : ''}
                                             </div>
-                                            {exp.description && <p style={{ fontSize: '10pt', marginTop: 4, color: '#444' }}>{exp.description}</p>}
+                                            {exp.description && <HtmlRenderer html={exp.description} className="html-content" />}
                                             {exp.highlights.length > 0 && (
                                                 <ul>
                                                     {exp.highlights.filter(Boolean).map((h, i) => (
@@ -113,7 +125,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                                                 {edu.institution}{edu.location ? `, ${edu.location}` : ''}
                                                 {edu.gpa ? ` • GPA: ${edu.gpa}` : ''}
                                             </div>
-                                            {edu.description && <p style={{ fontSize: '10pt', marginTop: 4, color: '#444' }}>{edu.description}</p>}
+                                            {edu.description && <HtmlRenderer html={edu.description} className="html-content" />}
                                         </div>
                                     ))}
                                 </div>
@@ -153,7 +165,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                                                     {proj.technologies.join(' • ')}
                                                 </div>
                                             )}
-                                            <p style={{ fontSize: '10pt', color: '#444' }}>{proj.description}</p>
+                                            <HtmlRenderer html={proj.description} className="html-content" />
                                         </div>
                                     ))}
                                 </div>
@@ -200,7 +212,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                                                 <span className="entry-date">{formatDate(award.date)}</span>
                                             </div>
                                             <div className="entry-subtitle">{award.issuer}</div>
-                                            {award.description && <p style={{ fontSize: '10pt', color: '#444' }}>{award.description}</p>}
+                                            {award.description && <HtmlRenderer html={award.description} className="html-content" />}
                                         </div>
                                     ))}
                                 </div>
@@ -219,7 +231,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                                                 {item.date && <span className="entry-date">{item.date}</span>}
                                             </div>
                                             {item.subtitle && <div className="entry-subtitle">{item.subtitle}</div>}
-                                            {item.description && <p style={{ fontSize: '10pt', color: '#444' }}>{item.description}</p>}
+                                            {item.description && <HtmlRenderer html={item.description} className="html-content" />}
                                         </div>
                                     ))}
                                 </div>

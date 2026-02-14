@@ -1,6 +1,7 @@
 'use client';
 
 import { useResumeStore } from '@/stores/resume-store';
+import { useActiveResume } from '@/hooks/use-active-resume';
 
 const templates = [
     { id: 'modern', label: 'Modern' },
@@ -39,7 +40,7 @@ interface SettingsPanelProps {
 }
 
 export default function SettingsPanel({ onClose }: SettingsPanelProps) {
-    const resume = useResumeStore((s) => s.getActiveResume());
+    const resume = useActiveResume();
     const updateSettings = useResumeStore((s) => s.updateSettings);
     const pushUndoState = useResumeStore((s) => s.pushUndoState);
 
@@ -194,6 +195,60 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                     onChange={(e) => updateSettings({ pageMargin: parseInt(e.target.value) })}
                     style={{ width: '100%' }}
                 />
+            </div>
+
+            {/* Data Management */}
+            <div className="settings-section" style={{ borderTop: '1px solid var(--border-color)', paddingTop: 16 }}>
+                <div className="settings-label" style={{ marginBottom: 12 }}>Data Management</div>
+                <button
+                    className="btn-secondary"
+                    onClick={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = '.json';
+                        input.onchange = (e) => {
+                            const file = (e.target as HTMLInputElement).files?.[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = async (event) => {
+                                    const content = event.target?.result as string;
+                                    if (content) {
+                                        try {
+                                            const json = JSON.parse(content);
+                                            let id;
+                                            // Check if Reactive Resume format (has basics)
+                                            if (json.basics) {
+                                                const { importReactiveResumeJson } = await import('@/utils/import-reactive-resume');
+                                                const converted = importReactiveResumeJson(json);
+                                                if (converted) {
+                                                    id = useResumeStore.getState().addResume(converted);
+                                                }
+                                            } else {
+                                                id = useResumeStore.getState().importResume(content);
+                                            }
+
+                                            if (id) {
+                                                alert('Resume imported successfully!');
+                                                // Small delay to ensure state update propagates safely
+                                                setTimeout(() => onClose(), 100);
+                                            } else {
+                                                alert('Invalid resume file');
+                                            }
+                                        } catch (err: any) {
+                                            console.error('Import Error:', err);
+                                            alert(`Error importing resume: ${err.message || 'Unknown error'}`);
+                                        }
+                                    }
+                                };
+                                reader.readAsText(file);
+                            }
+                        };
+                        input.click();
+                    }}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                >
+                    <span>📥</span> Import JSON (CV Creator / Reactive Resume)
+                </button>
             </div>
         </div>
     );

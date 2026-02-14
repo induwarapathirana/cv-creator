@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useResumeStore } from '@/stores/resume-store';
+import { useActiveResume } from '@/hooks/use-active-resume';
 import EditorSidebar from '@/components/builder/EditorSidebar';
 import BuilderToolbar from '@/components/builder/BuilderToolbar';
 import ATSPanel from '@/components/builder/ATSPanel';
@@ -14,7 +15,7 @@ import { FiSun, FiMoon } from 'react-icons/fi';
 export default function BuilderPage() {
     const resumes = useResumeStore((s) => s.resumes);
     const activeResumeId = useResumeStore((s) => s.activeResumeId);
-    const resume = useResumeStore((s) => s.getActiveResume());
+    const resume = useActiveResume();
     const createResume = useResumeStore((s) => s.createResume);
     const loadSampleResume = useResumeStore((s) => s.loadSampleResume);
     const setActiveResume = useResumeStore((s) => s.setActiveResume);

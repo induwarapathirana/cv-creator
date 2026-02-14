@@ -1,6 +1,8 @@
 'use client';
 
 import { Resume } from '@/types/resume';
+import { defaultSettings } from '@/utils/sample-data';
+import HtmlRenderer from '@/components/ui/HtmlRenderer';
 
 interface TemplateProps {
     resume: Resume;
@@ -15,10 +17,11 @@ function formatDate(dateStr: string): string {
 }
 
 export default function CreativeTemplate({ resume, scale = 1 }: TemplateProps) {
-    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections, settings } = resume;
+    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections } = resume;
+    const settings = resume.settings || defaultSettings;
     const primaryColor = settings.colors.primary;
 
-    const visibleSections = sections.filter(s => s.visible).sort((a, b) => a.order - b.order);
+    const visibleSections = (Array.isArray(sections) ? sections : []).filter(s => s.visible).sort((a, b) => a.order - b.order);
 
     return (
         <div
@@ -84,18 +87,19 @@ export default function CreativeTemplate({ resume, scale = 1 }: TemplateProps) {
                     </div>
                 </div>
 
-                {/* Two Column Layout for everything else */}
+                {/* Two Column Layout */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: 40 }}>
 
                     {/* Left Column (Main) */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: settings.sectionSpacing * 1.2 }}>
-                        {visibleSections.filter(s => ['summary', 'experience', 'projects', 'custom'].includes(s.type)).map(section => {
+                        {visibleSections.filter(s => (s.column === 'left' || (!s.column && ['summary', 'experience', 'projects', 'custom'].includes(s.type)))).map(section => {
+                            // Default logic: detailed sections go here unless specified otherwise
                             switch (section.type) {
                                 case 'summary':
                                     return personalInfo.summary ? (
                                         <div key={section.id}>
                                             <h2 style={{ fontSize: '14px', fontWeight: 800, textTransform: 'uppercase', marginBottom: 12, color: '#111' }}>About Me</h2>
-                                            <p style={{ fontSize: '11pt', lineHeight: 1.7, color: '#444' }}>{personalInfo.summary}</p>
+                                            <HtmlRenderer html={personalInfo.summary} className="html-content" />
                                         </div>
                                     ) : null;
                                 case 'experience':
@@ -114,24 +118,56 @@ export default function CreativeTemplate({ resume, scale = 1 }: TemplateProps) {
                                                         <div style={{ fontSize: '11px', color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
                                                             {formatDate(exp.startDate)} — {exp.current ? 'Present' : formatDate(exp.endDate)}
                                                         </div>
-                                                        <p style={{ fontSize: '10.5pt', color: '#555' }}>{exp.description}</p>
+                                                        <HtmlRenderer html={exp.description} className="html-content" />
                                                     </div>
                                                 ))}
                                             </div>
                                         </div>
                                     ) : null;
-                                case 'projects': // reuse styling logic
-                                case 'custom':
-                                    // ... implementation for other main column items
+
+                                case 'personalInfo':
                                     return null;
-                                default: return null;
+
+                                default:
+                                    // Handle any moved section in main column
+                                    const items: any[] = (resume as any)[section.type] || (section.type === 'custom' ? resume.customSections.find(cs => cs.id === section.customSectionId)?.items : []);
+                                    if (!items || items.length === 0) return null;
+                                    const sectionTitle = section.title || (section.type === 'custom' ? resume.customSections.find(cs => cs.id === section.customSectionId)?.title : '');
+
+                                    // Check if it's a list-like section (skills, languages) forced into main column
+                                    const isList = ['skills', 'languages', 'certifications', 'awards'].includes(section.type);
+
+                                    return (
+                                        <div key={section.id}>
+                                            <h2 style={{ fontSize: '14px', fontWeight: 800, textTransform: 'uppercase', marginBottom: 16, color: '#111', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                <span style={{ width: 8, height: 8, background: primaryColor, borderRadius: 2 }}></span>
+                                                {sectionTitle}
+                                            </h2>
+                                            {isList ? (
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                                    {items.map((item: any) => (
+                                                        <span key={item.id} style={{ fontSize: '11px', fontWeight: 600, background: primaryColor, color: 'white', padding: '4px 10px', borderRadius: 20 }}>
+                                                            {item.name || item.title}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                items.map(item => (
+                                                    <div key={item.id} style={{ marginBottom: 12 }}>
+                                                        <div style={{ fontWeight: 700 }}>{item.title || item.name}</div>
+                                                        <div><HtmlRenderer html={item.description} /></div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    );
                             }
                         })}
                     </div>
 
                     {/* Right Column (Sidebar) */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: settings.sectionSpacing * 1.2 }}>
-                        {visibleSections.filter(s => ['education', 'skills', 'languages', 'certifications', 'awards'].includes(s.type)).map(section => {
+                        {visibleSections.filter(s => (s.column === 'right' || (!s.column && ['education', 'skills', 'languages', 'certifications', 'awards'].includes(s.type)))).map(section => {
                             switch (section.type) {
                                 case 'education':
                                     return education.length > 0 ? (
@@ -161,14 +197,17 @@ export default function CreativeTemplate({ resume, scale = 1 }: TemplateProps) {
                                         </div>
                                     ) : null;
 
-                                case 'languages':
-                                case 'awards':
-                                case 'certifications':
-                                    const items: any[] = (resume as any)[section.type] || [];
+                                case 'personalInfo':
+                                    return null;
+
+                                default:
+                                    const items: any[] = (resume as any)[section.type] || (section.type === 'custom' ? resume.customSections.find(cs => cs.id === section.customSectionId)?.items : []);
                                     if (!items || items.length === 0) return null;
+                                    const sectionTitle = section.title || (section.type === 'custom' ? resume.customSections.find(cs => cs.id === section.customSectionId)?.title : '');
+
                                     return (
                                         <div key={section.id}>
-                                            <h2 style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', marginBottom: 12, color: primaryColor }}>{section.title}</h2>
+                                            <h2 style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', marginBottom: 12, color: primaryColor }}>{sectionTitle}</h2>
                                             {items.map((item: any) => (
                                                 <div key={item.id} style={{ marginBottom: 8, fontSize: '13px' }}>
                                                     <strong>{item.name || item.title}</strong>
@@ -177,12 +216,9 @@ export default function CreativeTemplate({ resume, scale = 1 }: TemplateProps) {
                                             ))}
                                         </div>
                                     );
-
-                                default: return null;
                             }
                         })}
                     </div>
-
                 </div>
             </div>
         </div>

@@ -1,6 +1,8 @@
 'use client';
 
 import { Resume } from '@/types/resume';
+import { defaultSettings } from '@/utils/sample-data';
+import HtmlRenderer from '@/components/ui/HtmlRenderer';
 
 interface TemplateProps {
     resume: Resume;
@@ -15,17 +17,11 @@ function formatDate(dateStr: string): string {
 }
 
 export default function ExecutiveTemplate({ resume, scale = 1 }: TemplateProps) {
-    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections, settings } = resume;
+    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections } = resume;
+    const settings = resume.settings || defaultSettings;
     const primaryColor = settings.colors.primary;
 
-    // Split sections into main and sidebar
-    const mainSections = sections.filter(s =>
-        s.visible && ['summary', 'experience', 'projects', 'custom'].includes(s.type)
-    ).sort((a, b) => a.order - b.order);
-
-    const sidebarSections = sections.filter(s =>
-        s.visible && ['education', 'skills', 'languages', 'certifications', 'awards'].includes(s.type)
-    ).sort((a, b) => a.order - b.order);
+    const visibleSections = (Array.isArray(sections) ? sections : []).filter(s => s.visible).sort((a, b) => a.order - b.order);
 
     return (
         <div
@@ -40,7 +36,7 @@ export default function ExecutiveTemplate({ resume, scale = 1 }: TemplateProps) 
                 flexDirection: 'row',
             }}
         >
-            {/* Sidebar Column */}
+            {/* Sidebar Column (Left) */}
             <div style={{
                 width: '32%',
                 background: '#f4f4f5',
@@ -72,7 +68,7 @@ export default function ExecutiveTemplate({ resume, scale = 1 }: TemplateProps) 
                     </div>
                 </div>
 
-                {sidebarSections.map(section => {
+                {visibleSections.filter(s => s.column === 'left').map(section => {
                     switch (section.type) {
                         case 'education':
                             return education.length > 0 ? (
@@ -104,11 +100,12 @@ export default function ExecutiveTemplate({ resume, scale = 1 }: TemplateProps) 
                                 </div>
                             ) : null;
 
-                        case 'certifications':
-                        case 'awards':
-                        case 'languages':
-                            // Generic list
-                            const items: any[] = (resume as any)[section.type] || [];
+                        case 'personalInfo':
+                            return null;
+
+                        // Flexible handling for other sections in sidebar
+                        default:
+                            const items: any[] = (resume as any)[section.type] || (section.type === 'custom' ? resume.customSections.find(cs => cs.id === section.customSectionId)?.items : []);
                             if (!items || items.length === 0) return null;
                             return (
                                 <div key={section.id}>
@@ -122,12 +119,11 @@ export default function ExecutiveTemplate({ resume, scale = 1 }: TemplateProps) 
                                     </ul>
                                 </div>
                             );
-                        default: return null;
                     }
                 })}
             </div>
 
-            {/* Main Content Column */}
+            {/* Main Content Column (Right) */}
             <div style={{
                 flex: 1,
                 padding: `${settings.pageMargin}px 40px`,
@@ -143,7 +139,7 @@ export default function ExecutiveTemplate({ resume, scale = 1 }: TemplateProps) 
                     </div>
                 </div>
 
-                {mainSections.map(section => {
+                {visibleSections.filter(s => (s.column === 'right' || !s.column)).map(section => {
                     if (section.type === 'personalInfo') return null;
                     switch (section.type) {
                         case 'summary':
@@ -153,7 +149,7 @@ export default function ExecutiveTemplate({ resume, scale = 1 }: TemplateProps) 
                                         <span style={{ width: 40, height: 2, background: '#1a1a2e' }}></span>
                                         {section.title}
                                     </h2>
-                                    <p style={{ fontSize: '11pt', lineHeight: 1.6, color: '#333' }}>{personalInfo.summary}</p>
+                                    <HtmlRenderer html={personalInfo.summary} className="html-content" />
                                 </div>
                             ) : null;
 
@@ -172,7 +168,7 @@ export default function ExecutiveTemplate({ resume, scale = 1 }: TemplateProps) 
                                                     <span style={{ fontWeight: 600, fontSize: '11pt', color: '#444' }}>{formatDate(exp.startDate)} — {exp.current ? 'Present' : formatDate(exp.endDate)}</span>
                                                 </div>
                                                 <div style={{ fontSize: '12pt', color: primaryColor, fontWeight: 500, marginBottom: 8 }}>{exp.company}, {exp.location}</div>
-                                                <p style={{ fontSize: '11pt', marginBottom: 6 }}>{exp.description}</p>
+                                                <HtmlRenderer html={exp.description} className="html-content" />
                                                 <ul style={{ paddingLeft: 18, margin: 0 }}>
                                                     {exp.highlights.filter(Boolean).map((h, i) => (
                                                         <li key={i} style={{ marginBottom: 4, fontSize: '10.5pt' }}>{h}</li>
@@ -195,7 +191,7 @@ export default function ExecutiveTemplate({ resume, scale = 1 }: TemplateProps) 
                                         {projects.map(proj => (
                                             <div key={proj.id}>
                                                 <h3 style={{ fontSize: '14px', fontWeight: 700 }}>{proj.name}</h3>
-                                                <p style={{ fontSize: '11pt', marginTop: 4 }}>{proj.description}</p>
+                                                <HtmlRenderer html={proj.description} className="html-content" />
                                                 {proj.technologies.length > 0 && <div style={{ fontSize: '10pt', color: '#666', marginTop: 4, fontStyle: 'italic' }}>{proj.technologies.join(', ')}</div>}
                                             </div>
                                         ))}
@@ -203,26 +199,39 @@ export default function ExecutiveTemplate({ resume, scale = 1 }: TemplateProps) 
                                 </div>
                             ) : null;
 
-                        // Custom sections
-                        case 'custom':
-                            const sectionData = resume.customSections.find(cs => cs.id === section.customSectionId);
-                            if (!sectionData || sectionData.items.length === 0) return null;
+                        // Handle custom sections and others in main column
+                        default:
+                            const items: any[] = (resume as any)[section.type] || (section.type === 'custom' ? resume.customSections.find(cs => cs.id === section.customSectionId)?.items : []);
+                            if (!items || items.length === 0) return null;
+                            const sectionTitle = section.title || (section.type === 'custom' ? resume.customSections.find(cs => cs.id === section.customSectionId)?.title : '');
+
+                            // Check if it's a list-like section (skills, languages) forced into main column
+                            const isList = ['skills', 'languages', 'certifications', 'awards'].includes(section.type);
+
                             return (
                                 <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
                                     <h2 style={{ fontSize: '16px', fontWeight: 700, textTransform: 'uppercase', color: '#1a1a2e', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
                                         <span style={{ width: 40, height: 2, background: '#1a1a2e' }}></span>
-                                        {sectionData.title}
+                                        {sectionTitle}
                                     </h2>
-                                    {sectionData.items.map(item => (
-                                        <div key={item.id} style={{ marginBottom: 12 }}>
-                                            <div style={{ fontWeight: 700 }}>{item.title}</div>
-                                            <div>{item.description}</div>
+                                    {isList ? (
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                                            {items.map((item: any) => (
+                                                <div key={item.id} style={{ background: '#f5f5f5', padding: '6px 12px', borderRadius: 4, fontSize: '13px', fontWeight: 500 }}>
+                                                    {item.name || item.title}
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
+                                    ) : (
+                                        items.map(item => (
+                                            <div key={item.id} style={{ marginBottom: 12 }}>
+                                                <div style={{ fontWeight: 700 }}>{item.title || item.name}</div>
+                                                <div><HtmlRenderer html={item.description} /></div>
+                                            </div>
+                                        ))
+                                    )}
                                 </div>
                             );
-
-                        default: return null;
                     }
                 })}
             </div>

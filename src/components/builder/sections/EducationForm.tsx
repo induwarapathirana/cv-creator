@@ -3,6 +3,7 @@
 import { useResumeStore } from '@/stores/resume-store';
 import { Education } from '@/types/resume';
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 
 export default function EducationForm() {
     const resume = useResumeStore((s) => s.getActiveResume());
@@ -110,12 +111,10 @@ export default function EducationForm() {
                     </div>
 
                     <div className="input-group" style={{ marginTop: 8 }}>
-                        <label>Activities / Description</label>
-                        <textarea
-                            className="textarea"
-                            rows={2}
+                        <RichTextEditor
+                            label="Activities / Description"
                             value={edu.description}
-                            onChange={(e) => handleUpdate(edu.id, { description: e.target.value })}
+                            onChange={(val) => handleUpdate(edu.id, { description: val })}
                             placeholder="Dean's List, Club President..."
                         />
                     </div>

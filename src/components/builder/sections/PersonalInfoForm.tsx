@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useResumeStore } from '@/stores/resume-store';
 import ImageEditorModal from '@/components/ui/ImageEditorModal';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 
 export default function PersonalInfoForm() {
     const updatePersonalInfo = useResumeStore((s) => s.updatePersonalInfo);
@@ -189,13 +190,11 @@ export default function PersonalInfoForm() {
             </div>
 
             <div className="input-group">
-                <label>Professional Summary</label>
-                <textarea
-                    className="textarea"
-                    rows={4}
+                <RichTextEditor
+                    label="Professional Summary"
                     value={personalInfo.summary}
-                    onChange={(e) => handleChange('summary', e.target.value)}
-                    placeholder="Write a brief 2-4 sentence summary of your professional background, key skills, and career goals..."
+                    onChange={(val) => handleChange('summary', val)}
+                    placeholder="Write a brief 2-4 sentence summary..."
                 />
             </div>
         </div>

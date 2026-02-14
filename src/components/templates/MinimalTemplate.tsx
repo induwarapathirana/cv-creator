@@ -1,6 +1,8 @@
 'use client';
 
 import { Resume } from '@/types/resume';
+import { defaultSettings } from '@/utils/sample-data';
+import HtmlRenderer from '@/components/ui/HtmlRenderer';
 
 interface TemplateProps {
     resume: Resume;
@@ -15,8 +17,9 @@ function formatDate(dateStr: string): string {
 }
 
 export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
-    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections, settings } = resume;
-    const visibleSections = sections.filter(s => s.visible).sort((a, b) => a.order - b.order);
+    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections } = resume;
+    const settings = resume.settings || defaultSettings;
+    const visibleSections = (Array.isArray(sections) ? sections : []).filter(s => s.visible).sort((a, b) => a.order - b.order);
     const primaryColor = settings.colors.primary;
 
     return (
@@ -54,7 +57,7 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
                         case 'summary':
                             return personalInfo.summary ? (
                                 <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                                    <p style={{ fontSize: '10.5pt', lineHeight: 1.6, color: '#333' }}>{personalInfo.summary}</p>
+                                    <HtmlRenderer html={personalInfo.summary} className="html-content" />
                                 </div>
                             ) : null;
 
@@ -76,7 +79,7 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
                                                 <div style={{ fontSize: '13px', fontWeight: 500, color: '#444', marginBottom: 6 }}>
                                                     {exp.company}{exp.location ? `, ${exp.location}` : ''}
                                                 </div>
-                                                {exp.description && <p style={{ fontSize: '10pt', color: '#444', marginBottom: 4 }}>{exp.description}</p>}
+                                                {exp.description && <HtmlRenderer html={exp.description} className="html-content" />}
                                                 {exp.highlights.length > 0 && (
                                                     <ul style={{ paddingLeft: 16, margin: 0 }}>
                                                         {exp.highlights.filter(Boolean).map((h, i) => (
@@ -117,7 +120,7 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
                                                 <div style={{ fontSize: '13px', color: '#444' }}>
                                                     {item.degree ? `${item.degree} in ${item.field}` : (item.issuer || item.subtitle)}
                                                 </div>
-                                                {item.description && <p style={{ fontSize: '10pt', color: '#444', marginTop: 4 }}>{item.description}</p>}
+                                                {item.description && <HtmlRenderer html={item.description} className="html-content" />}
                                                 {item.technologies && item.technologies.length > 0 && (
                                                     <div style={{ fontSize: '9pt', color: '#666', marginTop: 4 }}>{item.technologies.join(' • ')}</div>
                                                 )}

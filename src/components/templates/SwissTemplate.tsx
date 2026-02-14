@@ -1,6 +1,8 @@
 'use client';
 
 import { Resume } from '@/types/resume';
+import { defaultSettings } from '@/utils/sample-data';
+import HtmlRenderer from '@/components/ui/HtmlRenderer';
 
 interface TemplateProps {
     resume: Resume;
@@ -14,7 +16,8 @@ function formatDate(dateStr: string): string {
 }
 
 export default function SwissTemplate({ resume, scale = 1 }: TemplateProps) {
-    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections, settings } = resume;
+    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections } = resume;
+    const settings = resume.settings || defaultSettings;
     const primaryColor = settings.colors.primary;
     const visibleSections = sections.filter(s => s.visible).sort((a, b) => a.order - b.order);
 
@@ -47,7 +50,7 @@ export default function SwissTemplate({ resume, scale = 1 }: TemplateProps) {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 40, borderTop: '4px solid #000', paddingTop: 32 }}>
 
-                    {/* Sidebar Info */}
+                    {/* Left Column (Sidebar) */}
                     <div style={{ fontSize: '14px', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: 32 }}>
                         <div>
                             <div style={{ textTransform: 'uppercase', fontSize: '12px', color: '#999', marginBottom: 8 }}>Contact</div>
@@ -59,7 +62,7 @@ export default function SwissTemplate({ resume, scale = 1 }: TemplateProps) {
                             </div>
                         </div>
 
-                        {visibleSections.filter(s => ['skills', 'languages', 'certifications', 'awards'].includes(s.type)).map(section => {
+                        {visibleSections.filter(s => s.column === 'left').map(section => {
                             switch (section.type) {
                                 case 'skills':
                                     return skills.length > 0 ? (
@@ -70,7 +73,6 @@ export default function SwissTemplate({ resume, scale = 1 }: TemplateProps) {
                                             </div>
                                         </div>
                                     ) : null;
-                                // ... other lists
                                 case 'languages':
                                     return languages.length > 0 ? (
                                         <div key={section.id}>
@@ -78,19 +80,35 @@ export default function SwissTemplate({ resume, scale = 1 }: TemplateProps) {
                                             {languages.map(l => <div key={l.id}>{l.name} <span style={{ color: '#999', fontWeight: 400 }}>— {l.proficiency}</span></div>)}
                                         </div>
                                     ) : null;
-                                default: return null;
+                                case 'personalInfo':
+                                    return null;
+                                // Handle other types in sidebar if moved there
+                                default:
+                                    // Generic list fallback for sidebar
+                                    const items: any[] = (resume as any)[section.type] || (section.type === 'custom' ? resume.customSections.find(cs => cs.id === section.customSectionId)?.items : []);
+                                    if (!items || items.length === 0) return null;
+                                    return (
+                                        <div key={section.id}>
+                                            <div style={{ textTransform: 'uppercase', fontSize: '12px', color: '#999', marginBottom: 8 }}>{section.title}</div>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                                {items.map((item: any) => (
+                                                    <div key={item.id}>{item.name || item.title}</div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
                             }
                         })}
                     </div>
 
-                    {/* Main Content */}
+                    {/* Right Column (Main) */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
-                        {visibleSections.filter(s => ['summary', 'experience', 'education', 'projects', 'custom'].includes(s.type)).map(section => {
+                        {visibleSections.filter(s => (s.column === 'right' || !s.column)).map(section => {
                             switch (section.type) {
                                 case 'summary':
                                     return personalInfo.summary ? (
                                         <div key={section.id}>
-                                            <p style={{ fontSize: '18px', fontWeight: 500, lineHeight: 1.4 }}>{personalInfo.summary}</p>
+                                            <HtmlRenderer html={personalInfo.summary} className="html-content" />
                                         </div>
                                     ) : null;
 
@@ -107,7 +125,7 @@ export default function SwissTemplate({ resume, scale = 1 }: TemplateProps) {
                                                         <div>
                                                             <h3 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 4px 0' }}>{exp.position}</h3>
                                                             <div style={{ fontSize: '14px', fontWeight: 600, color: primaryColor, marginBottom: 8 }}>{exp.company}, {exp.location}</div>
-                                                            <p style={{ fontSize: '14px', lineHeight: 1.5, fontWeight: 500 }}>{exp.description}</p>
+                                                            <HtmlRenderer html={exp.description} className="html-content" />
                                                         </div>
                                                     </div>
                                                 ))}

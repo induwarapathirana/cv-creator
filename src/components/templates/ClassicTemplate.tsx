@@ -1,6 +1,8 @@
 'use client';
 
 import { Resume } from '@/types/resume';
+import { defaultSettings } from '@/utils/sample-data';
+import HtmlRenderer from '@/components/ui/HtmlRenderer';
 
 interface TemplateProps {
     resume: Resume;
@@ -15,8 +17,9 @@ function formatDate(dateStr: string): string {
 }
 
 export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
-    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections, settings } = resume;
-    const visibleSections = sections.filter(s => s.visible).sort((a, b) => a.order - b.order);
+    const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections } = resume;
+    const settings = resume.settings || defaultSettings;
+    const visibleSections = (Array.isArray(sections) ? sections : []).filter(s => s.visible).sort((a, b) => a.order - b.order);
 
     return (
         <div
@@ -57,7 +60,7 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
                             return personalInfo.summary ? (
                                 <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
                                     <h2 style={{ color: '#1a1a2e', borderBottom: '1px solid #ccc', fontSize: '13pt', fontVariant: 'small-caps' }}>{section.title}</h2>
-                                    <p style={{ fontSize: '10.5pt', lineHeight: 1.6, color: '#333', textAlign: 'justify' }}>{personalInfo.summary}</p>
+                                    <HtmlRenderer html={personalInfo.summary} className="html-content" />
                                 </div>
                             ) : null;
 
@@ -113,7 +116,7 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
                                     {projects.map((proj) => (
                                         <div key={proj.id} className="entry">
                                             <div className="entry-header"><h3>{proj.name}</h3></div>
-                                            <p style={{ fontSize: '10pt', color: '#444' }}>{proj.description}</p>
+                                            <HtmlRenderer html={proj.description} className="html-content" />
                                         </div>
                                     ))}
                                 </div>

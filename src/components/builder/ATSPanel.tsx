@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useResumeStore } from '@/stores/resume-store';
+import { useActiveResume } from '@/hooks/use-active-resume';
 import { analyzeResume } from '@/utils/ats-analyzer';
 import { ATSScore } from '@/types/resume';
 import { FiX, FiTarget, FiAlertTriangle, FiCheckCircle } from 'react-icons/fi';
@@ -11,7 +12,7 @@ interface ATSPanelProps {
 }
 
 export default function ATSPanel({ onClose }: ATSPanelProps) {
-    const resume = useResumeStore((s) => s.getActiveResume());
+    const resume = useActiveResume();
     const [jobDescription, setJobDescription] = useState('');
     const [score, setScore] = useState<ATSScore | null>(null);
 

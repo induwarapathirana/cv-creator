@@ -4,6 +4,7 @@ import { useResumeStore } from '@/stores/resume-store';
 import { Project } from '@/types/resume';
 import { FiPlus, FiTrash2, FiX } from 'react-icons/fi';
 import { useState } from 'react';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 
 export default function ProjectsForm() {
     const resume = useResumeStore((s) => s.getActiveResume());
@@ -55,12 +56,10 @@ export default function ProjectsForm() {
                     </div>
 
                     <div className="input-group" style={{ marginTop: 8 }}>
-                        <label>Description</label>
-                        <textarea
-                            className="textarea"
-                            rows={3}
+                        <RichTextEditor
+                            label="Description"
                             value={proj.description}
-                            onChange={(e) => handleUpdate(proj.id, { description: e.target.value })}
+                            onChange={(val) => handleUpdate(proj.id, { description: val })}
                             placeholder="Describe the project, your role, and key outcomes..."
                         />
                     </div>

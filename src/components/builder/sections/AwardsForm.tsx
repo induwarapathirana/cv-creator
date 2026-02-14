@@ -2,6 +2,7 @@
 
 import { useResumeStore } from '@/stores/resume-store';
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 
 export default function AwardsForm() {
     const resume = useResumeStore((s) => s.getActiveResume());
@@ -38,8 +39,12 @@ export default function AwardsForm() {
                             <input className="input" type="month" value={award.date} onChange={(e) => { pushUndoState(); updateAward(award.id, { date: e.target.value }); }} />
                         </div>
                         <div className="input-group">
-                            <label>Description</label>
-                            <input className="input" value={award.description} onChange={(e) => { pushUndoState(); updateAward(award.id, { description: e.target.value }); }} placeholder="Brief description..." />
+                            <RichTextEditor
+                                label="Description"
+                                value={award.description}
+                                onChange={(val) => { pushUndoState(); updateAward(award.id, { description: val }); }}
+                                placeholder="Brief description..."
+                            />
                         </div>
                     </div>
                 </div>
