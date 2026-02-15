@@ -126,7 +126,7 @@ export default function BuilderContent() {
                 <EditorSidebar />
 
                 <div className="preview-panel">
-                    <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top center' }}>
+                    <div className="preview-wrapper" style={{ transform: `scale(${zoom})`, transformOrigin: 'top center' }}>
                         <TemplateRenderer resume={resume} />
                     </div>
                 </div>
