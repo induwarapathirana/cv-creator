@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useResumeStore } from '@/stores/resume-store';
 import { useActiveResume } from '@/hooks/use-active-resume';
 import { FiDownload, FiUpload, FiPrinter, FiFileText, FiMaximize, FiMinimize } from 'react-icons/fi';
@@ -58,6 +59,60 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
     if (!resume) return null;
 
     const { settings } = resume;
+    const [isExporting, setIsExporting] = useState(false);
+
+    const handleExportPdf = async () => {
+        setIsExporting(true);
+        try {
+            // Dynamically import the utils to avoid SSR issues if any
+            const { getResumeHtml, getDocumentStyles } = await import('@/utils/export-utils');
+
+            // 1. Get the HTML of the resume container
+            // We need to target the internal wrapper that holds the resume pages
+            // If usePaging is true, it's .resume-pages-container, otherwise .renderer-wrapper
+            const containerSelector = settings.usePaging ? '.resume-pages-container' : '.renderer-wrapper';
+            const container = document.querySelector(containerSelector);
+
+            if (!container) {
+                alert('Could not find resume content to export.');
+                setIsExporting(false);
+                return;
+            }
+
+            // 2. Wrap it for the API
+            const htmlContent = container.outerHTML;
+            const cssContent = await getDocumentStyles();
+
+            // 3. Send to API
+            const response = await fetch('/api/generate-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ html: htmlContent, css: cssContent }),
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.details || 'Failed to generate PDF');
+            }
+
+            // 4. Download the blob
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${resume.title.replace(/\s+/g, '_') || 'resume'}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+        } catch (error: any) {
+            console.error('Export failed:', error);
+            alert(`Export failed: ${error.message}`);
+        } finally {
+            setIsExporting(false);
+        }
+    };
 
     return (
         <div className="ats-panel" style={{ padding: 24 }}>
@@ -252,10 +307,20 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 10 }}>
                     <button
                         className="btn btn-primary"
-                        onClick={() => window.print()}
-                        style={{ width: '100%' }}
+                        disabled={isExporting}
+                        onClick={handleExportPdf}
+                        style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 8 }}
                     >
-                        <FiPrinter /> Export to PDF
+                        {isExporting ? (
+                            <>
+                                <span className="spinner" style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
+                                Generating PDF...
+                            </>
+                        ) : (
+                            <>
+                                <FiPrinter /> Download PDF
+                            </>
+                        )}
                     </button>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
