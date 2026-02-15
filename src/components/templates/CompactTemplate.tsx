@@ -1,18 +1,11 @@
-'use client';
-
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import HtmlRenderer from '@/components/ui/HtmlRenderer';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
     resume: Resume;
     scale?: number;
-}
-
-function formatDate(dateStr: string): string {
-    if (!dateStr) return '';
-    const [year, month] = dateStr.split('-');
-    return year; // Compact uses just year
 }
 
 export default function CompactTemplate({ resume }: TemplateProps) {
@@ -21,49 +14,31 @@ export default function CompactTemplate({ resume }: TemplateProps) {
     const primaryColor = settings.colors.primary;
     const visibleSections = sections.filter(s => s.visible).sort((a, b) => a.order - b.order);
 
-    // Compact splits sections for density
-    const col1 = visibleSections.filter((_, i) => i % 2 === 0);
-    const col2 = visibleSections.filter((_, i) => i % 2 !== 0);
-
-
-    const SectionTitle = ({ title }: { title: string }) => (
-        <h2 style={{
-            fontSize: '13px',
-            fontWeight: 800,
-            textTransform: 'uppercase',
-            color: primaryColor,
-            marginBottom: 8,
-            borderBottom: `1px solid ${primaryColor}40`,
-            paddingBottom: 2
-        }}>
-            {title}
-        </h2>
-    );
-
     const renderSection = (section: any) => {
         if (section.type === 'personalInfo') return null;
 
         switch (section.type) {
             case 'summary':
                 return personalInfo.summary ? (
-                    <div key={section.id} style={{ marginBottom: 16 }}>
-                        <SectionTitle title="Profile" />
-                        <HtmlRenderer html={personalInfo.summary} className="html-content" />
+                    <div key={section.id} style={{ marginBottom: '12px', breakInside: 'avoid' }}>
+                        <SectionTitle title="Profile" color={primaryColor} variant="minimal" />
+                        <ResumeHtmlContent html={personalInfo.summary} />
                     </div>
                 ) : null;
 
             case 'experience':
                 return experience.length > 0 ? (
-                    <div key={section.id} style={{ marginBottom: 16 }}>
-                        <SectionTitle title={section.title} />
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div key={section.id} style={{ marginBottom: '12px', breakInside: 'avoid' }}>
+                        <SectionTitle title={section.title} color={primaryColor} variant="minimal" />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             {experience.map(exp => (
                                 <div key={exp.id}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 700 }}>
-                                        <span>{exp.position}, {exp.company}</span>
-                                        <span style={{ color: '#666' }}>{formatDate(exp.startDate)}-{exp.current ? 'Pres' : formatDate(exp.endDate)}</span>
-                                    </div>
-                                    <HtmlRenderer html={exp.description} className="html-content" />
+                                    <EntryHeader
+                                        title={exp.position}
+                                        subtitle={exp.company}
+                                        date={`${formatDate(exp.startDate)}-${exp.current ? 'Pres' : formatDate(exp.endDate)}`}
+                                    />
+                                    <ResumeHtmlContent html={exp.description} />
                                 </div>
                             ))}
                         </div>
@@ -72,13 +47,11 @@ export default function CompactTemplate({ resume }: TemplateProps) {
 
             case 'skills':
                 return skills.length > 0 ? (
-                    <div key={section.id} style={{ marginBottom: 16 }}>
-                        <SectionTitle title={section.title} />
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 8px', fontSize: '12px' }}>
+                    <div key={section.id} style={{ marginBottom: '12px', breakInside: 'avoid' }}>
+                        <SectionTitle title={section.title} color={primaryColor} variant="minimal" />
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                             {skills.map(skill => (
-                                <span key={skill.id}>
-                                    <strong>{skill.name}</strong>
-                                </span>
+                                <SkillBadge key={skill.id} name={skill.name} color={primaryColor} />
                             ))}
                         </div>
                     </div>
@@ -96,17 +69,20 @@ export default function CompactTemplate({ resume }: TemplateProps) {
                     : section.title;
 
                 return (
-                    <div key={section.id} style={{ marginBottom: 16 }}>
-                        <SectionTitle title={dynamicTitle || section.title} />
-                        {items.map((item: any) => (
-                            <div key={item.id} style={{ marginBottom: 4 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 600 }}>
-                                    <span>{item.title || item.name || item.institution}</span>
-                                    <span style={{ color: '#666', fontSize: '11px' }}>{formatDate(item.date || item.startDate)}</span>
+                    <div key={section.id} style={{ marginBottom: '12px', breakInside: 'avoid' }}>
+                        <SectionTitle title={dynamicTitle || section.title} color={primaryColor} variant="minimal" />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {items.map((item: any) => (
+                                <div key={item.id}>
+                                    <EntryHeader
+                                        title={item.title || item.name || item.institution}
+                                        subtitle={item.subtitle}
+                                        date={formatDate(item.date || item.startDate)}
+                                    />
+                                    <ResumeHtmlContent html={item.description} />
                                 </div>
-                                {item.subtitle && <div style={{ fontSize: '12px', fontStyle: 'italic' }}>{item.subtitle}</div>}
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 );
         }
@@ -116,30 +92,38 @@ export default function CompactTemplate({ resume }: TemplateProps) {
         <div
             className="resume-page"
             style={{
-                fontFamily: '"Arial", sans-serif',
-                fontSize: (settings.fontSize - 2) + 'px', // Smaller default
+                fontFamily: '"Inter", sans-serif',
+                fontSize: (settings.fontSize - 2) + 'px',
                 lineHeight: 1.3,
-                padding: '30px',
+                padding: '32px',
                 color: '#111',
+                backgroundColor: 'white',
             }}
         >
             <div className="resume-template">
                 {/* Compact Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 20, borderBottom: `2px solid ${primaryColor}`, paddingBottom: 10 }}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline',
+                    marginBottom: '16px',
+                    borderBottom: `2px solid ${primaryColor}`,
+                    paddingBottom: '8px'
+                }}>
                     <div>
-                        <h1 style={{ fontSize: '28px', fontWeight: 800, margin: 0, textTransform: 'uppercase' }}>
+                        <h1 style={{ fontSize: '20pt', fontWeight: 800, margin: 0, textTransform: 'uppercase', color: '#000' }}>
                             {personalInfo.fullName}
                         </h1>
-                        <div style={{ fontSize: '14px', fontWeight: 700, color: primaryColor }}>{personalInfo.jobTitle}</div>
+                        <div style={{ fontSize: '10pt', fontWeight: 700, color: primaryColor }}>{personalInfo.jobTitle}</div>
                     </div>
-                    <div style={{ textAlign: 'right', fontSize: '11px', color: '#555' }}>
-                        <div>{personalInfo.email} • {personalInfo.phone}</div>
-                        <div>{personalInfo.location} • {personalInfo.linkedin?.replace('https://', '')}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}>
+                        <ContactItem icon={<FiMail />} text={personalInfo.email} color={primaryColor} />
+                        <ContactItem icon={<FiPhone />} text={personalInfo.phone} color={primaryColor} />
+                        <ContactItem icon={<FiMapPin />} text={personalInfo.location} color={primaryColor} />
                     </div>
                 </div>
 
-                <div style={{ columnCount: 2, columnGap: 24, orphans: 3 }}>
-                    {/* Render all sections in flow for masonry-like fit */}
+                <div style={{ columnCount: 2, columnGap: '24px' }}>
                     {visibleSections.map(renderSection)}
                 </div>
             </div>

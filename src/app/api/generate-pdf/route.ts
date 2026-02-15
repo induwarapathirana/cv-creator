@@ -10,6 +10,14 @@ async function getBrowser() {
         if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
             // Production: Use @sparticuz/chromium
             // Note: We use type assertion because @sparticuz/chromium types can be lagging
+
+            // Core serverless fixes
+            // @ts-ignore
+            if (chromium.setGraphicsMode) chromium.setGraphicsMode(false);
+
+            const executablePath = await chromium.executablePath();
+            console.log('Production Executable Path:', executablePath);
+
             return await puppeteer.launch({
                 args: [
                     ...chromium.args,
@@ -19,7 +27,7 @@ async function getBrowser() {
                     '--disable-gpu',
                 ],
                 defaultViewport: (chromium as any).defaultViewport || { width: 1200, height: 800 },
-                executablePath: await chromium.executablePath(),
+                executablePath,
                 headless: (chromium as any).headless,
             });
         }

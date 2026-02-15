@@ -1,19 +1,11 @@
-'use client';
-
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import HtmlRenderer from '@/components/ui/HtmlRenderer';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
     resume: Resume;
     scale?: number;
-}
-
-function formatDate(dateStr: string): string {
-    if (!dateStr) return '';
-    const [year, month] = dateStr.split('-');
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return month ? `${months[parseInt(month) - 1]} ${year}` : year;
 }
 
 export default function SplitTemplate({ resume }: TemplateProps) {
@@ -25,153 +17,93 @@ export default function SplitTemplate({ resume }: TemplateProps) {
     const leftColumnSections = visibleSections.filter(s => s.column === 'left');
     const rightColumnSections = visibleSections.filter(s => s.column === 'right' || !s.column);
 
-    const SidebarTitle = ({ title }: { title: string }) => (
-        <h2 style={{
-            fontSize: '14px',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            color: 'rgba(255,255,255,0.7)',
-            marginBottom: 16,
-            borderBottom: '1px solid rgba(255,255,255,0.2)',
-            paddingBottom: 4
-        }}>
-            {title}
-        </h2>
-    );
-
-    const MainTitle = ({ title }: { title: string }) => (
-        <h2 style={{
-            fontSize: '16px',
-            fontWeight: 800,
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            color: '#222',
-            marginBottom: 20,
-            borderBottom: `2px solid ${primaryColor}`,
-            paddingBottom: 4,
-            width: '100%'
-        }}>
-            {title}
-        </h2>
-    );
-
     const renderSidebarSection = (section: any) => {
         if (section.type === 'personalInfo') return null;
 
-        // Sidebar usually contains Skills, Languages, Contact, etc
-        // If "Education" is assigned left, it goes here too
-
-        let items: any[] = (resume as any)[section.type] || [];
+        const items = (resume as any)[section.type] || [];
         if (section.type === 'custom' && section.customSectionId) {
             const cs = resume.customSections.find(c => c.id === section.customSectionId);
-            if (cs) items = cs.items;
+            if (cs) items.push(...cs.items);
         }
 
         if (items.length === 0 && section.type !== 'summary') return null;
 
-        if (section.type === 'summary' && personalInfo.summary) {
-            return (
-                <div key={section.id} style={{ marginBottom: 32 }}>
-                    <SidebarTitle title="Profile" />
-                    <div style={{ fontSize: '13px', lineHeight: 1.6, opacity: 0.9 }}>
-                        <HtmlRenderer html={personalInfo.summary} className="html-content" />
-                    </div>
-                </div>
-            )
-        }
+        const dynamicTitle = section.type === 'custom' && section.customSectionId
+            ? resume.customSections.find(c => c.id === section.customSectionId)?.title
+            : section.title;
 
-        if (section.type === 'skills' || section.type === 'languages') {
-            return (
-                <div key={section.id} style={{ marginBottom: 32 }}>
-                    <SidebarTitle title={section.title} />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        return (
+            <div key={section.id} style={{ marginBottom: '32px' }}>
+                <SectionTitle title={dynamicTitle || section.title} color="rgba(255,255,255,0.8)" variant="minimal" />
+                {section.type === 'summary' && personalInfo.summary ? (
+                    <div style={{ color: 'rgba(255,255,255,0.9)' }}>
+                        <ResumeHtmlContent html={personalInfo.summary} />
+                    </div>
+                ) : section.type === 'skills' || section.type === 'languages' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {items.map((item: any) => (
-                            <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                            <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10pt' }}>
                                 <span style={{ fontWeight: 600 }}>{item.name}</span>
-                                {item.proficiency && <span style={{ opacity: 0.7 }}>{item.level ? `${item.level}/5` : item.proficiency}</span>}
+                                {item.proficiency && <span style={{ opacity: 0.7 }}>{item.proficiency}</span>}
                             </div>
                         ))}
                     </div>
-                </div>
-            )
-        }
-
-        // Default sidebar render for education/awards/etc
-        return (
-            <div key={section.id} style={{ marginBottom: 32 }}>
-                <SidebarTitle title={section.title} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {items.map((item: any) => (
-                        <div key={item.id} style={{ fontSize: '13px' }}>
-                            <div style={{ fontWeight: 700, fontSize: '14px' }}>{item.title || item.name || item.institution}</div>
-                            <div style={{ opacity: 0.8, marginBottom: 4 }}>
-                                {formatDate(item.date || item.startDate)}
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {items.map((item: any) => (
+                            <div key={item.id} style={{ fontSize: '10pt' }}>
+                                <div style={{ fontWeight: 700, fontSize: '11pt' }}>{item.title || item.name || item.institution}</div>
+                                <div style={{ opacity: 0.8, marginBottom: '4px' }}>
+                                    {formatDate(item.date || item.startDate)}
+                                </div>
+                                {item.description && <ResumeHtmlContent html={item.description} />}
                             </div>
-                            {item.subtitle && <div style={{ fontStyle: 'italic', marginBottom: 2 }}>{item.subtitle}</div>}
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
-        )
+        );
     };
 
     const renderMainSection = (section: any) => {
         if (section.type === 'personalInfo') return null;
 
-        // Experience, Projects usually here
-        let items: any[] = (resume as any)[section.type] || [];
+        const items = (resume as any)[section.type] || [];
         if (section.type === 'custom' && section.customSectionId) {
             const cs = resume.customSections.find(c => c.id === section.customSectionId);
-            if (cs) items = cs.items;
+            if (cs) items.push(...cs.items);
         }
 
         if (items.length === 0 && section.type !== 'summary') return null;
 
-        if (section.type === 'summary' && personalInfo.summary) {
-            return (
-                <div key={section.id} style={{ marginBottom: 32 }}>
-                    <MainTitle title="Professional Summary" />
-                    <HtmlRenderer html={personalInfo.summary} className="html-content" />
-                </div>
-            )
-        }
+        const dynamicTitle = section.type === 'custom' && section.customSectionId
+            ? resume.customSections.find(c => c.id === section.customSectionId)?.title
+            : section.title;
 
         return (
-            <div key={section.id} style={{ marginBottom: 32 }}>
-                <MainTitle title={section.title} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                    {items.map((item: any) => (
-                        <div key={item.id}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
-                                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>
-                                    {item.position || item.title || item.name || item.institution}
-                                </h3>
-                                <span style={{ fontSize: '13px', color: '#666' }}>
-                                    {formatDate(item.startDate || item.date)} {item.endDate ? `– ${item.endDate === 'Present' || item.current ? 'Present' : formatDate(item.endDate)}` : ''}
-                                </span>
-                            </div>
-                            {(item.company || item.subtitle || item.issuer) && (
-                                <div style={{ fontSize: '14px', color: primaryColor, fontWeight: 600, marginBottom: 8 }}>
-                                    {item.company || item.subtitle || item.issuer}
-                                    {item.location && <span style={{ color: '#888', fontWeight: 400 }}> • {item.location}</span>}
-                                </div>
-                            )}
-                            {item.description && <HtmlRenderer html={item.description} className="html-content" />}
+            <div key={section.id} style={{ marginBottom: '40px' }}>
+                <SectionTitle title={dynamicTitle || section.title} color="#222" variant="modern" style={{ borderBottom: `2px solid ${primaryColor}` }} />
 
-                            {item.highlights && item.highlights.length > 0 && (
-                                <ul style={{ paddingLeft: 16, marginTop: 6, marginBottom: 0 }}>
-                                    {item.highlights.filter(Boolean).map((h: string, i: number) => (
-                                        <li key={i} style={{ marginBottom: 3 }}>{h}</li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                {section.type === 'summary' && personalInfo.summary ? (
+                    <ResumeHtmlContent html={personalInfo.summary} />
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        {items.map((item: any) => (
+                            <div key={item.id}>
+                                <EntryHeader
+                                    title={item.position || item.title || item.name || item.institution}
+                                    subtitle={item.company || item.subtitle || item.issuer}
+                                    date={`${formatDate(item.startDate || item.date)}${item.endDate ? ` – ${item.endDate === 'Present' || item.current ? 'Present' : formatDate(item.endDate)}` : ''}`}
+                                    color={primaryColor}
+                                />
+                                <ResumeHtmlContent html={item.description} />
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
-        )
-    }
+        );
+    };
 
     return (
         <div
@@ -187,43 +119,39 @@ export default function SplitTemplate({ resume }: TemplateProps) {
             }}
         >
             <div className="resume-template" style={{ display: 'flex', height: '100%' }}>
-
-                {/* Fixed Sidebar - 35% width */}
+                {/* Dark Sidebar - 35% width */}
                 <div style={{
                     width: '35%',
-                    background: '#2d3748', // Dark slate
+                    background: '#2d3748',
                     color: '#fff',
                     padding: '40px 30px',
                     display: 'flex',
                     flexDirection: 'column'
                 }}>
-                    {/* Photo Placeholder if needed */}
-                    <div style={{ marginBottom: 30 }}>
-                        <h1 style={{ fontSize: '32px', fontWeight: 800, lineHeight: 1.1, marginBottom: 12 }}>
+                    <div style={{ marginBottom: '40px' }}>
+                        <h1 style={{ fontSize: '28pt', fontWeight: 800, lineHeight: 1.1, marginBottom: '12px', letterSpacing: '-0.02em' }}>
                             {personalInfo.fullName}
                         </h1>
-                        <div style={{ fontSize: '16px', color: primaryColor, fontWeight: 500 }}>
+                        <div style={{ fontSize: '13pt', color: primaryColor, fontWeight: 600 }}>
                             {personalInfo.jobTitle}
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 40, fontSize: '13px', opacity: 0.9 }}>
-                        <div>{personalInfo.location}</div>
-                        <div>{personalInfo.phone}</div>
-                        <div>{personalInfo.email}</div>
-                        <div>{personalInfo.website?.replace('https://', '')}</div>
-                        <div>{personalInfo.linkedin?.replace('https://', '')}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '48px' }}>
+                        <ContactItem icon={<FiMail />} text={personalInfo.email} color={primaryColor} />
+                        <ContactItem icon={<FiPhone />} text={personalInfo.phone} color={primaryColor} />
+                        <ContactItem icon={<FiMapPin />} text={personalInfo.location} color={primaryColor} />
+                        <ContactItem icon={<FiGlobe />} text={personalInfo.website?.replace('https://', '')} href={personalInfo.website} color={primaryColor} />
+                        <ContactItem icon={<FiLinkedin />} text={personalInfo.linkedin?.replace('https://', '')} href={personalInfo.linkedin} color={primaryColor} />
                     </div>
 
                     {leftColumnSections.map(renderSidebarSection)}
-
                 </div>
 
                 {/* Main Content - 65% width */}
                 <div style={{ width: '65%', padding: '40px' }}>
                     {rightColumnSections.map(renderMainSection)}
                 </div>
-
             </div>
         </div>
     );
