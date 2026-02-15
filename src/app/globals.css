@@ -1989,16 +1989,74 @@ body {
 }
 
 /* A4 dimensions only apply when pagination is ON */
+/* A4 dimensions only apply when pagination is ON */
+.resume-pages-container {
+  /* Container holds the "paper" */
+}
+
+/* 
+   When Pagination is ON:
+   - We allow the height to grow automatically (no max-height, no overflow hidden)
+   - We overlay a visual "page break" marker every 297mm to show where pages will split
+*/
 .resume-pages-container .resume-page {
   width: 210mm;
   min-height: 297mm;
-  max-height: 297mm;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  height: auto;
+  overflow: visible;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  /* Restored shadow */
   position: relative;
   box-sizing: border-box;
   page-break-after: always;
   page-break-inside: avoid;
+}
+
+/* Visual Page Break Marker (Gray Line) */
+.resume-pages-container .resume-page::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 100;
+  /* 297mm repitition. Transparent until the last 2px, then gray. */
+  background-image: linear-gradient(to bottom, transparent calc(297mm - 2px), #94a3b8 calc(297mm - 2px), #94a3b8 297mm);
+  background-size: 100% 297mm;
+  background-repeat: repeat-y;
+  opacity: 1;
+  /* Made fully visible but color is subtle */
+}
+
+/* Page Break Label */
+.resume-pages-container .resume-page::before {
+  content: "PAGE BREAK";
+  position: absolute;
+  right: -80px;
+  top: 297mm;
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: none;
+  /* Hidden for now, can enable if needed */
+}
+
+/* Hide the marker when printing */
+@media print {
+  .resume-pages-container .resume-page::after {
+    display: none;
+  }
+
+  .resume-pages-container .resume-page {
+    box-shadow: none;
+    margin: 0;
+    page-break-after: always;
+  }
 }
 
 @media print {
