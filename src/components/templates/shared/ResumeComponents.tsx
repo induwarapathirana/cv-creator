@@ -11,7 +11,7 @@ export function formatDate(dateStr: string): string {
 interface SectionTitleProps {
     title: string;
     color: string;
-    variant?: 'modern' | 'classic' | 'minimal' | 'elegant';
+    variant?: 'modern' | 'classic' | 'minimal' | 'elegant' | 'academic' | 'bold';
     centered?: boolean;
 }
 

@@ -5,22 +5,33 @@ import chromium from '@sparticuz/chromium';
 // Helper to determine the correct executable path based on environment
 async function getBrowser() {
     try {
-        if (process.env.NODE_ENV === 'production') {
+        console.log('Environment:', process.env.NODE_ENV);
+
+        if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
             // Production: Use @sparticuz/chromium
+            // Note: We use type assertion because @sparticuz/chromium types can be lagging
             return await puppeteer.launch({
-                args: chromium.args,
-                defaultViewport: (chromium as any).defaultViewport,
+                args: [
+                    ...chromium.args,
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-gpu',
+                ],
+                defaultViewport: (chromium as any).defaultViewport || { width: 1200, height: 800 },
                 executablePath: await chromium.executablePath(),
                 headless: (chromium as any).headless,
             });
         }
 
-        // Local Development: Common paths for Chrome
+        // Local Development
         const executablePath =
             process.env.PUPPETEER_EXECUTABLE_PATH ||
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' ||
             '/usr/bin/google-chrome-stable' ||
             'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+
+        console.log('Local Launch Path:', executablePath);
 
         return await puppeteer.launch({
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -28,8 +39,11 @@ async function getBrowser() {
             headless: true,
         });
     } catch (error: any) {
-        console.error('Browser Launch Error:', error);
-        throw new Error(`Failed to launch browser: ${error.message}`);
+        console.error('CRITICAL: Browser Launch Failed');
+        console.error('Error Name:', error.name);
+        console.error('Error Message:', error.message);
+        if (error.stack) console.error('Stack Trace:', error.stack);
+        throw new Error(`PDF Engine Error: ${error.message}`);
     }
 }
 
