@@ -116,7 +116,6 @@ export default function AcademicTemplate({ resume }: TemplateProps) {
                                     </div>
                                 ) : null;
 
-                            case 'publications': // Custom or Projects mapping
                             case 'projects':
                                 return projects.length > 0 ? (
                                     <div key={section.id}>
