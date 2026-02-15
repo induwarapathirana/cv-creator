@@ -2003,13 +2003,15 @@ body {
   width: 210mm;
   min-height: 297mm;
   height: auto;
-  overflow: visible;
+  overflow: visible !important;
+  /* Override base .resume-page overflow:hidden */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  /* Restored shadow */
   position: relative;
   box-sizing: border-box;
   page-break-after: always;
   page-break-inside: avoid;
+  /* Ensure the page background always fills at least one A4 page */
+  background: #fff;
 }
 
 /* Visual Page Break Marker (Gray Line) */
@@ -2019,15 +2021,16 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  /* Use min-height to ensure overlay always covers at least one A4 page */
+  height: 100%;
+  min-height: 297mm;
   pointer-events: none;
   z-index: 100;
-  /* 297mm repitition. Transparent until the last 2px, then gray. */
+  /* Gray separator line every 297mm (A4 page height) */
   background-image: linear-gradient(to bottom, transparent calc(297mm - 2px), #94a3b8 calc(297mm - 2px), #94a3b8 297mm);
   background-size: 100% 297mm;
   background-repeat: repeat-y;
   opacity: 1;
-  /* Made fully visible but color is subtle */
 }
 
 /* Page Break Label */

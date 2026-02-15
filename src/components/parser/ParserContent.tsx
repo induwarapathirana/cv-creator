@@ -76,6 +76,21 @@ export default function ParserContent() {
         if (!parsed) return;
 
         const now = new Date().toISOString();
+
+        // Flatten skills from categories for the resume store (which might expect a flat list or we need to update store)
+        // Check resume-store types. Usually skills are flat in the store with a 'level' and 'name'.
+        // We will map them and maybe add category if the store supports it, or just name.
+        // The previous code used: skills: parsed.skills.map(s => ({ ... category: 'General' }))
+
+        const allSkills = parsed.skills.flatMap(group =>
+            group.items.map(item => ({
+                id: uuidv4(),
+                name: item,
+                level: 3,
+                category: group.category || 'General',
+            }))
+        );
+
         const resumeData: any = {
             id: uuidv4(),
             title: parsed.fullName ? `${parsed.fullName}'s Resume` : 'Parsed Resume',
@@ -109,17 +124,12 @@ export default function ParserContent() {
                 institution: edu.institution,
                 degree: edu.degree,
                 field: edu.field,
-                startDate: '',
+                startDate: edu.startDate,
                 endDate: edu.endDate,
-                gpa: '',
+                gpa: edu.gpa,
                 description: '',
             })),
-            skills: parsed.skills.map(s => ({
-                id: uuidv4(),
-                name: s,
-                level: 3,
-                category: 'General',
-            })),
+            skills: allSkills,
             languages: parsed.languages.map(l => ({
                 id: uuidv4(),
                 name: l,
@@ -132,9 +142,16 @@ export default function ParserContent() {
                 date: '',
                 url: '',
             })),
-            projects: [],
+            projects: parsed.projects.map(p => ({
+                id: uuidv4(),
+                name: p.name,
+                description: p.description,
+                url: '',
+                technologies: p.technologies,
+            })),
             awards: [],
             customSections: [],
+            // Default Layout
             sections: [
                 { id: 'sec-1', type: 'personalInfo', title: 'Personal Info', visible: true, order: 0, column: 'left' },
                 { id: 'sec-2', type: 'summary', title: 'Professional Summary', visible: true, order: 1, column: 'right' },
@@ -161,6 +178,8 @@ export default function ParserContent() {
         addResume(resumeData);
         router.push('/builder');
     };
+
+    const [showRaw, setShowRaw] = useState(false);
 
     return (
         <div className="manager-page" style={{ minHeight: '100vh' }}>
@@ -298,6 +317,32 @@ export default function ParserContent() {
                             </button>
                         </div>
 
+                        {/* Raw Text Toggle (Debug) */}
+                        <div style={{ textAlign: 'right' }}>
+                            <button
+                                onClick={() => setShowRaw(!showRaw)}
+                                style={{ fontSize: 12, color: 'var(--text-tertiary)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+                            >
+                                {showRaw ? 'Hide Raw Text' : 'Show Extracted Text (Debug)'}
+                            </button>
+                        </div>
+
+                        {showRaw && (
+                            <div style={{
+                                padding: 16,
+                                background: '#1e1e1e',
+                                color: '#eee',
+                                borderRadius: 8,
+                                fontSize: 12,
+                                fontFamily: 'monospace',
+                                maxHeight: 300,
+                                overflowY: 'auto',
+                                whiteSpace: 'pre-wrap'
+                            }}>
+                                {parsed.rawText}
+                            </div>
+                        )}
+
                         {/* Personal Info Card */}
                         <div style={{
                             background: 'var(--bg-secondary)',
@@ -315,6 +360,8 @@ export default function ParserContent() {
                                 <InfoField icon={<FiPhone />} label="Phone" value={parsed.phone} />
                                 <InfoField icon={<FiMapPin />} label="Location" value={parsed.location} />
                                 <InfoField icon={<FiGlobe />} label="Website" value={parsed.website} />
+                                <InfoField icon={<FiGlobe />} label="LinkedIn" value={parsed.linkedin} />
+                                <InfoField icon={<FiGlobe />} label="GitHub" value={parsed.github} />
                             </div>
                             {parsed.summary && (
                                 <div style={{ marginTop: 16 }}>
@@ -346,7 +393,7 @@ export default function ParserContent() {
                                             <div style={{ fontWeight: 700, fontSize: 15 }}>{exp.position}</div>
                                             <div style={{ fontSize: 13, color: 'var(--accent-primary)', fontWeight: 600 }}>{exp.company}</div>
                                             <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 8 }}>
-                                                {exp.startDate} — {exp.endDate}
+                                                {exp.startDate} — {exp.endDate} {exp.location && `| ${exp.location}`}
                                             </div>
                                             {exp.description && (
                                                 <div style={{ fontSize: 13, color: 'var(--text-secondary)', whiteSpace: 'pre-wrap' }}>
@@ -379,8 +426,39 @@ export default function ParserContent() {
                                             border: '1px solid var(--border-color)',
                                         }}>
                                             <div style={{ fontWeight: 700 }}>{edu.degree || edu.institution}</div>
-                                            {edu.institution && edu.degree && <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{edu.institution}</div>}
-                                            {edu.endDate && <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{edu.endDate}</div>}
+                                            {edu.institution && <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{edu.institution}</div>}
+                                            <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--text-tertiary)', marginTop: 4 }}>
+                                                {edu.endDate && <span>{edu.startDate ? `${edu.startDate} - ` : ''}{edu.endDate}</span>}
+                                                {edu.gpa && <span>GPA: {edu.gpa}</span>}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Projects */}
+                        {parsed.projects.length > 0 && (
+                            <div style={{
+                                background: 'var(--bg-secondary)',
+                                borderRadius: 'var(--radius-lg)',
+                                border: '1px solid var(--border-color)',
+                                padding: 24,
+                            }}>
+                                <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <FiFileText style={{ color: 'var(--accent-primary)' }} /> Projects ({parsed.projects.length})
+                                </h2>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                    {parsed.projects.map((proj, i) => (
+                                        <div key={i} style={{
+                                            padding: 12,
+                                            background: 'var(--bg-primary)',
+                                            borderRadius: 'var(--radius-md)',
+                                            border: '1px solid var(--border-color)',
+                                        }}>
+                                            <div style={{ fontWeight: 700 }}>{proj.name}</div>
+                                            {proj.technologies && <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 4 }}>{proj.technologies}</div>}
+                                            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{proj.description}</div>
                                         </div>
                                     ))}
                                 </div>
@@ -396,20 +474,26 @@ export default function ParserContent() {
                                 padding: 24,
                             }}>
                                 <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <FiStar style={{ color: 'var(--accent-primary)' }} /> Skills ({parsed.skills.length})
+                                    <FiStar style={{ color: 'var(--accent-primary)' }} /> Skills
                                 </h2>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                                    {parsed.skills.map((s, i) => (
-                                        <span key={i} style={{
-                                            padding: '6px 14px',
-                                            background: 'var(--bg-primary)',
-                                            border: '1px solid var(--border-color)',
-                                            borderRadius: 20,
-                                            fontSize: 13,
-                                            fontWeight: 500,
-                                        }}>
-                                            {s}
-                                        </span>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                    {parsed.skills.map((group, i) => (
+                                        <div key={i}>
+                                            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-tertiary)', marginBottom: 8 }}>{group.category}</div>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                                {group.items.map((s, j) => (
+                                                    <span key={j} style={{
+                                                        padding: '4px 12px',
+                                                        background: 'var(--bg-primary)',
+                                                        border: '1px solid var(--border-color)',
+                                                        borderRadius: 16,
+                                                        fontSize: 12,
+                                                    }}>
+                                                        {s}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
