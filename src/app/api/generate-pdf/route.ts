@@ -91,10 +91,13 @@ export async function POST(req: NextRequest) {
         await browser.close();
 
         // Return PDF as submission
-        const response = new NextResponse(pdfBuffer);
-        response.headers.set('Content-Type', 'application/pdf');
-        response.headers.set('Content-Disposition', 'attachment; filename="resume.pdf"');
-        return response;
+        // Return PDF as submission
+        return new NextResponse(pdfBuffer as any, {
+            headers: {
+                'Content-Type': 'application/pdf',
+                'Content-Disposition': 'attachment; filename="resume.pdf"',
+            },
+        });
 
     } catch (error: any) {
         console.error('PDF Generation Error:', error);

@@ -2,120 +2,123 @@
 
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import HtmlRenderer from '@/components/ui/HtmlRenderer';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
 
 interface TemplateProps {
     resume: Resume;
     scale?: number;
 }
 
-function formatDate(dateStr: string): string {
-    if (!dateStr) return '';
-    const [year, month] = dateStr.split('-');
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return month ? `${months[parseInt(month) - 1]} ${year}` : year;
-}
-
 export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
     const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections } = resume;
     const settings = resume.settings || defaultSettings;
     const visibleSections = (Array.isArray(sections) ? sections : []).filter(s => s.visible).sort((a, b) => a.order - b.order);
+    const primaryColor = settings.colors.primary;
 
     return (
         <div
             className="resume-page"
             style={{
-                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontFamily: settings.font + ', serif',
                 fontSize: settings.fontSize + 'px',
                 lineHeight: settings.lineHeight,
                 padding: settings.pageMargin + 'px',
             }}
         >
             <div className="resume-template">
-                {visibleSections.map((section) => {
-                    switch (section.type) {
-                        case 'personalInfo':
-                            return (
-                                <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px', textAlign: 'center', borderBottom: '2px solid #1a1a2e', paddingBottom: 16 }}>
-                                    <h1 style={{ color: '#1a1a2e', fontSize: '26px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                                        {personalInfo.fullName || 'Your Name'}
-                                    </h1>
-                                    {personalInfo.jobTitle && (
-                                        <p style={{ fontSize: '13px', color: '#555', marginTop: 6, fontStyle: 'italic' }}>
-                                            {personalInfo.jobTitle}
-                                        </p>
-                                    )}
-                                    <div className="contact-row" style={{ justifyContent: 'center', marginTop: 8, gap: 10, fontSize: '10pt' }}>
-                                        {personalInfo.email && <span>{personalInfo.email}</span>}
-                                        {personalInfo.phone && <span>| {personalInfo.phone}</span>}
-                                        {personalInfo.location && <span>| {personalInfo.location}</span>}
-                                        {personalInfo.linkedin && <span>| {personalInfo.linkedin}</span>}
-                                        {personalInfo.website && <span>| {personalInfo.website}</span>}
-                                    </div>
-                                </div>
-                            );
+                {/* Header - Traditional Centered */}
+                <div style={{ marginBottom: settings.sectionSpacing + 'px', textAlign: 'center', borderBottom: '2px solid #1a1a2e', paddingBottom: 20 }}>
+                    <h1 style={{ color: '#1a1a2e', fontSize: '28px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 6 }}>
+                        {personalInfo.fullName || 'Your Name'}
+                    </h1>
+                    {personalInfo.jobTitle && (
+                        <p style={{ fontSize: '14px', color: '#4b5563', marginTop: 4, fontStyle: 'italic', fontWeight: 500 }}>
+                            {personalInfo.jobTitle}
+                        </p>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px 16px', marginTop: 12 }}>
+                        {personalInfo.email && <ContactItem text={personalInfo.email} color="#1a1a2e" />}
+                        {personalInfo.phone && <ContactItem text={personalInfo.phone} color="#1a1a2e" />}
+                        {personalInfo.location && <ContactItem text={personalInfo.location} color="#1a1a2e" />}
+                        {personalInfo.linkedin && <ContactItem text="LinkedIn" href={personalInfo.linkedin} color="#1a1a2e" />}
+                        {personalInfo.website && <ContactItem text="Portfolio" href={personalInfo.website} color="#1a1a2e" />}
+                    </div>
+                </div>
 
+                {visibleSections.map((section) => {
+                    if (section.type === 'personalInfo') return null;
+
+                    switch (section.type) {
                         case 'summary':
                             return personalInfo.summary ? (
-                                <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                                    <h2 style={{ color: '#1a1a2e', borderBottom: '1px solid #ccc', fontSize: '13pt', fontVariant: 'small-caps' }}>{section.title}</h2>
-                                    <HtmlRenderer html={personalInfo.summary} className="html-content" />
+                                <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                                    <SectionTitle title={section.title} color={primaryColor} variant="classic" />
+                                    <ResumeHtmlContent html={personalInfo.summary} />
                                 </div>
                             ) : null;
 
                         case 'experience':
                             return experience.length > 0 ? (
-                                <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                                    <h2 style={{ color: '#1a1a2e', borderBottom: '1px solid #ccc', fontSize: '13pt', fontVariant: 'small-caps' }}>{section.title}</h2>
-                                    {experience.map((exp) => (
-                                        <div key={exp.id} className="entry">
-                                            <div className="entry-header">
-                                                <h3 style={{ fontStyle: 'normal' }}>{exp.position}</h3>
-                                                <span className="entry-date">{formatDate(exp.startDate)} — {exp.current ? 'Present' : formatDate(exp.endDate)}</span>
+                                <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                                    <SectionTitle title={section.title} color={primaryColor} variant="classic" />
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                        {experience.map((exp: any) => (
+                                            <div key={exp.id}>
+                                                <EntryHeader
+                                                    title={exp.position}
+                                                    subtitle={exp.company}
+                                                    date={`${formatDate(exp.startDate)} — ${exp.current ? 'Present' : formatDate(exp.endDate)}`}
+                                                />
+                                                {exp.description && <ResumeHtmlContent html={exp.description} />}
+                                                {exp.highlights && exp.highlights.length > 0 && (
+                                                    <ul style={{ margin: '6px 0 0 20px', padding: 0, fontSize: '10pt', color: '#374151' }}>
+                                                        {exp.highlights.filter(Boolean).map((h: string, i: number) => (
+                                                            <li key={i} style={{ marginBottom: '2px' }}>{h}</li>
+                                                        ))}
+                                                    </ul>
+                                                )}
                                             </div>
-                                            <div className="entry-subtitle" style={{ fontStyle: 'italic' }}>
-                                                {exp.company}{exp.location ? `, ${exp.location}` : ''}
-                                            </div>
-                                            {exp.highlights.length > 0 && (
-                                                <ul>{exp.highlights.filter(Boolean).map((h, i) => <li key={i}>{h}</li>)}</ul>
-                                            )}
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
                             ) : null;
 
                         case 'education':
                             return education.length > 0 ? (
-                                <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                                    <h2 style={{ color: '#1a1a2e', borderBottom: '1px solid #ccc', fontSize: '13pt', fontVariant: 'small-caps' }}>{section.title}</h2>
-                                    {education.map((edu) => (
-                                        <div key={edu.id} className="entry">
-                                            <div className="entry-header">
-                                                <h3>{edu.degree} in {edu.field}</h3>
-                                                <span className="entry-date">{formatDate(edu.startDate)} — {formatDate(edu.endDate)}</span>
+                                <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                                    <SectionTitle title={section.title} color={primaryColor} variant="classic" />
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        {education.map((edu: any) => (
+                                            <div key={edu.id}>
+                                                <EntryHeader
+                                                    title={edu.institution}
+                                                    subtitle={`${edu.degree}${edu.field ? ` in ${edu.field}` : ''}`}
+                                                    date={`${formatDate(edu.startDate)} — ${formatDate(edu.endDate)}`}
+                                                />
                                             </div>
-                                            <div className="entry-subtitle" style={{ fontStyle: 'italic' }}>{edu.institution}{edu.gpa ? ` — GPA: ${edu.gpa}` : ''}</div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
                             ) : null;
 
                         case 'skills':
                             return skills.length > 0 ? (
-                                <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                                    <h2 style={{ color: '#1a1a2e', borderBottom: '1px solid #ccc', fontSize: '13pt', fontVariant: 'small-caps' }}>{section.title}</h2>
-                                    <p style={{ fontSize: '10pt', color: '#444' }}>{skills.map(s => s.name).join(' · ')}</p>
+                                <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                                    <SectionTitle title={section.title} color={primaryColor} variant="classic" />
+                                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                        {skills.map((s: any) => <SkillBadge key={s.id} name={s.name} color={primaryColor} />)}
+                                    </div>
                                 </div>
                             ) : null;
 
                         case 'projects':
                             return projects.length > 0 ? (
-                                <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                                    <h2 style={{ color: '#1a1a2e', borderBottom: '1px solid #ccc', fontSize: '13pt', fontVariant: 'small-caps' }}>{section.title}</h2>
-                                    {projects.map((proj) => (
-                                        <div key={proj.id} className="entry">
-                                            <div className="entry-header"><h3>{proj.name}</h3></div>
-                                            <HtmlRenderer html={proj.description} className="html-content" />
+                                <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                                    <SectionTitle title={section.title} color={primaryColor} variant="classic" />
+                                    {projects.map((proj: any) => (
+                                        <div key={proj.id} style={{ marginBottom: '12px' }}>
+                                            <EntryHeader title={proj.name} date={formatDate(proj.startDate)} />
+                                            <ResumeHtmlContent html={proj.description} />
                                         </div>
                                     ))}
                                 </div>
@@ -123,11 +126,11 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
 
                         case 'certifications':
                             return certifications.length > 0 ? (
-                                <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                                    <h2 style={{ color: '#1a1a2e', borderBottom: '1px solid #ccc', fontSize: '13pt', fontVariant: 'small-caps' }}>{section.title}</h2>
-                                    {certifications.map((cert) => (
-                                        <div key={cert.id} style={{ marginBottom: 4, fontSize: '10pt' }}>
-                                            <strong>{cert.name}</strong> — {cert.issuer} ({formatDate(cert.date)})
+                                <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                                    <SectionTitle title={section.title} color={primaryColor} variant="classic" />
+                                    {certifications.map((cert: any) => (
+                                        <div key={cert.id} style={{ marginBottom: '6px' }}>
+                                            <EntryHeader title={cert.name} subtitle={cert.issuer} date={formatDate(cert.date)} />
                                         </div>
                                     ))}
                                 </div>
@@ -135,46 +138,41 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
 
                         case 'languages':
                             return languages.length > 0 ? (
-                                <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                                    <h2 style={{ color: '#1a1a2e', borderBottom: '1px solid #ccc', fontSize: '13pt', fontVariant: 'small-caps' }}>{section.title}</h2>
-                                    <p style={{ fontSize: '10pt' }}>{languages.map(l => `${l.name} (${l.proficiency})`).join(' · ')}</p>
+                                <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                                    <SectionTitle title={section.title} color={primaryColor} variant="classic" />
+                                    <p style={{ fontSize: '10pt', margin: 0 }}>
+                                        {languages.map((l: any) => `${l.name} (${l.proficiency})`).join(' • ')}
+                                    </p>
                                 </div>
                             ) : null;
 
                         case 'awards':
                             return awards.length > 0 ? (
-                                <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                                    <h2 style={{ color: '#1a1a2e', borderBottom: '1px solid #ccc', fontSize: '13pt', fontVariant: 'small-caps' }}>{section.title}</h2>
-                                    {awards.map((a) => (
-                                        <div key={a.id} style={{ marginBottom: 4, fontSize: '10pt' }}>
-                                            <strong>{a.title}</strong> — {a.issuer} ({formatDate(a.date)})
+                                <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                                    <SectionTitle title={section.title} color={primaryColor} variant="classic" />
+                                    {awards.map((a: any) => (
+                                        <div key={a.id} style={{ marginBottom: '6px' }}>
+                                            <EntryHeader title={a.title} subtitle={a.issuer} date={formatDate(a.date)} />
                                         </div>
                                     ))}
                                 </div>
                             ) : null;
 
                         case 'custom':
-                            const customSection = resume.customSections?.find(cs => cs.id === section.customSectionId);
+                            const customSection = resume.customSections?.find((cs: any) => cs.id === section.customSectionId);
                             return customSection && customSection.items.length > 0 ? (
-                                <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                                    <h2 style={{ color: '#1a1a2e', borderBottom: '1px solid #ccc', fontSize: '13pt', fontVariant: 'small-caps' }}>
-                                        {section.title || customSection.title}
-                                    </h2>
-                                    {customSection.items.map((item) => (
-                                        <div key={item.id} className="entry">
-                                            <div className="entry-header">
-                                                <h3>{item.title}</h3>
-                                                <span className="entry-date">{formatDate(item.date)}</span>
-                                            </div>
-                                            {item.subtitle && <div className="entry-subtitle" style={{ fontStyle: 'italic' }}>{item.subtitle}</div>}
-                                            {item.description && <HtmlRenderer html={item.description} className="html-content" />}
+                                <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                                    <SectionTitle title={section.title || customSection.title} color={primaryColor} variant="classic" />
+                                    {customSection.items.map((item: any) => (
+                                        <div key={item.id} style={{ marginBottom: '12px' }}>
+                                            <EntryHeader title={item.title} subtitle={item.subtitle} date={formatDate(item.date)} />
+                                            <ResumeHtmlContent html={item.description} />
                                         </div>
                                     ))}
                                 </div>
                             ) : null;
 
-                        default:
-                            return null;
+                        default: return null;
                     }
                 })}
             </div>
