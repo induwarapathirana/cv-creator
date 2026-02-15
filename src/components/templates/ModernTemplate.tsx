@@ -231,6 +231,8 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                 fontSize: settings.fontSize + 'px',
                 lineHeight: settings.lineHeight,
                 padding: settings.pageMargin + 'px',
+                color: '#333',
+                backgroundColor: 'white',
             }}
         >
             <div className="resume-template" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 35%) minmax(0, 65%)', gap: '30px', height: '100%', alignItems: 'start' }}>

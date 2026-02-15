@@ -23,6 +23,7 @@ export default function ElegantTemplate({ resume }: TemplateProps) {
                 lineHeight: settings.lineHeight + 0.2,
                 padding: (settings.pageMargin + 20) + 'px',
                 color: '#333',
+                backgroundColor: 'white',
             }}
         >
             <div className="resume-template">

@@ -23,6 +23,8 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
                 fontSize: settings.fontSize + 'px',
                 lineHeight: settings.lineHeight,
                 padding: settings.pageMargin + 'px',
+                color: '#333',
+                backgroundColor: 'white',
             }}
         >
             <div className="resume-template">

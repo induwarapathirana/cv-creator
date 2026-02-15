@@ -66,12 +66,39 @@ export async function POST(req: NextRequest) {
         const browser = await getBrowser();
         const page = await browser.newPage();
 
+        // Ensure we emulate print media for consistent CSS application
+        await page.emulateMediaType('print');
+
+        // Inject a "Dark Mode Reset" style to ensure light mode variables are used
+        // even if the frontend captured dark mode variables.
+        const darkModeReset = `
+            <style>
+                :root {
+                    color-scheme: light !important;
+                    background-color: white !important;
+                    color: #333 !important;
+                }
+                body {
+                    background-color: white !important;
+                    color: #333 !important;
+                }
+                /* Force standard light theme variables common in Tailwind/Shadcn */
+                .dark {
+                    color-scheme: light !important;
+                }
+                [data-theme='dark'] {
+                    color-scheme: light !important;
+                }
+            </style>
+        `;
+
         // Construct the full HTML document
         const fullContent = `
             <!DOCTYPE html>
             <html>
                 <head>
                     <meta charset="UTF-8">
+                    ${darkModeReset}
                     <style>
                         /* Base resets */
                         * { box-sizing: border-box; }

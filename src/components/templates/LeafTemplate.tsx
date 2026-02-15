@@ -23,6 +23,7 @@ export default function LeafTemplate({ resume }: TemplateProps) {
                 lineHeight: 1.6,
                 padding: settings.pageMargin + 'px',
                 color: '#444',
+                backgroundColor: 'white',
             }}
         >
             <div className="resume-template" style={{ maxWidth: '800px', margin: '0 auto' }}>

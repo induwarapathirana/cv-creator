@@ -25,6 +25,8 @@ export default function Modern2Template({ resume }: TemplateProps) {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 30,
+                color: '#333',
+                backgroundColor: 'white',
             }}
         >
             {/* Header - Modern Left Aligned */}

@@ -80,7 +80,9 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
             }
 
             // 2. Wrap it for the API
-            const htmlContent = container.outerHTML;
+            const htmlContent = container.outerHTML
+                .replace(/transform:\s*scale\([^)]+\);?/g, '')
+                .replace(/transform-origin:\s*[^;]+;?/g, '');
             const cssContent = await getDocumentStyles();
 
             // 3. Send to API
