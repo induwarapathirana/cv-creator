@@ -64,32 +64,11 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
     const handleExportPdf = async () => {
         setIsExporting(true);
         try {
-            // Dynamically import the utils to avoid SSR issues if any
-            const { getResumeHtml, getDocumentStyles } = await import('@/utils/export-utils');
-
-            // 1. Get the HTML of the resume container
-            // We need to target the internal wrapper that holds the resume pages
-            // If usePaging is true, it's .resume-pages-container, otherwise .renderer-wrapper
-            const containerSelector = settings.usePaging ? '.resume-pages-container' : '.renderer-wrapper';
-            const container = document.querySelector(containerSelector);
-
-            if (!container) {
-                alert('Could not find resume content to export.');
-                setIsExporting(false);
-                return;
-            }
-
-            // 2. Wrap it for the API
-            const htmlContent = container.outerHTML
-                .replace(/transform:\s*scale\([^)]+\);?/g, '')
-                .replace(/transform-origin:\s*[^;]+;?/g, '');
-            const cssContent = await getDocumentStyles();
-
-            // 3. Send to API
+            // 3. Send to API (Reactive Resume style: send data, not HTML)
             const response = await fetch('/api/generate-pdf', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ html: htmlContent, css: cssContent }),
+                body: JSON.stringify({ resume }),
             });
 
             if (!response.ok) {
