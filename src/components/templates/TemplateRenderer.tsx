@@ -83,7 +83,7 @@ export default function TemplateRenderer({ resume: rawResume, scale = 1 }: Templ
     }
 
     return (
-        <div className="renderer-wrapper" style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
+        <div className="renderer-wrapper" data-print-wrapper="true" style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
             {renderTemplate()}
         </div>
     );

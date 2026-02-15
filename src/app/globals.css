@@ -2113,3 +2113,103 @@ body {
 .resume-template ul {
   list-style-position: outside;
 }
+
+/* ═══════════════════════════════════
+   PRINT STYLES (Export to PDF)
+   ═══════════════════════════════════ */
+
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+
+  body {
+    background: white;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  /* Hide UI elements */
+  .navbar,
+  .builder-toolbar,
+  .editor-sidebar,
+  .ats-panel,
+  .preview-controls,
+  .mobile-view-toggle,
+  .builder-layout,
+  /* .builder-main,  <-- Don't hide this completely, we need its children, but reset it */
+  .preview-panel {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    width: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Explicitly hide these */
+  .navbar,
+  .builder-toolbar,
+  .editor-sidebar,
+  .ats-panel,
+  .preview-controls,
+  .mobile-view-toggle,
+  .sync-notice-modal,
+  .settings-panel,
+  .ats-trigger,
+  .bmc-widget-container,
+  .mobile-view-toggle {
+    display: none !important;
+  }
+
+  /* Reset layout constraints */
+  .builder-layout,
+  .builder-main,
+  .preview-panel,
+  .renderer-wrapper {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    width: auto !important;
+    overflow: visible !important;
+    transform: none !important;
+    /* Remove scaling */
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  /* Target the resume page container */
+  .resume-pages-container {
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  /* Ensure the resume page itself prints correctly */
+  .resume-page {
+    margin: 0 auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 210mm !important;
+    /* min-height: 297mm !important; */
+    /* Let content dictate height or page usage */
+    height: auto !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    overflow: visible !important;
+    page-break-after: always;
+    padding: 0 !important;
+    /* Reset padding, as it's set inline */
+  }
+
+  /* Remove page break from the last page if needed */
+  .resume-page:last-child {
+    page-break-after: auto;
+  }
+}
