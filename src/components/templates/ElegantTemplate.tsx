@@ -118,6 +118,101 @@ export default function ElegantTemplate({ resume }: TemplateProps) {
                                     </div>
                                 ) : null;
 
+                            case 'projects':
+                                return projects.length > 0 ? (
+                                    <div key={section.id} className="section">
+                                        <h2 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', color: '#999', letterSpacing: '0.2em', textAlign: 'center', marginBottom: 24 }}>
+                                            {section.title}
+                                        </h2>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                                            {projects.map(proj => (
+                                                <div key={proj.id}>
+                                                    <h3 style={{ fontSize: '16px', fontWeight: 500, color: '#111', textAlign: 'center', marginBottom: 4 }}>{proj.name}</h3>
+                                                    <div style={{ fontSize: '12px', color: primaryColor, textAlign: 'center', marginBottom: 8, letterSpacing: '0.05em' }}>
+                                                        {proj.technologies.join(' • ')}
+                                                    </div>
+                                                    <div style={{ textAlign: 'center', maxWidth: '90%', margin: '0 auto' }}>
+                                                        <HtmlRenderer html={proj.description} className="html-content" />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null;
+
+                            case 'languages':
+                                return languages.length > 0 ? (
+                                    <div key={section.id} className="section">
+                                        <h2 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', color: '#999', letterSpacing: '0.2em', textAlign: 'center', marginBottom: 20 }}>
+                                            {section.title}
+                                        </h2>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px 24px', fontSize: '14px' }}>
+                                            {languages.map(lang => (
+                                                <div key={lang.id}>
+                                                    <span style={{ fontWeight: 500 }}>{lang.name}</span> <span style={{ color: '#888', fontStyle: 'italic' }}>— {lang.proficiency}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null;
+
+                            case 'certifications':
+                                return certifications.length > 0 ? (
+                                    <div key={section.id} className="section">
+                                        <h2 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', color: '#999', letterSpacing: '0.2em', textAlign: 'center', marginBottom: 20 }}>
+                                            {section.title}
+                                        </h2>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+                                            {certifications.map(cert => (
+                                                <div key={cert.id} style={{ textAlign: 'center' }}>
+                                                    <div style={{ fontWeight: 500 }}>{cert.name}</div>
+                                                    <div style={{ fontSize: '13px', color: '#666' }}>{cert.issuer} • {formatDate(cert.date)}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null;
+
+                            case 'awards':
+                                return awards.length > 0 ? (
+                                    <div key={section.id} className="section">
+                                        <h2 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', color: '#999', letterSpacing: '0.2em', textAlign: 'center', marginBottom: 20 }}>
+                                            {section.title}
+                                        </h2>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
+                                            {awards.map(award => (
+                                                <div key={award.id} style={{ textAlign: 'center', maxWidth: '80%' }}>
+                                                    <div style={{ fontWeight: 500 }}>{award.title}</div>
+                                                    <div style={{ fontSize: '13px', color: '#666', marginBottom: 4 }}>{award.issuer} • {formatDate(award.date)}</div>
+                                                    {award.description && <div style={{ fontSize: '13px', color: '#555', fontStyle: 'italic' }}><HtmlRenderer html={award.description} /></div>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null;
+
+                            case 'custom':
+                                const customSection = resume.customSections?.find(cs => cs.id === section.customSectionId);
+                                return customSection && customSection.items.length > 0 ? (
+                                    <div key={section.id} className="section">
+                                        <h2 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', color: '#999', letterSpacing: '0.2em', textAlign: 'center', marginBottom: 24 }}>
+                                            {section.title || customSection.title}
+                                        </h2>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                                            {customSection.items.map(item => (
+                                                <div key={item.id} style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: 40 }}>
+                                                    <div style={{ textAlign: 'right', fontSize: '12px', color: '#999' }}>{formatDate(item.date)}</div>
+                                                    <div>
+                                                        <div style={{ fontSize: '16px', fontWeight: 500, marginBottom: 2 }}>{item.title}</div>
+                                                        {item.subtitle && <div style={{ fontSize: '14px', color: primaryColor, marginBottom: 8 }}>{item.subtitle}</div>}
+                                                        {item.description && <HtmlRenderer html={item.description} className="html-content" />}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null;
+
                             default: return null;
                         }
                     })}

@@ -109,7 +109,11 @@ export default function GridTemplate({ resume, scale = 1 }: TemplateProps) {
                                 ) : null;
 
                             default:
-                                const items: any[] = (resume as any)[section.type] || [];
+                                let items: any[] = (resume as any)[section.type] || [];
+                                if (section.type === 'custom' && section.customSectionId) {
+                                    const customSection = resume.customSections?.find(cs => cs.id === section.customSectionId);
+                                    if (customSection) items = customSection.items;
+                                }
                                 if (!items || items.length === 0) return null;
                                 return (
                                     <div key={section.id} style={{ background: '#fff', padding: 20, borderRadius: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>

@@ -235,6 +235,49 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                     </div>
                 ) : null;
 
+            case 'awards':
+                return resume.awards && resume.awards.length > 0 ? (
+                    <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                        <h2 style={{ color: primaryColor, borderBottom: `2px solid ${primaryColor}`, fontSize: '12pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, paddingBottom: 4 }}>
+                            {section.title}
+                        </h2>
+                        {resume.awards.map((award) => (
+                            <div key={award.id} className="entry" style={{ marginBottom: 6 }}>
+                                <div className="entry-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                    <h3 style={{ fontSize: '10.5pt', fontWeight: 700, margin: 0 }}>{award.title}</h3>
+                                    <span className="entry-date" style={{ fontSize: '9pt', color: '#666', whiteSpace: 'nowrap' }}>{formatDate(award.date)}</span>
+                                </div>
+                                <div className="entry-subtitle" style={{ fontSize: '9.5pt', color: '#444' }}>{award.issuer}</div>
+                                {award.description && <HtmlRenderer html={award.description} className="html-content" />}
+                            </div>
+                        ))}
+                    </div>
+                ) : null;
+
+            case 'custom':
+                const customSection = resume.customSections?.find(cs => cs.id === section.customSectionId);
+                return customSection && customSection.items.length > 0 ? (
+                    <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                        <h2 style={{ color: primaryColor, borderBottom: `2px solid ${primaryColor}`, fontSize: '12pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, paddingBottom: 4 }}>
+                            {section.title || customSection.title}
+                        </h2>
+                        {customSection.items.map((item) => (
+                            <div key={item.id} className="entry" style={{ marginBottom: 10 }}>
+                                <div className="entry-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
+                                    <h3 style={{ fontSize: '11pt', fontWeight: 700, margin: 0 }}>{item.title}</h3>
+                                    <span className="entry-date" style={{ fontSize: '9pt', color: '#666', whiteSpace: 'nowrap' }}>{formatDate(item.date)}</span>
+                                </div>
+                                {item.subtitle && (
+                                    <div className="entry-subtitle" style={{ fontSize: '10pt', fontWeight: 600, color: '#444', marginBottom: 4 }}>
+                                        {item.subtitle}
+                                    </div>
+                                )}
+                                {item.description && <HtmlRenderer html={item.description} className="html-content" />}
+                            </div>
+                        ))}
+                    </div>
+                ) : null;
+
             default:
                 return null;
         }

@@ -1296,6 +1296,8 @@ body {
 
 .resume-page {
   background: #fff;
+  width: 210mm;
+  min-height: 297mm;
   box-shadow: var(--shadow-xl);
   border-radius: 4px;
   overflow: hidden;
@@ -1950,131 +1952,59 @@ body {
 
 /* Print styles */
 @media print {
-
-  .navbar,
-  .editor-sidebar,
-  .builder-toolbar,
-  .preview-controls,
-  .ats-panel {
-    display: none !important;
+  @page {
+    margin: 0;
+    size: auto;
   }
 
-  .preview-panel {
-    margin-top: 0;
-    padding: 0;
-    background: #fff;
-  }
-
-  .resume-page {
-    box-shadow: none;
-    border-radius: 0;
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 100vh;
-  }
-}
-
-/* ═══════════════════════════════════
-   PAGINATION STYLES
-   ═══════════════════════════════════ */
-
-.resume-pages-container {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-  padding: 40px 0;
-  align-items: center;
-}
-
-/* A4 dimensions only apply when pagination is ON */
-/* A4 dimensions only apply when pagination is ON */
-.resume-pages-container {
-  /* Container holds the "paper" */
-}
-
-/* 
-   When Pagination is ON:
-   - We allow the height to grow automatically (no max-height, no overflow hidden)
-   - We overlay a visual "page break" marker every 297mm to show where pages will split
-*/
-.resume-pages-container .resume-page {
-  width: 210mm;
-  min-height: 297mm;
-  height: auto;
-  overflow: visible !important;
-  /* Override base .resume-page overflow:hidden */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  position: relative;
-  box-sizing: border-box;
-  page-break-after: always;
-  page-break-inside: avoid;
-  /* Ensure the page background always fills at least one A4 page */
-  background: #fff;
-}
-
-/* Visual Page Break Marker (Gray Line) */
-.resume-pages-container .resume-page::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  /* Use min-height to ensure overlay always covers at least one A4 page */
-  height: 100%;
-  min-height: 297mm;
-  pointer-events: none;
-  z-index: 100;
-  /* Gray separator line every 297mm (A4 page height) */
-  background-image: linear-gradient(to bottom, transparent calc(297mm - 2px), #94a3b8 calc(297mm - 2px), #94a3b8 297mm);
-  background-size: 100% 297mm;
-  background-repeat: repeat-y;
-  opacity: 1;
-}
-
-/* Page Break Label */
-.resume-pages-container .resume-page::before {
-  content: "PAGE BREAK";
-  position: absolute;
-  right: -80px;
-  top: 297mm;
-  font-size: 10px;
-  color: #94a3b8;
-  font-weight: 600;
-  letter-spacing: 1px;
-  transform: translateY(-50%);
-  pointer-events: none;
-  display: none;
-  /* Hidden for now, can enable if needed */
-}
-
-/* Hide the marker when printing */
-@media print {
+  html,
   body {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    background: #fff !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  .resume-pages-container .resume-page::after {
-    display: none;
+  /* Hide everything by default */
+  body>*:not(.builder-layout) {
+    display: none !important;
   }
 
-  .resume-pages-container .resume-page {
-    box-shadow: none;
-    margin: 0;
-    page-break-after: always;
+  /* Specifically hide UI overlays */
+  .navbar,
+  .editor-sidebar,
+  .builder-toolbar,
+  .preview-controls,
+  .ats-panel,
+  .mobile-view-toggle,
+  #bmc-wbtn,
+  #bmc-iframe,
+  [data-name="BMC-Widget"],
+  .bmc-btn-container {
+    display: none !important;
+  }
+
+  /* Reset the builder layout to be print-friendly */
+  .builder-layout {
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
     overflow: visible !important;
   }
 
-  /* Reset transformations for print */
-  .preview-wrapper,
-  .renderer-wrapper {
-    transform: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  .builder-main {
+    display: block !important;
     width: 100% !important;
     height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
     overflow: visible !important;
   }
 
@@ -2082,44 +2012,59 @@ body {
     display: block !important;
     width: 100% !important;
     height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+    border: none !important;
+  }
+
+  .preview-wrapper,
+  .renderer-wrapper {
+    transform: none !important;
+    width: 100% !important;
+    height: auto !important;
     overflow: visible !important;
   }
 
-  /* Don't override padding, let inline styles work */
+  /* Resume Page - A4 Specifics */
+  .resume-pages-container {
+    display: block !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  .resume-pages-container .resume-page {
+    box-shadow: none !important;
+    margin: 0 !important;
+    page-break-after: always !important;
+    overflow: visible !important;
+    border: none !important;
+  }
+
+  .resume-pages-container .resume-page::after {
+    display: none !important;
+  }
+
+  .resume-pages-container .resume-page:last-child {
+    page-break-after: auto !important;
+  }
+
+  /* Single Page Mode */
   .resume-page {
     box-shadow: none !important;
-    border-radius: 0;
+    border-radius: 0 !important;
     margin: 0 !important;
+    padding: 0 !important;
+    /* Allow user settings to control padding via inline styles */
     width: 100% !important;
     height: auto !important;
-    min-height: 100vh;
+    min-height: 100% !important;
     overflow: visible !important;
   }
 
   .resume-template {
     height: auto !important;
-    /* Allow grid to grow */
-  }
-}
-
-@media print {
-  .resume-pages-container {
-    padding: 0;
-    gap: 0;
-  }
-
-  .resume-page {
-    box-shadow: none !important;
-    margin: 0;
-    border-radius: 0;
-  }
-
-  .resume-pages-container .resume-page {
-    page-break-after: always;
-  }
-
-  .resume-pages-container .resume-page:last-child {
-    page-break-after: avoid;
   }
 }
 

@@ -153,6 +153,26 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
                                 </div>
                             ) : null;
 
+                        case 'custom':
+                            const customSection = resume.customSections?.find(cs => cs.id === section.customSectionId);
+                            return customSection && customSection.items.length > 0 ? (
+                                <div key={section.id} className="section" style={{ marginBottom: settings.sectionSpacing + 'px' }}>
+                                    <h2 style={{ color: '#1a1a2e', borderBottom: '1px solid #ccc', fontSize: '13pt', fontVariant: 'small-caps' }}>
+                                        {section.title || customSection.title}
+                                    </h2>
+                                    {customSection.items.map((item) => (
+                                        <div key={item.id} className="entry">
+                                            <div className="entry-header">
+                                                <h3>{item.title}</h3>
+                                                <span className="entry-date">{formatDate(item.date)}</span>
+                                            </div>
+                                            {item.subtitle && <div className="entry-subtitle" style={{ fontStyle: 'italic' }}>{item.subtitle}</div>}
+                                            {item.description && <HtmlRenderer html={item.description} className="html-content" />}
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : null;
+
                         default:
                             return null;
                     }

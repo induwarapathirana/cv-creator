@@ -123,6 +123,69 @@ export default function Modern2Template({ resume }: TemplateProps) {
                                     </div>
                                 ) : null;
 
+                            case 'certifications':
+                                return certifications.length > 0 ? (
+                                    <div key={section.id} className="section">
+                                        <h2 style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', color: primaryColor, marginBottom: 16, borderBottom: `2px solid ${primaryColor}1a` }}>
+                                            {section.title}
+                                        </h2>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                            {certifications.map(cert => (
+                                                <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                    <div>
+                                                        <div style={{ fontSize: '15px', fontWeight: 700 }}>{cert.name}</div>
+                                                        <div style={{ fontSize: '13px', color: '#555' }}>{cert.issuer}</div>
+                                                    </div>
+                                                    <div style={{ fontSize: '12px', color: '#888', whiteSpace: 'nowrap' }}>{formatDate(cert.date)}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null;
+
+                            case 'awards':
+                                return awards.length > 0 ? (
+                                    <div key={section.id} className="section">
+                                        <h2 style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', color: primaryColor, marginBottom: 16, borderBottom: `2px solid ${primaryColor}1a` }}>
+                                            {section.title}
+                                        </h2>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                            {awards.map(award => (
+                                                <div key={award.id}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                        <div style={{ fontSize: '15px', fontWeight: 700 }}>{award.title}</div>
+                                                        <div style={{ fontSize: '12px', color: '#888', whiteSpace: 'nowrap' }}>{formatDate(award.date)}</div>
+                                                    </div>
+                                                    <div style={{ fontSize: '13px', color: '#555' }}>{award.issuer}</div>
+                                                    {award.description && <HtmlRenderer html={award.description} className="html-content" />}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null;
+
+                            case 'custom':
+                                const customSection = resume.customSections?.find(cs => cs.id === section.customSectionId);
+                                return customSection && customSection.items.length > 0 ? (
+                                    <div key={section.id} className="section">
+                                        <h2 style={{ fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', color: primaryColor, marginBottom: 16, borderBottom: `2px solid ${primaryColor}1a` }}>
+                                            {section.title || customSection.title}
+                                        </h2>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                            {customSection.items.map(item => (
+                                                <div key={item.id}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
+                                                        <div style={{ fontSize: '15px', fontWeight: 700 }}>{item.title}</div>
+                                                        <div style={{ fontSize: '12px', color: '#888', whiteSpace: 'nowrap' }}>{formatDate(item.date)}</div>
+                                                    </div>
+                                                    {item.subtitle && <div style={{ fontSize: '13px', fontWeight: 600, color: '#555', marginBottom: 4 }}>{item.subtitle}</div>}
+                                                    {item.description && <HtmlRenderer html={item.description} className="html-content" />}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null;
+
                             default: return null;
                         }
                     })}
