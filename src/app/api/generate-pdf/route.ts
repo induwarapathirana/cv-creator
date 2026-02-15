@@ -1,5 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
+
+// Helper to determine the correct executable path based on environment
+async function getBrowser() {
+    let browser;
+    if (process.env.NODE_ENV === 'production') {
+        // Production: Use @sparticuz/chromium
+        browser = await puppeteer.launch({
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
+        });
+    } else {
+        // Local Development: Connect to local Chrome or use a local path if configured
+        // Attempt to find local Chrome installation for Mac/Windows/Linux?
+        // Or instruct user to set PUPPETEER_EXECUTABLE_PATH env var.
+        // For simplicity in this specific project context, we'll try a common Mac path or fallback.
+        const executablePath =
+            process.env.PUPPETEER_EXECUTABLE_PATH ||
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' ||
+            '/usr/bin/google-chrome-stable';
+
+        try {
+            browser = await puppeteer.launch({
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                executablePath,
+                headless: true, // New headless mode
+            });
+        } catch (e) {
+            console.error('Local Chrome launch failed. Ensure Chrome is installed.', e);
+            throw new Error('Local Chrome not found. Set PUPPETEER_EXECUTABLE_PATH.');
+        }
+    }
+    return browser;
+}
 
 export async function POST(req: NextRequest) {
     try {
@@ -9,12 +45,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Missing HTML content' }, { status: 400 });
         }
 
-        // Launch headless browser
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
-
+        const browser = await getBrowser();
         const page = await browser.newPage();
 
         // Construct the full HTML document
@@ -61,12 +92,10 @@ export async function POST(req: NextRequest) {
         await browser.close();
 
         // Return PDF as submission
-        return new NextResponse(pdfBuffer, {
-            headers: {
-                'Content-Type': 'application/pdf',
-                'Content-Disposition': 'attachment; filename="resume.pdf"',
-            },
-        });
+        const response = new NextResponse(pdfBuffer);
+        response.headers.set('Content-Type', 'application/pdf');
+        response.headers.set('Content-Disposition', 'attachment; filename="resume.pdf"');
+        return response;
 
     } catch (error: any) {
         console.error('PDF Generation Error:', error);
