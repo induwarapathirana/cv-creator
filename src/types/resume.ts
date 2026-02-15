@@ -107,6 +107,7 @@ export interface ResumeSettings {
   sectionSpacing: number;
   pageMargin: number;
   usePaging: boolean;
+  useSinglePage: boolean; // Continuous single page mode
 }
 
 export type SectionType =

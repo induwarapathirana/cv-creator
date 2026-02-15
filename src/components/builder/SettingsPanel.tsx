@@ -229,6 +229,20 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                         <span>A4 Pagination</span>
                     </button>
                 </div>
+                {!settings.usePaging && (
+                    <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <input
+                            type="checkbox"
+                            id="useSinglePage"
+                            checked={settings.useSinglePage || false}
+                            onChange={(e) => { pushUndoState(); updateSettings({ useSinglePage: e.target.checked }); }}
+                            style={{ width: 16, height: 16 }}
+                        />
+                        <label htmlFor="useSinglePage" style={{ fontSize: 13, userSelect: 'none', cursor: 'pointer' }}>
+                            Continuous PDF (One long page)
+                        </label>
+                    </div>
+                )}
             </div>
 
             {/* Data Management */}

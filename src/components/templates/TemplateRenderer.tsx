@@ -1,5 +1,5 @@
 'use client';
-
+import { useEffect, useRef } from 'react';
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
 import { sanitizeResume } from '@/utils/resume-sanitizer';
@@ -30,6 +30,65 @@ interface TemplateRendererProps {
 export default function TemplateRenderer({ resume: rawResume, scale = 1 }: TemplateRendererProps) {
     const resume = sanitizeResume(rawResume);
     const settings = resume.settings || defaultSettings;
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Initial check for useSinglePage migration (ensure it exists)
+    if (typeof settings.useSinglePage === 'undefined') {
+        settings.useSinglePage = false;
+    }
+
+    useEffect(() => {
+        if (!settings.useSinglePage || settings.usePaging) return;
+
+        const handleBeforePrint = () => {
+            if (containerRef.current) {
+                const heightPx = containerRef.current.scrollHeight;
+                const widthPx = containerRef.current.scrollWidth;
+                // Convert to mm assuming standard 96dpi or relative to 210mm width
+                // A4 width is 210mm.
+                // Ratio = height / width
+                const ratio = heightPx / widthPx;
+                const heightMm = Math.ceil(210 * ratio);
+
+                // Create or update dynamic style
+                let styleEl = document.getElementById('dynamic-print-style');
+                if (!styleEl) {
+                    styleEl = document.createElement('style');
+                    styleEl.id = 'dynamic-print-style';
+                    document.head.appendChild(styleEl);
+                }
+
+                // Check if height is less than A4 (297mm), if so enforce at least A4 to avoid issues
+                const finalHeight = Math.max(heightMm, 297);
+
+                styleEl.innerHTML = `
+                    @media print {
+                        @page {
+                            size: 210mm ${finalHeight + 20}mm !important; /* +20mm buffer */
+                            margin: 0 !important;
+                        }
+                        .resume-page {
+                            min-height: ${finalHeight + 20}mm !important;
+                            height: ${finalHeight + 20}mm !important;
+                        }
+                    }
+                `;
+            }
+        };
+
+        const handleAfterPrint = () => {
+            const styleEl = document.getElementById('dynamic-print-style');
+            if (styleEl) styleEl.remove();
+        };
+
+        window.addEventListener('beforeprint', handleBeforePrint);
+        window.addEventListener('afterprint', handleAfterPrint);
+
+        return () => {
+            window.removeEventListener('beforeprint', handleBeforePrint);
+            window.removeEventListener('afterprint', handleAfterPrint);
+        };
+    }, [settings.useSinglePage, settings.usePaging, resume]);
 
     const renderTemplate = () => {
         switch (settings.template) {
@@ -83,7 +142,7 @@ export default function TemplateRenderer({ resume: rawResume, scale = 1 }: Templ
     }
 
     return (
-        <div className="renderer-wrapper" data-print-wrapper="true" style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
+        <div ref={containerRef} className="renderer-wrapper" data-print-wrapper="true" style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
             {renderTemplate()}
         </div>
     );
