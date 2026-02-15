@@ -28,7 +28,6 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
                 fontFamily: 'Georgia, "Times New Roman", serif',
                 fontSize: settings.fontSize + 'px',
                 lineHeight: settings.lineHeight,
-                transform: `scale(${scale})`,
                 padding: settings.pageMargin + 'px',
             }}
         >

@@ -2,6 +2,7 @@
 
 import { useResumeStore } from '@/stores/resume-store';
 import { useActiveResume } from '@/hooks/use-active-resume';
+import { FiDownload, FiUpload, FiPrinter, FiFileText, FiMaximize, FiMinimize } from 'react-icons/fi';
 
 const templates = [
     { id: 'modern', label: 'Modern' },
@@ -12,6 +13,9 @@ const templates = [
     { id: 'timeline', label: 'Timeline' },
     { id: 'swiss', label: 'Swiss (Bold)' },
     { id: 'grid', label: 'Grid' },
+    { id: 'modern2', label: 'Modern 2 (Sleek)' },
+    { id: 'professional', label: 'Professional' },
+    { id: 'elegant', label: 'Elegant' },
 ];
 
 const fonts = [
@@ -197,58 +201,111 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                 />
             </div>
 
-            {/* Data Management */}
+            {/* Pagination Toggle */}
             <div className="settings-section" style={{ borderTop: '1px solid var(--border-color)', paddingTop: 16 }}>
-                <div className="settings-label" style={{ marginBottom: 12 }}>Data Management</div>
-                <button
-                    className="btn-secondary"
-                    onClick={() => {
-                        const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = '.json';
-                        input.onchange = (e) => {
-                            const file = (e.target as HTMLInputElement).files?.[0];
-                            if (file) {
-                                const reader = new FileReader();
-                                reader.onload = async (event) => {
-                                    const content = event.target?.result as string;
-                                    if (content) {
-                                        try {
-                                            const json = JSON.parse(content);
-                                            let id;
-                                            // Check if Reactive Resume format (has basics)
-                                            if (json.basics) {
-                                                const { importReactiveResumeJson } = await import('@/utils/import-reactive-resume');
-                                                const converted = importReactiveResumeJson(json);
-                                                if (converted) {
-                                                    id = useResumeStore.getState().addResume(converted);
-                                                }
-                                            } else {
-                                                id = useResumeStore.getState().importResume(content);
-                                            }
+                <div className="settings-label" style={{ marginBottom: 12 }}>Page Layout</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                    <button
+                        className={`template-option ${!settings.usePaging ? 'active' : ''}`}
+                        onClick={() => { pushUndoState(); updateSettings({ usePaging: false }); }}
+                        style={{ display: 'flex', flexDirection: 'column', padding: '12px 8px', gap: 4 }}
+                    >
+                        <FiMaximize style={{ fontSize: 18 }} />
+                        <span>Single Page</span>
+                    </button>
+                    <button
+                        className={`template-option ${settings.usePaging ? 'active' : ''}`}
+                        onClick={() => { pushUndoState(); updateSettings({ usePaging: true }); }}
+                        style={{ display: 'flex', flexDirection: 'column', padding: '12px 8px', gap: 4 }}
+                    >
+                        <FiMinimize style={{ fontSize: 18 }} />
+                        <span>A4 Pagination</span>
+                    </button>
+                </div>
+            </div>
 
-                                            if (id) {
-                                                alert('Resume imported successfully!');
-                                                // Small delay to ensure state update propagates safely
-                                                setTimeout(() => onClose(), 100);
-                                            } else {
-                                                alert('Invalid resume file');
+            {/* Data Management */}
+            <div className="settings-section" style={{ borderTop: '1px solid var(--border-color)', paddingTop: 16, paddingBottom: 40 }}>
+                <div className="settings-label" style={{ marginBottom: 12 }}>Import / Export</div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 10 }}>
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => window.print()}
+                        style={{ width: '100%' }}
+                    >
+                        <FiPrinter /> Export to PDF
+                    </button>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                        <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => {
+                                const json = useResumeStore.getState().exportResume(resume.id);
+                                const blob = new Blob([json], { type: 'application/json' });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `${resume.title.replace(/\s+/g, '_')}.json`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                            }}
+                        >
+                            <FiFileText /> JSON
+                        </button>
+
+                        <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => {
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = '.json';
+                                input.onchange = (e) => {
+                                    const file = (e.target as HTMLInputElement).files?.[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onload = async (event) => {
+                                            const content = event.target?.result as string;
+                                            if (content) {
+                                                try {
+                                                    const json = JSON.parse(content);
+                                                    let id;
+                                                    if (json.basics) {
+                                                        const { importReactiveResumeJson } = await import('@/utils/import-reactive-resume');
+                                                        const converted = importReactiveResumeJson(json);
+                                                        if (converted) {
+                                                            id = useResumeStore.getState().addResume(converted);
+                                                        }
+                                                    } else {
+                                                        id = useResumeStore.getState().importResume(content);
+                                                    }
+
+                                                    if (id) {
+                                                        alert('Resume imported successfully!');
+                                                        setTimeout(() => onClose(), 100);
+                                                    } else {
+                                                        alert('Invalid resume file');
+                                                    }
+                                                } catch (err: any) {
+                                                    console.error('Import Error:', err);
+                                                    alert(`Error importing resume: ${err.message || 'Unknown error'}`);
+                                                }
                                             }
-                                        } catch (err: any) {
-                                            console.error('Import Error:', err);
-                                            alert(`Error importing resume: ${err.message || 'Unknown error'}`);
-                                        }
+                                        };
+                                        reader.readAsText(file);
                                     }
                                 };
-                                reader.readAsText(file);
-                            }
-                        };
-                        input.click();
-                    }}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-                >
-                    <span>📥</span> Import JSON (CV Creator / Reactive Resume)
-                </button>
+                                input.click();
+                            }}
+                        >
+                            <FiUpload /> Import
+                        </button>
+                    </div>
+                </div>
+
+                <p style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 12, textAlign: 'center' }}>
+                    JSON files are compatible with CV Creator and Reactive Resume v4.
+                </p>
             </div>
         </div>
     );

@@ -1295,8 +1295,6 @@ body {
 }
 
 .resume-page {
-  width: 210mm;
-  min-height: 297mm;
   background: #fff;
   box-shadow: var(--shadow-xl);
   border-radius: 4px;
@@ -1707,8 +1705,13 @@ body {
   .preview-panel {
     width: 100%;
     height: 100%;
-    padding: 12px;
-    background: var(--bg-primary);
+    padding: 0;
+    background: #1a1a2e;
+    /* Darker background for preview contrast */
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
   }
 
   /* Mobile Toggle Logic */
@@ -1778,6 +1781,13 @@ body {
   .mobile-toggle-btn.active {
     background: var(--accent-primary);
     color: #fff;
+  }
+
+  /* Ensure resume is visible on mobile */
+  .preview-panel>div {
+    min-width: 100%;
+    display: flex;
+    justify-content: center;
   }
 }
 
@@ -1933,8 +1943,9 @@ body {
 }
 
 .range-input {
-  width: 120px;
+  width: 100%;
   accent-color: var(--accent-primary);
+  cursor: pointer;
 }
 
 /* Print styles */
@@ -1957,6 +1968,57 @@ body {
   .resume-page {
     box-shadow: none;
     border-radius: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100vh;
+  }
+}
+
+/* ═══════════════════════════════════
+   PAGINATION STYLES
+   ═══════════════════════════════════ */
+
+.resume-pages-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 40px 0;
+  align-items: center;
+}
+
+/* A4 dimensions only apply when pagination is ON */
+.resume-pages-container .resume-page {
+  width: 210mm;
+  min-height: 297mm;
+  max-height: 297mm;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+  box-sizing: border-box;
+  page-break-after: always;
+  page-break-inside: avoid;
+}
+
+@media print {
+  .resume-pages-container {
+    padding: 0;
+    gap: 0;
+  }
+
+  .resume-page {
+    box-shadow: none !important;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .resume-pages-container .resume-page {
+    page-break-after: always;
+  }
+
+  .resume-pages-container .resume-page:last-child {
+    page-break-after: avoid;
   }
 }
 

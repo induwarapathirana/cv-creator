@@ -29,7 +29,6 @@ export default function GridTemplate({ resume, scale = 1 }: TemplateProps) {
                 fontFamily: settings.font + ', sans-serif',
                 fontSize: settings.fontSize + 'px',
                 lineHeight: settings.lineHeight,
-                transform: `scale(${scale})`,
                 padding: settings.pageMargin + 'px',
                 background: '#f8fafc',
             }}

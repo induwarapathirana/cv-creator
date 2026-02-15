@@ -28,7 +28,6 @@ export default function SwissTemplate({ resume, scale = 1 }: TemplateProps) {
                 fontFamily: 'Helvetica, Arial, sans-serif', // Enforce Swiss typography
                 fontSize: settings.fontSize + 'px',
                 lineHeight: settings.lineHeight,
-                transform: `scale(${scale})`,
                 padding: settings.pageMargin + 'px',
             }}
         >

@@ -106,6 +106,7 @@ export interface ResumeSettings {
   colors: ResumeColors;
   sectionSpacing: number;
   pageMargin: number;
+  usePaging: boolean;
 }
 
 export type SectionType =

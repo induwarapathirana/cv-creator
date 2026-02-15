@@ -10,7 +10,8 @@ import {
     FiTrash2,
     FiSun,
     FiMoon,
-    FiArrowLeft
+    FiArrowLeft,
+    FiFileText
 } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import TemplateRenderer from '@/components/templates/TemplateRenderer';
@@ -101,6 +102,18 @@ export default function DashboardPage() {
                             <span>Start with Sample</span>
                         </button>
                     )}
+
+                    {/* Import from PDF */}
+                    <button
+                        className="new-resume-card"
+                        onClick={() => router.push('/parser')}
+                        style={{ borderColor: '#8b5cf6', borderStyle: 'dashed' }}
+                    >
+                        <div className="new-resume-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6, #6366f1)' }}>
+                            <FiFileText />
+                        </div>
+                        <span>Import from PDF</span>
+                    </button>
 
                     {/* Existing resumes */}
                     {resumes.map((r) => (

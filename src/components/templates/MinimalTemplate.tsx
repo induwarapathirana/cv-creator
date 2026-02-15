@@ -29,7 +29,6 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
                 fontFamily: settings.font + ', sans-serif',
                 fontSize: settings.fontSize + 'px',
                 lineHeight: settings.lineHeight,
-                transform: `scale(${scale})`,
                 padding: settings.pageMargin + 'px',
             }}
         >

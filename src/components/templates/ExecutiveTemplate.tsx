@@ -30,7 +30,6 @@ export default function ExecutiveTemplate({ resume, scale = 1 }: TemplateProps) 
                 fontFamily: settings.font + ', sans-serif',
                 fontSize: settings.fontSize + 'px',
                 lineHeight: settings.lineHeight,
-                transform: `scale(${scale})`,
                 padding: 0,
                 display: 'flex',
                 flexDirection: 'row',

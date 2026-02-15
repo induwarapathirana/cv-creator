@@ -26,6 +26,7 @@ export const defaultSettings = {
     },
     sectionSpacing: 16,
     pageMargin: 40,
+    usePaging: false,
 };
 
 export function createEmptyResume(title: string = 'Untitled Resume'): Resume {
