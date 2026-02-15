@@ -9,9 +9,8 @@ async function getBrowser() {
         // Production: Use @sparticuz/chromium
         browser = await puppeteer.launch({
             args: chromium.args,
-            defaultViewport: chromium.defaultViewport,
             executablePath: await chromium.executablePath(),
-            headless: chromium.headless,
+            headless: true,
         });
     } else {
         // Local Development: Connect to local Chrome or use a local path if configured
