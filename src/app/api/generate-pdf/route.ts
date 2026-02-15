@@ -95,27 +95,44 @@ export async function POST(req: NextRequest) {
         // Construct the full HTML document
         const fullContent = `
             <!DOCTYPE html>
-            <html>
+            <html data-theme="light">
                 <head>
                     <meta charset="UTF-8">
                     ${darkModeReset}
                     <style>
                         /* Base resets */
                         * { box-sizing: border-box; }
-                        body { margin: 0; padding: 0; background: white; }
+                        body { 
+                            margin: 0; 
+                            padding: 0; 
+                            background: white !important; 
+                            color: #333 !important;
+                        }
                         
                         /* Injected Global Styles */
                         ${css}
 
                         /* Print-specific overrides to ensure exact fidelity */
                         @media print {
-                            body { -webkit-print-color-adjust: exact; }
+                            body { -webkit-print-color-adjust: exact !important; }
                             @page { margin: 0; }
+                            
+                            /* Ensure the injected content is visible even if the "not builder-layout" rule exists */
+                            .builder-layout, .builder-main, .preview-panel {
+                                display: block !important;
+                                visibility: visible !important;
+                                opacity: 1 !important;
+                                background: white !important;
+                            }
                         }
                     </style>
                 </head>
-                <body>
-                    ${html}
+                <body class="builder-layout">
+                    <div class="builder-main">
+                        <div class="preview-panel">
+                            ${html}
+                        </div>
+                    </div>
                 </body>
             </html>
         `;
