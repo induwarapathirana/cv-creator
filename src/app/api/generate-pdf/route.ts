@@ -4,36 +4,33 @@ import chromium from '@sparticuz/chromium';
 
 // Helper to determine the correct executable path based on environment
 async function getBrowser() {
-    let browser;
-    if (process.env.NODE_ENV === 'production') {
-        // Production: Use @sparticuz/chromium
-        browser = await puppeteer.launch({
-            args: chromium.args,
-            executablePath: await chromium.executablePath(),
-            headless: true,
-        });
-    } else {
-        // Local Development: Connect to local Chrome or use a local path if configured
-        // Attempt to find local Chrome installation for Mac/Windows/Linux?
-        // Or instruct user to set PUPPETEER_EXECUTABLE_PATH env var.
-        // For simplicity in this specific project context, we'll try a common Mac path or fallback.
+    try {
+        if (process.env.NODE_ENV === 'production') {
+            // Production: Use @sparticuz/chromium
+            return await puppeteer.launch({
+                args: chromium.args,
+                defaultViewport: (chromium as any).defaultViewport,
+                executablePath: await chromium.executablePath(),
+                headless: (chromium as any).headless,
+            });
+        }
+
+        // Local Development: Common paths for Chrome
         const executablePath =
             process.env.PUPPETEER_EXECUTABLE_PATH ||
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' ||
-            '/usr/bin/google-chrome-stable';
+            '/usr/bin/google-chrome-stable' ||
+            'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 
-        try {
-            browser = await puppeteer.launch({
-                args: ['--no-sandbox', '--disable-setuid-sandbox'],
-                executablePath,
-                headless: true, // New headless mode
-            });
-        } catch (e) {
-            console.error('Local Chrome launch failed. Ensure Chrome is installed.', e);
-            throw new Error('Local Chrome not found. Set PUPPETEER_EXECUTABLE_PATH.');
-        }
+        return await puppeteer.launch({
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            executablePath,
+            headless: true,
+        });
+    } catch (error: any) {
+        console.error('Browser Launch Error:', error);
+        throw new Error(`Failed to launch browser: ${error.message}`);
     }
-    return browser;
 }
 
 export async function POST(req: NextRequest) {
