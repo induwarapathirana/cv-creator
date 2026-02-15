@@ -16,175 +16,168 @@ function formatDate(dateStr: string): string {
     return month ? `${months[parseInt(month) - 1]} ${year}` : year;
 }
 
-export default function TimelineTemplate({ resume, scale = 1 }: TemplateProps) {
+export default function TimelineTemplate({ resume }: TemplateProps) {
     const { personalInfo, experience, education, skills, projects, certifications, languages, awards, sections } = resume;
     const settings = resume.settings || defaultSettings;
     const primaryColor = settings.colors.primary;
-
     const visibleSections = sections.filter(s => s.visible).sort((a, b) => a.order - b.order);
+
+    const leftColumnSections = visibleSections.filter(s => s.column === 'left');
+    const rightColumnSections = visibleSections.filter(s => s.column === 'right' || !s.column);
+
+    const SectionTitle = ({ title }: { title: string }) => (
+        <h2 style={{
+            fontSize: '14px',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: '#888',
+            marginBottom: 20,
+            borderBottom: '1px solid #eee',
+            paddingBottom: 8
+        }}>
+            {title}
+        </h2>
+    );
 
     return (
         <div
             className="resume-page"
             style={{
-                fontFamily: settings.font + ', sans-serif',
+                fontFamily: '"Lato", "Inter", sans-serif',
                 fontSize: settings.fontSize + 'px',
-                lineHeight: settings.lineHeight,
+                lineHeight: 1.5,
                 padding: settings.pageMargin + 'px',
+                color: '#333',
             }}
         >
             <div className="resume-template">
                 {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: 40, borderBottom: `4px solid ${primaryColor}`, paddingBottom: 30 }}>
-                    {personalInfo.photo && (
-                        <img
-                            src={personalInfo.photo}
-                            alt={personalInfo.fullName}
-                            style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', marginBottom: 16, border: `4px solid ${primaryColor}` }}
-                        />
-                    )}
-                    <h1 style={{ fontSize: '36px', fontWeight: 800, letterSpacing: '-0.02em', color: '#1a1a2e', marginBottom: 8 }}>
-                        {personalInfo.fullName}
-                    </h1>
-                    <div style={{ fontSize: '16px', color: primaryColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                        {personalInfo.jobTitle}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40 }}>
+                    <div>
+                        <h1 style={{ fontSize: '36px', fontWeight: 800, margin: '0 0 8px 0', color: primaryColor }}>
+                            {personalInfo.fullName}
+                        </h1>
+                        <div style={{ fontSize: '16px', fontWeight: 500, letterSpacing: '0.05em' }}>{personalInfo.jobTitle.toUpperCase()}</div>
                     </div>
-
-                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px 20px', marginTop: 16, fontSize: '13px' }}>
-                        {personalInfo.email && <span>{personalInfo.email}</span>}
-                        {personalInfo.phone && <span>{personalInfo.phone}</span>}
-                        {personalInfo.location && <span>{personalInfo.location}</span>}
-                        {personalInfo.website && <span>{personalInfo.website.replace(/^https?:\/\//, '')}</span>}
-                        {personalInfo.linkedin && <span>LinkedIn</span>}
+                    <div style={{ textAlign: 'right', fontSize: '13px', lineHeight: 1.6 }}>
+                        <div>{personalInfo.email}</div>
+                        <div>{personalInfo.phone}</div>
+                        <div>{personalInfo.location}</div>
+                        <div>{personalInfo.linkedin?.replace('https://', '')}</div>
                     </div>
                 </div>
 
-                {/* Content */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: settings.sectionSpacing + 'px' }}>
-                    {visibleSections.map(section => {
-                        if (section.type === 'personalInfo') return null;
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 40 }}>
+                    {/* Left Sidebar */}
+                    <div>
+                        {leftColumnSections.map(section => {
+                            if (section.type === 'personalInfo') return null;
 
-                        switch (section.type) {
-                            case 'summary':
-                                return personalInfo.summary ? (
-                                    <div key={section.id}>
-                                        <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1a1a2e', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
-                                            <span style={{ width: 4, height: 24, background: primaryColor }}></span>
-                                            About Me
-                                        </h2>
+                            const items = (resume as any)[section.type] || [];
+                            if (['skills', 'languages', 'certifications', 'awards'].includes(section.type) && items.length > 0) {
+                                return (
+                                    <div key={section.id} style={{ marginBottom: 30 }}>
+                                        <h3 style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', color: '#999', marginBottom: 12 }}>{section.title}</h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                            {items.map((item: any) => (
+                                                <div key={item.id} style={section.type === 'skills' ? { background: '#f5f5f5', padding: '4px 8px', borderRadius: 4, fontSize: '12px', display: 'inline-block' } : { fontSize: '13px', width: '100%' }}>
+                                                    {item.name || item.title} {item.proficiency && <span style={{ color: '#999' }}> - {item.proficiency}</span>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )
+                            }
+
+                            if (section.type === 'summary' && personalInfo.summary) {
+                                return (
+                                    <div key={section.id} style={{ marginBottom: 30 }}>
+                                        <h3 style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', color: '#999', marginBottom: 12 }}>Profile</h3>
                                         <HtmlRenderer html={personalInfo.summary} className="html-content" />
                                     </div>
-                                ) : null;
+                                )
+                            }
+                            return null;
+                        })}
+                    </div>
 
-                            case 'experience':
-                                return experience.length > 0 ? (
-                                    <div key={section.id}>
-                                        <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1a1a2e', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-                                            <span style={{ width: 4, height: 24, background: primaryColor }}></span>
-                                            {section.title}
+                    {/* Right Main Content (Timeline) */}
+                    <div style={{ paddingLeft: 20, borderLeft: '2px solid #eee' }}>
+                        {rightColumnSections.map(section => {
+                            if (section.type === 'personalInfo') return null;
+
+                            let items: any[] = [];
+                            if (['experience', 'education', 'projects', 'custom'].includes(section.type)) {
+                                items = (resume as any)[section.type] || [];
+                                if (section.type === 'custom' && section.customSectionId) {
+                                    const cs = resume.customSections.find(c => c.id === section.customSectionId);
+                                    if (cs) items = cs.items;
+                                }
+                            }
+
+                            if (items.length > 0) {
+                                const dynamicTitle = section.type === 'custom'
+                                    ? resume.customSections.find(c => c.id === section.customSectionId)?.title
+                                    : section.title;
+
+                                return (
+                                    <div key={section.id} style={{ marginBottom: 40, position: 'relative' }}>
+                                        <h2 style={{
+                                            fontSize: '18px',
+                                            fontWeight: 800,
+                                            color: primaryColor,
+                                            marginBottom: 20,
+                                            position: 'relative'
+                                        }}>
+                                            <span style={{
+                                                position: 'absolute',
+                                                left: -29,
+                                                top: 4,
+                                                width: 16,
+                                                height: 16,
+                                                borderRadius: '50%',
+                                                background: '#fff',
+                                                border: `4px solid ${primaryColor}`
+                                            }}></span>
+                                            {dynamicTitle || section.title}
                                         </h2>
-                                        <div style={{ display: 'flex', flexDirection: 'column', position: 'relative', paddingLeft: 20 }}>
-                                            {/* Timeline vertical line */}
-                                            <div style={{ position: 'absolute', left: 4, top: 4, bottom: 0, width: 2, background: '#e5e7eb' }}></div>
 
-                                            {experience.map((exp, index) => (
-                                                <div key={exp.id} style={{ marginBottom: 24, position: 'relative', paddingLeft: 24 }}>
-                                                    {/* Timeline dot */}
-                                                    <div style={{ position: 'absolute', left: -21, top: 6, width: 10, height: 10, borderRadius: '50%', background: primaryColor, border: '2px solid white', boxShadow: '0 0 0 2px ' + primaryColor }}></div>
-
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-                                                        <h3 style={{ fontSize: '15px', fontWeight: 700 }}>{exp.position}</h3>
-                                                        <span style={{ fontSize: '12px', fontWeight: 600, color: primaryColor, background: 'rgba(0,0,0,0.05)', padding: '2px 8px', borderRadius: 4 }}>
-                                                            {formatDate(exp.startDate)} — {exp.current ? 'Present' : formatDate(exp.endDate)}
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                                            {items.map((item: any) => (
+                                                <div key={item.id}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                                        <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0 }}>
+                                                            {item.title || item.position || item.institution || item.name}
+                                                        </h3>
+                                                        <span style={{ fontSize: '13px', color: '#888' }}>
+                                                            {formatDate(item.startDate || item.date)} {item.endDate ? `– ${item.endDate === 'Present' || item.current ? 'Present' : formatDate(item.endDate)}` : ''}
                                                         </span>
                                                     </div>
-                                                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#555', marginBottom: 8 }}>
-                                                        {exp.company}{exp.location ? `, ${exp.location}` : ''}
-                                                    </div>
-                                                    <HtmlRenderer html={exp.description} className="html-content" />
-                                                    {exp.highlights.length > 0 && (
-                                                        <ul style={{ paddingLeft: 18, margin: 0 }}>
-                                                            {exp.highlights.filter(Boolean).map((h, i) => (
-                                                                <li key={i} style={{ marginBottom: 3, fontSize: '10pt' }}>{h}</li>
-                                                            ))}
-                                                        </ul>
+                                                    {(item.company || item.subtitle || item.issuer) && (
+                                                        <div style={{ fontSize: '14px', fontWeight: 600, color: '#555', marginBottom: 8 }}>
+                                                            {item.company || item.subtitle || item.issuer}
+                                                        </div>
                                                     )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ) : null;
-
-                            case 'education': // Simple timeline for education too
-                                return education.length > 0 ? (
-                                    <div key={section.id}>
-                                        <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1a1a2e', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-                                            <span style={{ width: 4, height: 24, background: primaryColor }}></span>
-                                            {section.title}
-                                        </h2>
-                                        <div style={{ display: 'flex', flexDirection: 'column', position: 'relative', paddingLeft: 20 }}>
-                                            <div style={{ position: 'absolute', left: 4, top: 4, bottom: 0, width: 2, background: '#e5e7eb' }}></div>
-                                            {education.map((edu) => (
-                                                <div key={edu.id} style={{ marginBottom: 20, position: 'relative', paddingLeft: 24 }}>
-                                                    <div style={{ position: 'absolute', left: -20, top: 6, width: 8, height: 8, borderRadius: '50%', background: '#fff', border: `2px solid ${primaryColor}` }}></div>
-                                                    <div style={{ fontWeight: 700, fontSize: '14px' }}>{edu.degree}</div>
-                                                    <div style={{ fontSize: '13px' }}>{edu.institution}</div>
-                                                    <div style={{ fontSize: '12px', color: '#666', marginTop: 2 }}>
-                                                        {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ) : null;
-
-                            case 'skills':
-                                return skills.length > 0 ? (
-                                    <div key={section.id}>
-                                        <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1a1a2e', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
-                                            <span style={{ width: 4, height: 24, background: primaryColor }}></span>
-                                            {section.title}
-                                        </h2>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                                            {skills.map(skill => (
-                                                <div key={skill.id} style={{
-                                                    border: `1px solid ${primaryColor}`,
-                                                    borderRadius: 4,
-                                                    padding: '6px 12px',
-                                                    fontSize: '13px',
-                                                    fontWeight: 500,
-                                                    color: '#1a1a2e'
-                                                }}>
-                                                    {skill.name}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ) : null;
-
-                            // ... reuse standard list logic or minimal for others
-                            default:
-                                const items: any[] = (resume as any)[section.type] || (section.type === 'custom' ? resume.customSections.find(cs => cs.id === section.customSectionId)?.items : []);
-                                if (!items || items.length === 0) return null;
-                                return (
-                                    <div key={section.id}>
-                                        <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1a1a2e', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
-                                            <span style={{ width: 4, height: 24, background: primaryColor }}></span>
-                                            {section.title || (section.type === 'custom' ? resume.customSections.find(cs => cs.id === section.customSectionId)?.title : '')}
-                                        </h2>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                                            {items.map((item: any) => (
-                                                <div key={item.id} style={{ background: '#f9f9f9', padding: 12, borderRadius: 6 }}>
-                                                    <div style={{ fontWeight: 700, fontSize: '13px' }}>{item.name || item.title}</div>
-                                                    {item.proficiency && <div style={{ fontSize: '12px', color: primaryColor }}>{item.proficiency}</div>}
-                                                    {item.description && <div style={{ fontSize: '12px', marginTop: 4 }}><HtmlRenderer html={item.description} /></div>}
+                                                    {item.description && <HtmlRenderer html={item.description} className="html-content" />}
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
                                 );
-                        }
-                    })}
+                            }
+
+                            if (section.type === 'summary' && personalInfo.summary) {
+                                return (
+                                    <div key={section.id} style={{ marginBottom: 30 }}>
+                                        <HtmlRenderer html={personalInfo.summary} className="html-content" />
+                                    </div>
+                                )
+                            }
+
+                            return null;
+                        })}
+                    </div>
                 </div>
             </div>
         </div>

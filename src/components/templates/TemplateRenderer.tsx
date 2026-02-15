@@ -8,7 +8,14 @@ import ClassicTemplate from './ClassicTemplate';
 import MinimalTemplate from './MinimalTemplate';
 import ExecutiveTemplate from './ExecutiveTemplate';
 import CreativeTemplate from './CreativeTemplate';
+import TechTemplate from './TechTemplate';
+import AcademicTemplate from './AcademicTemplate';
+import CompactTemplate from './CompactTemplate';
 import TimelineTemplate from './TimelineTemplate';
+import BoldTemplate from './BoldTemplate';
+import SplitTemplate from './SplitTemplate';
+import GlitchTemplate from './GlitchTemplate';
+import LeafTemplate from './LeafTemplate';
 import SwissTemplate from './SwissTemplate';
 import GridTemplate from './GridTemplate';
 import Modern2Template from './Modern2Template';
@@ -34,8 +41,22 @@ export default function TemplateRenderer({ resume: rawResume, scale = 1 }: Templ
                 return <ExecutiveTemplate resume={resume} scale={scale} />;
             case 'creative':
                 return <CreativeTemplate resume={resume} scale={scale} />;
+            case 'tech':
+                return <TechTemplate resume={resume} scale={scale} />;
+            case 'academic':
+                return <AcademicTemplate resume={resume} scale={scale} />;
+            case 'compact':
+                return <CompactTemplate resume={resume} scale={scale} />;
             case 'timeline':
                 return <TimelineTemplate resume={resume} scale={scale} />;
+            case 'bold':
+                return <BoldTemplate resume={resume} scale={scale} />;
+            case 'split':
+                return <SplitTemplate resume={resume} scale={scale} />;
+            case 'glitch':
+                return <GlitchTemplate resume={resume} scale={scale} />;
+            case 'leaf':
+                return <LeafTemplate resume={resume} scale={scale} />;
             case 'swiss':
                 return <SwissTemplate resume={resume} scale={scale} />;
             case 'grid':
