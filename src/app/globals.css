@@ -2051,6 +2051,11 @@ body {
 
 /* Hide the marker when printing */
 @media print {
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   .resume-pages-container .resume-page::after {
     display: none;
   }
@@ -2059,6 +2064,23 @@ body {
     box-shadow: none;
     margin: 0;
     page-break-after: always;
+    overflow: visible !important;
+  }
+
+  /* Don't override padding, let inline styles work */
+  .resume-page {
+    box-shadow: none !important;
+    border-radius: 0;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
+  }
+
+  .resume-template {
+    height: auto !important;
+    /* Allow grid to grow */
   }
 }
 
