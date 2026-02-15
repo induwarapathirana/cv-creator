@@ -1,6 +1,6 @@
 {
-    "name": "CV Creator",
-    "short_name": "CV Creator",
+    "name": "OpenResume",
+    "short_name": "OpenResume",
     "description": "Build ATS-Friendly Resumes That Get You Hired",
     "start_url": "/builder",
     "display": "standalone",
