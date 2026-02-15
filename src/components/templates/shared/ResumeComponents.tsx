@@ -13,9 +13,10 @@ interface SectionTitleProps {
     color: string;
     variant?: 'modern' | 'classic' | 'minimal' | 'elegant' | 'academic' | 'bold';
     centered?: boolean;
+    style?: React.CSSProperties;
 }
 
-export const SectionTitle = ({ title, color, variant = 'modern', centered }: SectionTitleProps) => {
+export const SectionTitle = ({ title, color, variant = 'modern', centered, style }: SectionTitleProps) => {
     if (variant === 'classic') {
         return (
             <h2 style={{
@@ -25,7 +26,8 @@ export const SectionTitle = ({ title, color, variant = 'modern', centered }: Sec
                 fontVariant: 'small-caps',
                 marginBottom: '10px',
                 marginTop: '15px',
-                paddingBottom: '2px'
+                paddingBottom: '2px',
+                ...style
             }}>
                 {title}
             </h2>
@@ -42,7 +44,8 @@ export const SectionTitle = ({ title, color, variant = 'modern', centered }: Sec
                 letterSpacing: '0.25em',
                 textAlign: 'center',
                 marginBottom: '32px',
-                marginTop: '16px'
+                marginTop: '16px',
+                ...style
             }}>
                 {title}
             </h2>
@@ -50,7 +53,7 @@ export const SectionTitle = ({ title, color, variant = 'modern', centered }: Sec
     }
 
     return (
-        <div style={{ marginBottom: '12px', marginTop: '4px', textAlign: centered ? 'center' : 'left' }}>
+        <div style={{ marginBottom: '12px', marginTop: '4px', textAlign: centered ? 'center' : 'left', ...style }}>
             <h2 style={{
                 color: color,
                 fontSize: '11pt',
