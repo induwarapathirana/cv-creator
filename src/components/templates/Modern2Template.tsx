@@ -19,9 +19,7 @@ export default function Modern2Template({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: settings.font + ', sans-serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: settings.lineHeight,
-                padding: settings.pageMargin + 'px',
+                padding: 'var(--page-margin)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 30,

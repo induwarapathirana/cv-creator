@@ -19,9 +19,7 @@ export default function LeafTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: '"Quicksand", "Nunito", sans-serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: 1.6,
-                padding: settings.pageMargin + 'px',
+                padding: 'var(--page-margin)',
                 color: '#444',
                 backgroundColor: 'white',
             }}

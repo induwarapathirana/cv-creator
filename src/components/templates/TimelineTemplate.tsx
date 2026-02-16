@@ -107,9 +107,7 @@ export default function TimelineTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: '"Lato", "Inter", sans-serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: 1.5,
-                padding: settings.pageMargin + 'px',
+                padding: 'var(--page-margin)',
                 color: '#333',
                 backgroundColor: 'white',
             }}

@@ -19,9 +19,9 @@ export default function ElegantTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: '"Playfair Display", "Times New Roman", serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: settings.lineHeight + 0.2,
-                padding: (settings.pageMargin + 20) + 'px',
+                // Elegant adds a bit more line height for that premium feel
+                lineHeight: 'calc(var(--line-height) + 0.2)',
+                padding: 'calc(var(--page-margin) + 20px)',
                 color: '#333',
                 backgroundColor: 'white',
             }}

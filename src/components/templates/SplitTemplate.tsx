@@ -110,8 +110,6 @@ export default function SplitTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: '"Roboto", sans-serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: 1.5,
                 padding: 0,
                 color: '#333',
                 backgroundColor: '#fff',

@@ -137,7 +137,16 @@ export default function TemplateRenderer({ resume: rawResume, scale = 1 }: Templ
             <div
                 className="resume-pages-container renderer-wrapper"
                 data-paging="true"
-                style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}
+                style={{
+                    transform: `scale(${scale})`,
+                    transformOrigin: 'top center',
+                    // Reactive Resume Style CSS Variables
+                    ['--font-size' as any]: settings.fontSize + 'px',
+                    ['--line-height' as any]: settings.lineHeight,
+                    ['--section-spacing' as any]: settings.sectionSpacing + 'px',
+                    ['--primary-color' as any]: settings.colors.primary,
+                    ['--page-margin' as any]: settings.pageMargin + 'px'
+                } as any}
             >
                 {/* For now, we render as one big "page" that can be breaked by CSS print rules or just viewed as a sequence */}
                 {renderTemplate()}
@@ -146,7 +155,21 @@ export default function TemplateRenderer({ resume: rawResume, scale = 1 }: Templ
     }
 
     return (
-        <div ref={containerRef} className="renderer-wrapper" data-print-wrapper="true" style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
+        <div
+            ref={containerRef}
+            className="renderer-wrapper"
+            data-print-wrapper="true"
+            style={{
+                transform: `scale(${scale})`,
+                transformOrigin: 'top center',
+                // Reactive Resume Style CSS Variables
+                ['--font-size' as any]: settings.fontSize + 'px',
+                ['--line-height' as any]: settings.lineHeight,
+                ['--section-spacing' as any]: settings.sectionSpacing + 'px',
+                ['--primary-color' as any]: settings.colors.primary,
+                ['--page-margin' as any]: settings.pageMargin + 'px'
+            } as any}
+        >
             {renderTemplate()}
         </div>
     );

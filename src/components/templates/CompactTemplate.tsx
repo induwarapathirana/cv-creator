@@ -93,9 +93,9 @@ export default function CompactTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: '"Inter", sans-serif',
-                fontSize: (settings.fontSize - 2) + 'px',
-                lineHeight: 1.3,
-                padding: '32px',
+                fontSize: 'calc(var(--font-size) - 2px)',
+                lineHeight: 'var(--line-height)',
+                padding: 'var(--page-margin)',
                 color: '#111',
                 backgroundColor: 'white',
             }}

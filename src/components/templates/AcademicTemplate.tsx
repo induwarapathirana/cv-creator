@@ -19,9 +19,7 @@ export default function AcademicTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: '"Times New Roman", Times, serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: 1.4,
-                padding: settings.pageMargin + 'px',
+                padding: 'var(--page-margin)',
                 color: '#000',
                 backgroundColor: 'white',
             }}

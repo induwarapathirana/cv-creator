@@ -19,9 +19,7 @@ export default function ProfessionalTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: settings.font + ', serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: settings.lineHeight,
-                padding: settings.pageMargin + 'px',
+                padding: 'var(--page-margin)',
                 color: '#333',
                 backgroundColor: 'white',
             }}

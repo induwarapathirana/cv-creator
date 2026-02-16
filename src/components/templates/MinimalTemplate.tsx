@@ -21,11 +21,9 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: settings.font + ', sans-serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: settings.lineHeight,
-                padding: settings.pageMargin + 'px',
                 color: '#333',
                 backgroundColor: 'white',
+                padding: 'var(--page-margin)',
             }}
         >
             <div className="resume-template">

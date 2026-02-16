@@ -19,9 +19,7 @@ export default function ExecutiveTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: 'Georgia, Cambria, "Times New Roman", serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: settings.lineHeight,
-                padding: settings.pageMargin + 'px',
+                padding: 'var(--page-margin)',
                 color: '#1f2937',
                 backgroundColor: 'white',
             }}

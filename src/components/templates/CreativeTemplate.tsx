@@ -116,8 +116,6 @@ export default function CreativeTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: '"Poppins", "Inter", sans-serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: 1.6,
                 padding: 0,
                 color: '#333',
                 backgroundColor: 'white',

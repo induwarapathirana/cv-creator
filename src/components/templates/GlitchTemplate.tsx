@@ -86,9 +86,7 @@ export default function GlitchTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: '"Courier New", Courier, monospace',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: 1.4,
-                padding: settings.pageMargin + 'px',
+                padding: 'var(--page-margin)',
                 color: '#111',
                 backgroundColor: 'white',
             }}

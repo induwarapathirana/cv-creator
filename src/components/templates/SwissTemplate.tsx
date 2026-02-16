@@ -109,9 +109,7 @@ export default function SwissTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: settings.lineHeight,
-                padding: settings.pageMargin + 'px',
+                padding: 'var(--page-margin)',
                 color: '#000',
                 backgroundColor: 'white',
             }}

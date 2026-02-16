@@ -1304,6 +1304,9 @@ body {
   transform-origin: top center;
   color: #1a1a2e;
   position: relative;
+  /* Use CSS variables for scaling */
+  font-size: var(--font-size, 12px);
+  line-height: var(--line-height, 1.5);
 }
 
 /* Visual Page Breaks in Editor */

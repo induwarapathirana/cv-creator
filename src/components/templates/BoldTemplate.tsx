@@ -128,9 +128,7 @@ export default function BoldTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: '"Inter", "Impact", "Arial Black", sans-serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: 1.5,
-                padding: '40px',
+                padding: 'var(--page-margin)',
                 color: '#000',
                 backgroundColor: 'white',
             }}

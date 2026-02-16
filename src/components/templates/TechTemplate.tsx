@@ -85,9 +85,7 @@ export default function TechTemplate({ resume }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: '"Inter", sans-serif',
-                fontSize: settings.fontSize + 'px',
-                lineHeight: 1.5,
-                padding: settings.pageMargin + 'px',
+                padding: 'var(--page-margin)',
                 color: '#1f2937',
                 backgroundColor: 'white',
             }}
