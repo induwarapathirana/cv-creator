@@ -69,18 +69,34 @@ export default function ExportPage() {
                                 padding: 0 !important;
                             }
                             
-                            /* We rely on globals.css for print layout, but verify visibility */
                             @media print {
+                                @page {
+                                    margin: ${resume.settings.pageMargin}px !important;
+                                    size: auto;
+                                }
+
                                 .builder-layout, .builder-main, .preview-panel {
                                     background: white !important;
+                                    display: block !important;
+                                    padding: 0 !important;
+                                    margin: 0 !important;
                                 }
-                            }
 
-                            .renderer-wrapper {
-                                transform: none !important;
-                                margin: 0 !important;
-                                padding: 0 !important;
-                                width: 100% !important;
+                                .resume-page {
+                                    padding: 0 !important;
+                                    margin: 0 !important;
+                                    width: 100% !important;
+                                    box-shadow: none !important;
+                                    border: none !important;
+                                    background: white !important;
+                                }
+                                
+                                .renderer-wrapper {
+                                    transform: none !important;
+                                    margin: 0 !important;
+                                    padding: 0 !important;
+                                    width: 100% !important;
+                                }
                             }
                         `}</style>
                         <TemplateRenderer resume={resume} scale={1} />
