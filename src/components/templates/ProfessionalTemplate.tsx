@@ -29,11 +29,11 @@ export default function ProfessionalTemplate({ resume }: TemplateProps) {
             <div className="resume-template">
                 {/* Header - Traditional Center Aligned */}
                 <div style={{ textAlign: 'center', marginBottom: 32 }}>
-                    <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#111827', margin: '0 0 4px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <h1 style={{ fontSize: '2.2em', fontWeight: 700, color: '#111827', margin: '0 0 4px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         {personalInfo.fullName || 'Your Name'}
                     </h1>
                     {personalInfo.jobTitle && (
-                        <div style={{ fontSize: '15px', fontWeight: 600, color: primaryColor, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                        <div style={{ fontSize: '1.1em', fontWeight: 600, color: primaryColor, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             {personalInfo.jobTitle}
                         </div>
                     )}
@@ -74,7 +74,7 @@ export default function ProfessionalTemplate({ resume }: TemplateProps) {
                                                     />
                                                     {exp.description && <ResumeHtmlContent html={exp.description} />}
                                                     {exp.highlights && exp.highlights.length > 0 && (
-                                                        <ul style={{ margin: '6px 0 0 20px', padding: 0, fontSize: '10pt', color: '#374151', lineHeight: 1.5 }}>
+                                                        <ul style={{ margin: '6px 0 0 20px', padding: 0, fontSize: '0.9em', color: '#374151', lineHeight: 'inherit' }}>
                                                             {exp.highlights.filter(Boolean).map((h: string, i: number) => (
                                                                 <li key={i} style={{ marginBottom: '3px' }}>{h}</li>
                                                             ))}
@@ -98,7 +98,7 @@ export default function ProfessionalTemplate({ resume }: TemplateProps) {
                                                         subtitle={`${edu.degree}${edu.field ? ` in ${edu.field}` : ''}`}
                                                         date={`${formatDate(edu.startDate)} — ${formatDate(edu.endDate)}`}
                                                     />
-                                                    {edu.gpa && <div style={{ fontSize: '9pt', color: '#6b7280', marginTop: '-2px' }}>GPA: {edu.gpa}</div>}
+                                                    {edu.gpa && <div style={{ fontSize: '0.85em', color: '#6b7280', marginTop: '-2px' }}>GPA: {edu.gpa}</div>}
                                                 </div>
                                             ))}
                                         </div>
@@ -151,7 +151,7 @@ export default function ProfessionalTemplate({ resume }: TemplateProps) {
                                         <SectionTitle title={section.title} color="#111827" />
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
                                             {languages.map((lang: any) => (
-                                                <div key={lang.id} style={{ fontSize: '10pt' }}>
+                                                <div key={lang.id} style={{ fontSize: '0.9em' }}>
                                                     <span style={{ fontWeight: 700, color: '#111827' }}>{lang.name}</span>
                                                     <span style={{ color: '#6b7280' }}> ({lang.proficiency})</span>
                                                 </div>

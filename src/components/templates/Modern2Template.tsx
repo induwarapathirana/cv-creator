@@ -32,11 +32,11 @@ export default function Modern2Template({ resume }: TemplateProps) {
             {/* Header - Modern Left Aligned */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: `2px solid ${primaryColor}1a`, paddingBottom: 24 }}>
                 <div style={{ flex: 1 }}>
-                    <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>
+                    <h1 style={{ fontSize: '2em', fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>
                         {personalInfo.fullName || 'Your Name'}
                     </h1>
                     {personalInfo.jobTitle && (
-                        <p style={{ fontSize: '18px', color: primaryColor, fontWeight: 600, marginTop: 4 }}>
+                        <p style={{ fontSize: '1.2em', color: primaryColor, fontWeight: 600, marginTop: 4 }}>
                             {personalInfo.jobTitle}
                         </p>
                     )}
@@ -80,7 +80,7 @@ export default function Modern2Template({ resume }: TemplateProps) {
                                                     />
                                                     {exp.description && <ResumeHtmlContent html={exp.description} />}
                                                     {exp.highlights && exp.highlights.length > 0 && (
-                                                        <ul style={{ margin: '6px 0 0 20px', padding: 0, fontSize: '10pt', color: '#4b5563', lineHeight: 1.5 }}>
+                                                        <ul style={{ margin: '6px 0 0 20px', padding: 0, fontSize: '0.9em', color: '#4b5563', lineHeight: 'inherit' }}>
                                                             {exp.highlights.filter(Boolean).map((h: string, i: number) => (
                                                                 <li key={i} style={{ marginBottom: '3px' }}>{h}</li>
                                                             ))}
@@ -101,7 +101,7 @@ export default function Modern2Template({ resume }: TemplateProps) {
                                                 <div key={proj.id}>
                                                     <EntryHeader title={proj.name} date={proj.startDate ? formatDate(proj.startDate) : undefined} />
                                                     {proj.technologies && proj.technologies.length > 0 && (
-                                                        <div style={{ fontSize: '9pt', color: primaryColor, fontWeight: 600, marginBottom: 4 }}>
+                                                        <div style={{ fontSize: '0.85em', color: primaryColor, fontWeight: 600, marginBottom: 4 }}>
                                                             {proj.technologies.join(' • ')}
                                                         </div>
                                                     )}
@@ -173,9 +173,9 @@ export default function Modern2Template({ resume }: TemplateProps) {
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                                             {education.map((edu: any) => (
                                                 <div key={edu.id}>
-                                                    <div style={{ fontWeight: 700, fontSize: '11pt', color: '#111827' }}>{edu.degree}</div>
-                                                    <div style={{ fontSize: '10pt', color: '#4b5563' }}>{edu.institution}</div>
-                                                    <div style={{ fontSize: '9pt', color: '#9ca3af' }}>{formatDate(edu.endDate)}</div>
+                                                    <div style={{ fontWeight: 700, fontSize: '1em', color: '#111827' }}>{edu.degree}</div>
+                                                    <div style={{ fontSize: '0.9em', color: '#4b5563' }}>{edu.institution}</div>
+                                                    <div style={{ fontSize: '0.85em', color: '#9ca3af' }}>{formatDate(edu.endDate)}</div>
                                                 </div>
                                             ))}
                                         </div>
@@ -198,7 +198,7 @@ export default function Modern2Template({ resume }: TemplateProps) {
                                         <SectionTitle title={section.title} color={primaryColor} />
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                             {languages.map((lang: any) => (
-                                                <div key={lang.id} style={{ fontSize: '10pt' }}>
+                                                <div key={lang.id} style={{ fontSize: '0.9em' }}>
                                                     <span style={{ fontWeight: 700, color: '#111827' }}>{lang.name}</span>
                                                     <span style={{ color: '#6b7280' }}> — {lang.proficiency}</span>
                                                 </div>
@@ -215,9 +215,9 @@ export default function Modern2Template({ resume }: TemplateProps) {
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                                             {customSection.items.map((item: any) => (
                                                 <div key={item.id}>
-                                                    <div style={{ fontWeight: 700, fontSize: '11pt', color: '#111827' }}>{item.title}</div>
-                                                    {item.subtitle && <div style={{ fontSize: '10pt', color: '#4b5563' }}>{item.subtitle}</div>}
-                                                    <div style={{ fontSize: '9pt', color: '#9ca3af' }}>{formatDate(item.date)}</div>
+                                                    <div style={{ fontWeight: 700, fontSize: '1em', color: '#111827' }}>{item.title}</div>
+                                                    {item.subtitle && <div style={{ fontSize: '0.9em', color: '#4b5563' }}>{item.subtitle}</div>}
+                                                    <div style={{ fontSize: '0.85em', color: '#9ca3af' }}>{formatDate(item.date)}</div>
                                                 </div>
                                             ))}
                                         </div>

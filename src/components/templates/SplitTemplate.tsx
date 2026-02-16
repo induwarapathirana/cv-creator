@@ -42,7 +42,7 @@ export default function SplitTemplate({ resume }: TemplateProps) {
                 ) : section.type === 'skills' || section.type === 'languages' ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {items.map((item: any) => (
-                            <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10pt' }}>
+                            <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9em' }}>
                                 <span style={{ fontWeight: 600 }}>{item.name}</span>
                                 {item.proficiency && <span style={{ opacity: 0.7 }}>{item.proficiency}</span>}
                             </div>
@@ -51,8 +51,8 @@ export default function SplitTemplate({ resume }: TemplateProps) {
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {items.map((item: any) => (
-                            <div key={item.id} style={{ fontSize: '10pt' }}>
-                                <div style={{ fontWeight: 700, fontSize: '11pt' }}>{item.title || item.name || item.institution}</div>
+                            <div key={item.id} style={{ fontSize: '0.9em' }}>
+                                <div style={{ fontWeight: 700, fontSize: '1em' }}>{item.title || item.name || item.institution}</div>
                                 <div style={{ opacity: 0.8, marginBottom: '4px' }}>
                                     {formatDate(item.date || item.startDate)}
                                 </div>
@@ -129,10 +129,10 @@ export default function SplitTemplate({ resume }: TemplateProps) {
                     flexDirection: 'column'
                 }}>
                     <div style={{ marginBottom: '40px' }}>
-                        <h1 style={{ fontSize: '28pt', fontWeight: 800, lineHeight: 1.1, marginBottom: '12px', letterSpacing: '-0.02em' }}>
+                        <h1 style={{ fontSize: '2em', fontWeight: 800, lineHeight: 1.1, marginBottom: '12px', letterSpacing: '-0.02em' }}>
                             {personalInfo.fullName}
                         </h1>
-                        <div style={{ fontSize: '13pt', color: primaryColor, fontWeight: 600 }}>
+                        <div style={{ fontSize: '1.1em', color: primaryColor, fontWeight: 600 }}>
                             {personalInfo.jobTitle}
                         </div>
                     </div>

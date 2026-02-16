@@ -1303,6 +1303,34 @@ body {
   overflow: hidden;
   transform-origin: top center;
   color: #1a1a2e;
+  position: relative;
+}
+
+/* Visual Page Breaks in Editor */
+.resume-pages-container[data-paging="true"] .resume-page {
+  background-image:
+    linear-gradient(to bottom,
+      transparent calc(297mm - 1px),
+      var(--border-color) calc(297mm - 1px),
+      var(--border-color) 297mm,
+      transparent 297mm);
+  background-size: 100% 297mm;
+  box-shadow: none;
+  border-radius: 0;
+  border: 1px solid var(--border-color);
+}
+
+.resume-pages-container[data-paging="true"]::after {
+  content: "A4 Page Guides Enabled";
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 /* ═══════════════════════════════════

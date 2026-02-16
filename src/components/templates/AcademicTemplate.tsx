@@ -29,7 +29,7 @@ export default function AcademicTemplate({ resume }: TemplateProps) {
             <div className="resume-template">
                 {/* Header - Academic Style (Centered, simple) */}
                 <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                    <h1 style={{ fontSize: '24pt', fontWeight: 700, margin: '0 0 8px 0', color: '#000' }}>
+                    <h1 style={{ fontSize: '2em', fontWeight: 700, margin: '0 0 8px 0', color: '#000' }}>
                         {personalInfo.fullName}
                     </h1>
 
@@ -38,7 +38,7 @@ export default function AcademicTemplate({ resume }: TemplateProps) {
                         justifyContent: 'center',
                         flexWrap: 'wrap',
                         gap: '12px',
-                        fontSize: '10pt',
+                        fontSize: '0.9em',
                         color: '#4b5563'
                     }}>
                         <ContactItem icon={<FiMapPin />} text={personalInfo.location} color={primaryColor} />

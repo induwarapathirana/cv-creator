@@ -127,10 +127,10 @@ export default function CreativeTemplate({ resume }: TemplateProps) {
             <div className="resume-template" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 {/* Header Block */}
                 <div style={{ background: primaryColor, color: '#fff', padding: '48px 64px' }}>
-                    <h1 style={{ fontSize: '48pt', fontWeight: 900, margin: 0, letterSpacing: '-0.04em', lineHeight: 0.9, textTransform: 'uppercase' }}>
+                    <h1 style={{ fontSize: '3.5em', fontWeight: 900, margin: 0, letterSpacing: '-0.04em', lineHeight: 0.9, textTransform: 'uppercase' }}>
                         {personalInfo.fullName}
                     </h1>
-                    <div style={{ fontSize: '18pt', marginTop: '12px', opacity: 0.9, fontWeight: 300 }}>
+                    <div style={{ fontSize: '1.5em', marginTop: '12px', opacity: 0.9, fontWeight: 300 }}>
                         {personalInfo.jobTitle}
                     </div>
                 </div>

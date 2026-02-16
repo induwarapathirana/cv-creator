@@ -31,11 +31,11 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
             <div className="resume-template">
                 {/* Header - Left Aligned */}
                 <div style={{ marginBottom: settings.sectionSpacing * 1.5 + 'px' }}>
-                    <h1 style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 6, color: '#111827' }}>
+                    <h1 style={{ fontSize: '2.5em', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 6, color: '#111827' }}>
                         {personalInfo.fullName || 'Your Name'}
                     </h1>
                     {personalInfo.jobTitle && (
-                        <p style={{ fontSize: '16px', color: '#4b5563', fontWeight: 600, letterSpacing: '0.02em' }}>
+                        <p style={{ fontSize: '1.2em', color: '#4b5563', fontWeight: 600, letterSpacing: '0.02em' }}>
                             {personalInfo.jobTitle}
                         </p>
                     )}
@@ -75,7 +75,7 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
                                                 />
                                                 {exp.description && <ResumeHtmlContent html={exp.description} />}
                                                 {exp.highlights && exp.highlights.length > 0 && (
-                                                    <ul style={{ margin: '6px 0 0 16px', padding: 0, fontSize: '10pt', color: '#4b5563', lineHeight: 1.5 }}>
+                                                    <ul style={{ margin: '6px 0 0 16px', padding: 0, fontSize: 'inherit', color: '#4b5563', lineHeight: 'inherit' }}>
                                                         {exp.highlights.filter(Boolean).map((h: string, i: number) => (
                                                             <li key={i} style={{ marginBottom: '3px' }}>{h}</li>
                                                         ))}
@@ -99,7 +99,7 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
                                                     subtitle={`${edu.degree}${edu.field ? ` in ${edu.field}` : ''}`}
                                                     date={`${formatDate(edu.startDate)} — ${formatDate(edu.endDate)}`}
                                                 />
-                                                {edu.gpa && <div style={{ fontSize: '9pt', color: '#6b7280', marginTop: '-2px' }}>GPA: {edu.gpa}</div>}
+                                                {edu.gpa && <div style={{ fontSize: '0.85em', color: '#6b7280', marginTop: '-2px' }}>GPA: {edu.gpa}</div>}
                                             </div>
                                         ))}
                                     </div>
@@ -152,7 +152,7 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
                                     <SectionTitle title={section.title} color="#9ca3af" />
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                                         {languages.map((lang: any) => (
-                                            <div key={lang.id} style={{ fontSize: '10pt' }}>
+                                            <div key={lang.id} style={{ fontSize: 'inherit' }}>
                                                 <span style={{ fontWeight: 700, color: '#111827' }}>{lang.name}</span>
                                                 <span style={{ color: '#6b7280' }}> ({lang.proficiency})</span>
                                             </div>

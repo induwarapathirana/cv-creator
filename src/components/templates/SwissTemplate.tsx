@@ -35,7 +35,7 @@ export default function SwissTemplate({ resume }: TemplateProps) {
                             {experience.map(exp => (
                                 <div key={exp.id} style={{ display: isSidebar ? 'block' : 'grid', gridTemplateColumns: isSidebar ? 'none' : '120px 1fr', gap: '24px' }}>
                                     {!isSidebar && (
-                                        <div style={{ fontSize: '11pt', fontWeight: 700, color: '#000' }}>
+                                        <div style={{ fontSize: '1em', fontWeight: 700, color: '#000' }}>
                                             {formatDate(exp.startDate)} —<br />{exp.current ? 'Now' : formatDate(exp.endDate)}
                                         </div>
                                     )}
@@ -84,7 +84,7 @@ export default function SwissTemplate({ resume }: TemplateProps) {
                             {items.map((item: any) => (
                                 <div key={item.id} style={{ display: isSidebar ? 'block' : 'grid', gridTemplateColumns: isSidebar ? 'none' : '120px 1fr', gap: '24px' }}>
                                     {!isSidebar && (
-                                        <div style={{ fontSize: '11pt', fontWeight: 700 }}>
+                                        <div style={{ fontSize: '1em', fontWeight: 700 }}>
                                             {formatDate(item.date || item.startDate)} — {item.endDate ? formatDate(item.endDate) : ''}
                                         </div>
                                     )}
@@ -120,11 +120,11 @@ export default function SwissTemplate({ resume }: TemplateProps) {
                 {/* Header - Huge and Bold */}
                 <div style={{ marginBottom: '64px', display: 'flex', justifyContent: 'space-between', alignItems: 'end' }}>
                     <div>
-                        <h1 style={{ fontSize: '48pt', fontWeight: 900, lineHeight: 0.9, letterSpacing: '-0.04em', margin: '0 0 16px 0', textTransform: 'lowercase' }}>
+                        <h1 style={{ fontSize: '3.5em', fontWeight: 900, lineHeight: 0.9, letterSpacing: '-0.04em', margin: '0 0 16px 0', textTransform: 'lowercase' }}>
                             {personalInfo.fullName.split(' ')[0]}<br />
                             <span style={{ color: primaryColor }}>{personalInfo.fullName.split(' ').slice(1).join(' ')}</span>.
                         </h1>
-                        <p style={{ fontSize: '18pt', fontWeight: 700, letterSpacing: '-0.02em', margin: 0 }}>{personalInfo.jobTitle}</p>
+                        <p style={{ fontSize: '1.5em', fontWeight: 700, letterSpacing: '-0.02em', margin: 0 }}>{personalInfo.jobTitle}</p>
                     </div>
 
                     {personalInfo.photo && (

@@ -29,12 +29,12 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
         >
             <div className="resume-template">
                 {/* Header - Traditional Centered */}
-                <div style={{ marginBottom: settings.sectionSpacing + 'px', textAlign: 'center', borderBottom: '2px solid #1a1a2e', paddingBottom: 20 }}>
-                    <h1 style={{ color: '#1a1a2e', fontSize: '28px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 6 }}>
+                <div style={{ marginBottom: settings.sectionSpacing + 'px', textAlign: 'center', borderBottom: '2px solid #1a1a2e', paddingBottom: '1.2em' }}>
+                    <h1 style={{ color: '#1a1a2e', fontSize: '2.2em', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 6 }}>
                         {personalInfo.fullName || 'Your Name'}
                     </h1>
                     {personalInfo.jobTitle && (
-                        <p style={{ fontSize: '14px', color: '#4b5563', marginTop: 4, fontStyle: 'italic', fontWeight: 500 }}>
+                        <p style={{ fontSize: '1.1em', color: '#4b5563', marginTop: 4, fontStyle: 'italic', fontWeight: 500 }}>
                             {personalInfo.jobTitle}
                         </p>
                     )}
@@ -73,7 +73,7 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
                                                 />
                                                 {exp.description && <ResumeHtmlContent html={exp.description} />}
                                                 {exp.highlights && exp.highlights.length > 0 && (
-                                                    <ul style={{ margin: '6px 0 0 20px', padding: 0, fontSize: '10pt', color: '#374151' }}>
+                                                    <ul style={{ margin: '6px 0 0 20px', padding: 0, fontSize: 'inherit', color: '#374151' }}>
                                                         {exp.highlights.filter(Boolean).map((h: string, i: number) => (
                                                             <li key={i} style={{ marginBottom: '2px' }}>{h}</li>
                                                         ))}
@@ -142,7 +142,7 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
                             return languages.length > 0 ? (
                                 <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
                                     <SectionTitle title={section.title} color={primaryColor} variant="classic" />
-                                    <p style={{ fontSize: '10pt', margin: 0 }}>
+                                    <p style={{ fontSize: 'inherit', margin: 0 }}>
                                         {languages.map((l: any) => `${l.name} (${l.proficiency})`).join(' • ')}
                                     </p>
                                 </div>

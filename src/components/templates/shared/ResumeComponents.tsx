@@ -22,7 +22,7 @@ export const SectionTitle = ({ title, color, variant = 'modern', centered, style
             <h2 style={{
                 color: '#1a1a2e',
                 borderBottom: '1px solid #ccc',
-                fontSize: '13pt',
+                fontSize: '1.2em',
                 fontVariant: 'small-caps',
                 marginBottom: '10px',
                 marginTop: '15px',
@@ -37,7 +37,7 @@ export const SectionTitle = ({ title, color, variant = 'modern', centered, style
     if (variant === 'elegant') {
         return (
             <h2 style={{
-                fontSize: '10pt',
+                fontSize: '0.9em',
                 fontWeight: 600,
                 textTransform: 'uppercase',
                 color: '#9ca3af', // gray-400
@@ -56,7 +56,7 @@ export const SectionTitle = ({ title, color, variant = 'modern', centered, style
         <div style={{ marginBottom: '12px', marginTop: '4px', textAlign: centered ? 'center' : 'left', ...style }}>
             <h2 style={{
                 color: color,
-                fontSize: '11pt',
+                fontSize: '1em',
                 fontWeight: 800,
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
@@ -91,15 +91,15 @@ export const EntryHeader = ({ title, subtitle, date, color, centered }: EntryHea
             alignItems: centered ? 'center' : 'baseline',
             gap: centered ? '2px' : '12px'
         }}>
-            <h3 style={{ fontSize: '11pt', fontWeight: 700, margin: 0, color: '#1a1a2e' }}>{title}</h3>
+            <h3 style={{ fontSize: '1em', fontWeight: 700, margin: 0, color: '#1a1a2e' }}>{title}</h3>
             {date && (
-                <span style={{ fontSize: '9pt', color: '#666', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: '0.85em', color: '#666', fontWeight: 500, whiteSpace: 'nowrap' }}>
                     {date}
                 </span>
             )}
         </div>
         {subtitle && (
-            <div style={{ fontSize: '10pt', fontWeight: 600, color: '#4b5563', marginTop: '1px' }}>
+            <div style={{ fontSize: '0.9em', fontWeight: 600, color: '#4b5563', marginTop: '1px' }}>
                 {subtitle}
             </div>
         )}
@@ -107,7 +107,7 @@ export const EntryHeader = ({ title, subtitle, date, color, centered }: EntryHea
 );
 
 export const ResumeHtmlContent = ({ html }: { html?: string }) => (
-    <div style={{ fontSize: '10pt', color: '#374151', lineHeight: 1.5 }}>
+    <div style={{ fontSize: 'inherit', color: '#374151', lineHeight: 'inherit' }}>
         <HtmlRenderer html={html || ''} className="html-content" />
     </div>
 );
@@ -118,7 +118,7 @@ export const SkillBadge = ({ name, color }: { name: string, color: string }) => 
         color: color,
         padding: '2px 10px',
         borderRadius: '5px',
-        fontSize: '9pt',
+        fontSize: '0.85em',
         fontWeight: 600,
         display: 'inline-block',
         marginRight: '8px',
@@ -132,8 +132,8 @@ export const SkillBadge = ({ name, color }: { name: string, color: string }) => 
 
 export const ContactItem = ({ icon, text, href, color }: { icon?: React.ReactNode, text: string, href?: string, color: string }) => {
     const content = (
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#4b5563', fontSize: '10px', fontWeight: 500 }}>
-            {icon && <span style={{ color: color, fontSize: '12px' }}>{icon}</span>}
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#4b5563', fontSize: '0.85em', fontWeight: 500 }}>
+            {icon && <span style={{ color: color, fontSize: '0.8em' }}>{icon}</span>}
             {text}
         </span>
     );

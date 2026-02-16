@@ -44,9 +44,9 @@ export default function TimelineTemplate({ resume }: TemplateProps) {
                                 section.type === 'skills' ? (
                                     <SkillBadge key={item.id} name={item.name} color={primaryColor} />
                                 ) : (
-                                    <div key={item.id} style={{ fontSize: '10pt', width: '100%' }}>
+                                    <div key={item.id} style={{ fontSize: '0.9em', width: '100%' }}>
                                         <strong>{item.name || item.title || item.institution}</strong>
-                                        {item.proficiency && <div style={{ color: '#888', fontSize: '9pt' }}>{item.proficiency}</div>}
+                                        {item.proficiency && <div style={{ color: '#888', fontSize: '0.85em' }}>{item.proficiency}</div>}
                                     </div>
                                 )
                             ))}
@@ -60,7 +60,7 @@ export default function TimelineTemplate({ resume }: TemplateProps) {
         return (
             <div key={section.id} style={{ marginBottom: '48px', position: 'relative' }}>
                 <h2 style={{
-                    fontSize: '18pt',
+                    fontSize: '1.2em',
                     fontWeight: 800,
                     color: primaryColor,
                     marginBottom: '24px',
@@ -118,10 +118,10 @@ export default function TimelineTemplate({ resume }: TemplateProps) {
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '48px' }}>
                     <div>
-                        <h1 style={{ fontSize: '32pt', fontWeight: 800, margin: '0 0 8px 0', color: primaryColor, letterSpacing: '-0.03em' }}>
+                        <h1 style={{ fontSize: '2.5em', fontWeight: 800, margin: '0 0 8px 0', color: primaryColor, letterSpacing: '-0.03em' }}>
                             {personalInfo.fullName}
                         </h1>
-                        <div style={{ fontSize: '13pt', fontWeight: 600, letterSpacing: '0.1em', color: '#666' }}>{personalInfo.jobTitle.toUpperCase()}</div>
+                        <div style={{ fontSize: '1em', fontWeight: 600, letterSpacing: '0.1em', color: '#666' }}>{personalInfo.jobTitle.toUpperCase()}</div>
                     </div>
                     <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <ContactItem icon={<FiMail />} text={personalInfo.email} color={primaryColor} />

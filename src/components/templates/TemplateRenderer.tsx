@@ -134,7 +134,11 @@ export default function TemplateRenderer({ resume: rawResume, scale = 1 }: Templ
 
     if (settings.usePaging) {
         return (
-            <div className="resume-pages-container renderer-wrapper" style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
+            <div
+                className="resume-pages-container renderer-wrapper"
+                data-paging="true"
+                style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}
+            >
                 {/* For now, we render as one big "page" that can be breaked by CSS print rules or just viewed as a sequence */}
                 {renderTemplate()}
             </div>

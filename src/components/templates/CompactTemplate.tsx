@@ -111,10 +111,10 @@ export default function CompactTemplate({ resume }: TemplateProps) {
                     paddingBottom: '8px'
                 }}>
                     <div>
-                        <h1 style={{ fontSize: '20pt', fontWeight: 800, margin: 0, textTransform: 'uppercase', color: '#000' }}>
+                        <h1 style={{ fontSize: '1.5em', fontWeight: 800, margin: 0, textTransform: 'uppercase', color: '#000' }}>
                             {personalInfo.fullName}
                         </h1>
-                        <div style={{ fontSize: '10pt', fontWeight: 700, color: primaryColor }}>{personalInfo.jobTitle}</div>
+                        <div style={{ fontSize: '0.9em', fontWeight: 700, color: primaryColor }}>{personalInfo.jobTitle}</div>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}>
                         <ContactItem icon={<FiMail />} text={personalInfo.email} color={primaryColor} />

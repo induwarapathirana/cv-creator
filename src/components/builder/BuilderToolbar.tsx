@@ -176,16 +176,6 @@ export default function BuilderToolbar({ onToggleATS, onToggleSettings, onShowDa
                     >
                         <FiCloud /> <span>Sync</span>
                     </button>
-                    <div className="toolbar-divider" />
-                    <button className="btn-icon" onClick={handleImportJSON} title="Import JSON">
-                        <FiUpload />
-                    </button>
-                    <button className="btn-icon" onClick={handleExportJSON} title="Export JSON">
-                        <FiDownload />
-                    </button>
-                    <button className="btn btn-primary btn-sm" onClick={handlePrintPDF}>
-                        <FiDownload /> PDF
-                    </button>
                 </div>
             </div>
 

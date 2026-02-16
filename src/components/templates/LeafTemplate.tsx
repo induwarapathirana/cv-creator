@@ -39,17 +39,17 @@ export default function LeafTemplate({ resume }: TemplateProps) {
                         alignItems: 'center',
                         justifyContent: 'center',
                         color: '#fff',
-                        fontSize: '32px',
+                        fontSize: '2.2em',
                         fontWeight: 300,
                         boxShadow: `0 4px 12px ${primaryColor}40`
                     }}>
                         {personalInfo.fullName?.charAt(0) || '?'}
                     </div>
-                    <h1 style={{ fontSize: '32px', fontWeight: 700, color: '#111827', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
+                    <h1 style={{ fontSize: '2.2em', fontWeight: 700, color: '#111827', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
                         {personalInfo.fullName || 'Your Name'}
                     </h1>
                     {personalInfo.jobTitle && (
-                        <div style={{ fontSize: '16px', color: primaryColor, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 20 }}>
+                        <div style={{ fontSize: '1.1em', color: primaryColor, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 20 }}>
                             {personalInfo.jobTitle}
                         </div>
                     )}
@@ -93,7 +93,7 @@ export default function LeafTemplate({ resume }: TemplateProps) {
                                                 <div style={{ maxWidth: '95%', textAlign: 'left', width: '100%', margin: '0 auto' }}>
                                                     {exp.description && <ResumeHtmlContent html={exp.description} />}
                                                     {exp.highlights && exp.highlights.length > 0 && (
-                                                        <ul style={{ margin: '8px 0 0 20px', padding: 0, fontSize: '10.5pt', color: '#4b5563', lineHeight: 1.6 }}>
+                                                        <ul style={{ margin: '8px 0 0 20px', padding: 0, fontSize: '0.95em', color: '#4b5563', lineHeight: 'inherit' }}>
                                                             {exp.highlights.filter(Boolean).map((h: string, i: number) => (
                                                                 <li key={i} style={{ marginBottom: '4px' }}>{h}</li>
                                                             ))}
@@ -168,7 +168,7 @@ export default function LeafTemplate({ resume }: TemplateProps) {
                                     <SectionTitle title={section.title} color={primaryColor} centered />
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center' }}>
                                         {languages.map((lang: any) => (
-                                            <div key={lang.id} style={{ fontSize: '11pt' }}>
+                                            <div key={lang.id} style={{ fontSize: '1em' }}>
                                                 <span style={{ fontWeight: 700, color: '#111827' }}>{lang.name}</span>
                                                 <span style={{ color: '#6b7280' }}> ({lang.proficiency})</span>
                                             </div>

@@ -34,8 +34,8 @@ export default function GridTemplate({ resume }: TemplateProps) {
                         <img src={personalInfo.photo} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '16px', objectFit: 'cover' }} />
                     )}
                     <div style={{ flex: 1 }}>
-                        <h1 style={{ fontSize: '24pt', fontWeight: 800, margin: 0, color: '#111', letterSpacing: '-0.02em' }}>{personalInfo.fullName}</h1>
-                        <p style={{ fontSize: '13pt', color: primaryColor, fontWeight: 600, margin: '4px 0 0 0' }}>{personalInfo.jobTitle}</p>
+                        <h1 style={{ fontSize: '1.8em', fontWeight: 800, margin: 0, color: '#111', letterSpacing: '-0.02em' }}>{personalInfo.fullName}</h1>
+                        <p style={{ fontSize: '1.1em', color: primaryColor, fontWeight: 600, margin: '4px 0 0 0' }}>{personalInfo.jobTitle}</p>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <ContactItem icon={<FiMail />} text={personalInfo.email} color={primaryColor} />

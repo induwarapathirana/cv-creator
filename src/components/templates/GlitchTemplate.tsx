@@ -52,7 +52,7 @@ export default function GlitchTemplate({ resume }: TemplateProps) {
                 ) : section.type === 'skills' ? (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
                         {skills.map(skill => (
-                            <div key={skill.id} style={{ border: '1px solid #000', padding: '4px 8px', fontSize: '9pt', fontWeight: 700 }}>
+                            <div key={skill.id} style={{ border: '1px solid #000', padding: '4px 8px', fontSize: '0.85em', fontWeight: 700 }}>
                                 {skill.name.toUpperCase()} <span style={{ color: primaryColor }}>:: {skill.level || 5}/5</span>
                             </div>
                         ))}
@@ -68,7 +68,7 @@ export default function GlitchTemplate({ resume }: TemplateProps) {
                                     color={primaryColor}
                                 />
                                 {item.technologies && (
-                                    <div style={{ fontSize: '8pt', margin: '4px 0', fontWeight: 700 }}>
+                                    <div style={{ fontSize: '0.75em', margin: '4px 0', fontWeight: 700 }}>
                                         STACK: [{item.technologies.join(', ').toUpperCase()}]
                                     </div>
                                 )}
@@ -96,10 +96,10 @@ export default function GlitchTemplate({ resume }: TemplateProps) {
             <div className="resume-template">
                 {/* Glitch Header */}
                 <div style={{ marginBottom: '40px', borderBottom: '4px solid #000', paddingBottom: '20px' }}>
-                    <h1 style={{ fontSize: '38pt', fontWeight: 900, margin: 0, letterSpacing: '-0.05em' }}>
+                    <h1 style={{ fontSize: '2.5em', fontWeight: 900, margin: 0, letterSpacing: '-0.05em' }}>
                         {personalInfo.fullName.toUpperCase()}
                     </h1>
-                    <div style={{ fontSize: '14pt', fontWeight: 700, background: '#000', color: '#fff', display: 'inline-block', padding: '4px 12px', marginTop: '12px' }}>
+                    <div style={{ fontSize: '1.1em', fontWeight: 700, background: '#000', color: '#fff', display: 'inline-block', padding: '4px 12px', marginTop: '12px' }}>
                         {`// ${personalInfo.jobTitle.toUpperCase()}`}
                     </div>
                     <div style={{ marginTop: '24px', display: 'flex', flexWrap: 'wrap', gap: '16px' }}>

@@ -23,7 +23,7 @@ export default function BoldTemplate({ resume }: TemplateProps) {
             case 'summary':
                 return personalInfo.summary ? (
                     <div key={section.id} style={{ marginBottom: '40px' }}>
-                        <div style={{ fontSize: '14pt', lineHeight: 1.6, fontWeight: 500 }}>
+                        <div style={{ fontSize: '1.2em', lineHeight: 1.6, fontWeight: 500 }}>
                             <ResumeHtmlContent html={personalInfo.summary} />
                         </div>
                     </div>
@@ -56,9 +56,9 @@ export default function BoldTemplate({ resume }: TemplateProps) {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                             {education.map(edu => (
                                 <div key={edu.id} style={{ border: '3px solid #000', padding: '16px' }}>
-                                    <h3 style={{ fontSize: '12pt', fontWeight: 900, margin: '0 0 4px 0', textTransform: 'uppercase' }}>{edu.institution}</h3>
-                                    <div style={{ fontSize: '11pt', fontWeight: 700 }}>{edu.degree}</div>
-                                    <div style={{ fontSize: '10pt', fontWeight: 600, color: '#666', marginTop: '4px' }}>
+                                    <h3 style={{ fontSize: '1.1em', fontWeight: 900, margin: '0 0 4px 0', textTransform: 'uppercase' }}>{edu.institution}</h3>
+                                    <div style={{ fontSize: '1em', fontWeight: 700 }}>{edu.degree}</div>
+                                    <div style={{ fontSize: '0.9em', fontWeight: 600, color: '#666', marginTop: '4px' }}>
                                         {formatDate(edu.startDate)} – {formatDate(edu.endDate)}
                                     </div>
                                 </div>
@@ -78,7 +78,7 @@ export default function BoldTemplate({ resume }: TemplateProps) {
                                     color: '#fff',
                                     padding: '8px 16px',
                                     fontWeight: 900,
-                                    fontSize: '10pt',
+                                    fontSize: '0.9em',
                                     textTransform: 'uppercase'
                                 }}>
                                     {skill.name}
@@ -138,11 +138,11 @@ export default function BoldTemplate({ resume }: TemplateProps) {
             <div className="resume-template">
                 {/* Huge Header */}
                 <div style={{ marginBottom: '48px', borderBottom: '12px solid #000', paddingBottom: '24px' }}>
-                    <h1 style={{ fontSize: '64pt', fontWeight: 900, lineHeight: 0.8, textTransform: 'uppercase', margin: 0, letterSpacing: '-0.05em' }}>
+                    <h1 style={{ fontSize: '4.5em', fontWeight: 900, lineHeight: 0.8, textTransform: 'uppercase', margin: 0, letterSpacing: '-0.05em' }}>
                         {firstName}
                         <span style={{ color: primaryColor }}>{lastName}</span>
                     </h1>
-                    <div style={{ fontSize: '18pt', fontWeight: 900, marginTop: '12px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                    <div style={{ fontSize: '1.5em', fontWeight: 900, marginTop: '12px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                         {personalInfo.jobTitle}
                     </div>
                 </div>

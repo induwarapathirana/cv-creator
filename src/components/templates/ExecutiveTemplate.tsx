@@ -20,7 +20,7 @@ export default function ExecutiveTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: 'Georgia, Cambria, "Times New Roman", serif',
                 fontSize: settings.fontSize + 'px',
-                lineHeight: 1.6,
+                lineHeight: settings.lineHeight,
                 padding: settings.pageMargin + 'px',
                 color: '#1f2937',
                 backgroundColor: 'white',
@@ -28,11 +28,11 @@ export default function ExecutiveTemplate({ resume }: TemplateProps) {
         >
             <div className="resume-template">
                 {/* Header - Centered, Classic */}
-                <div style={{ textAlign: 'center', marginBottom: '40px', borderBottom: '1px double #e5e7eb', paddingBottom: '24px' }}>
-                    <h1 style={{ fontSize: '32pt', fontWeight: 700, margin: '0 0 8px 0', letterSpacing: '-0.01em', color: '#111827', textTransform: 'uppercase' }}>
+                <div style={{ textAlign: 'center', marginBottom: settings.sectionSpacing + 'px', borderBottom: '1px double #e5e7eb', paddingBottom: '1.5em' }}>
+                    <h1 style={{ fontSize: '2.5em', fontWeight: 700, margin: '0 0 8px 0', letterSpacing: '-0.01em', color: '#111827', textTransform: 'uppercase' }}>
                         {personalInfo.fullName}
                     </h1>
-                    <div style={{ fontSize: '14pt', color: primaryColor, marginBottom: '16px', fontWeight: 500, fontStyle: 'italic' }}>
+                    <div style={{ fontSize: '1.2em', color: primaryColor, marginBottom: '16px', fontWeight: 500, fontStyle: 'italic' }}>
                         {personalInfo.jobTitle}
                     </div>
 
@@ -41,7 +41,7 @@ export default function ExecutiveTemplate({ resume }: TemplateProps) {
                         justifyContent: 'center',
                         flexWrap: 'wrap',
                         gap: '20px',
-                        fontSize: '10pt',
+                        fontSize: '0.9em',
                         color: '#4b5563'
                     }}>
                         <ContactItem icon={<FiMapPin />} text={personalInfo.location} color={primaryColor} />
@@ -53,7 +53,7 @@ export default function ExecutiveTemplate({ resume }: TemplateProps) {
                 </div>
 
                 {/* Content */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: settings.sectionSpacing + 'px' }}>
                     {visibleSections.map(section => {
                         if (section.type === 'personalInfo') return null;
 

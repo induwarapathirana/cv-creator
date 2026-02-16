@@ -39,11 +39,11 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
             case 'personalInfo':
                 return (
                     <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                        <h1 style={{ color: primaryColor, fontSize: '26px', lineHeight: 1.1, letterSpacing: '-0.03em', fontWeight: 900, marginBottom: '6px' }}>
+                        <h1 style={{ color: primaryColor, fontSize: '2.5em', lineHeight: 1.1, letterSpacing: '-0.03em', fontWeight: 900, marginBottom: '6px' }}>
                             {personalInfo.fullName || 'Your Name'}
                         </h1>
                         {personalInfo.jobTitle && (
-                            <p style={{ fontSize: '13px', color: '#4b5563', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
+                            <p style={{ fontSize: '1.2em', color: '#4b5563', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
                                 {personalInfo.jobTitle}
                             </p>
                         )}
@@ -79,7 +79,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                                 />
                                 {exp.description && <ResumeHtmlContent html={exp.description} />}
                                 {exp.highlights && exp.highlights.length > 0 && (
-                                    <ul style={{ margin: '6px 0 0 16px', padding: 0, fontSize: '10pt', color: '#374151', lineHeight: 1.5 }}>
+                                    <ul style={{ margin: '6px 0 0 16px', padding: 0, fontSize: '0.9em', color: '#374151', lineHeight: 'inherit' }}>
                                         {exp.highlights.filter(Boolean).map((h, i) => (
                                             <li key={i} style={{ marginBottom: '3px' }}>{h}</li>
                                         ))}
@@ -101,7 +101,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                                     subtitle={`${edu.degree}${edu.field ? ` in ${edu.field}` : ''}`}
                                     date={`${formatDate(edu.startDate)} — ${formatDate(edu.endDate)}`}
                                 />
-                                {edu.gpa && <div style={{ fontSize: '9pt', color: '#666', marginTop: '-2px', marginBottom: '4px' }}>GPA: {edu.gpa}</div>}
+                                {edu.gpa && <div style={{ fontSize: '0.85em', color: '#666', marginTop: '-2px', marginBottom: '4px' }}>GPA: {edu.gpa}</div>}
                                 {edu.description && <ResumeHtmlContent html={edu.description} />}
                             </div>
                         ))}
@@ -115,7 +115,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             {Object.entries(skillsByCategory).map(([category, catSkills]) => (
                                 <div key={category}>
-                                    <div style={{ fontWeight: 700, color: '#1a1a2e', fontSize: '9pt', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
+                                    <div style={{ fontWeight: 700, color: '#1a1a2e', fontSize: '0.85em', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
                                         {category}
                                     </div>
                                     <div style={{ display: 'flex', flexWrap: 'wrap' }}>
@@ -140,7 +140,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                                 {proj.technologies && proj.technologies.length > 0 && (
                                     <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: '-2px', marginBottom: '6px' }}>
                                         {proj.technologies.map((tech, i) => (
-                                            <span key={i} style={{ fontSize: '8.5pt', color: primaryColor, fontWeight: 600, marginRight: '8px' }}>
+                                            <span key={i} style={{ fontSize: '0.8em', color: primaryColor, fontWeight: 600, marginRight: '8px' }}>
                                                 {tech}{i < proj.technologies.length - 1 ? ' •' : ''}
                                             </span>
                                         ))}
@@ -174,9 +174,9 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                         <SectionTitle title={section.title} color={primaryColor} />
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '8px' }}>
                             {languages.map((lang) => (
-                                <div key={lang.id} style={{ fontSize: '10pt' }}>
+                                <div key={lang.id} style={{ fontSize: '0.9em' }}>
                                     <div style={{ fontWeight: 700, color: '#1a1a2e' }}>{lang.name}</div>
-                                    <div style={{ fontSize: '9pt', color: '#666' }}>{lang.proficiency}</div>
+                                    <div style={{ fontSize: '0.85em', color: '#666' }}>{lang.proficiency}</div>
                                 </div>
                             ))}
                         </div>
