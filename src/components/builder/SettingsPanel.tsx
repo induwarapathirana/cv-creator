@@ -73,7 +73,7 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
 
             if (!response.ok) {
                 const err = await response.json();
-                throw new Error(err.details || 'Failed to generate PDF');
+                throw new Error(err.details || err.error || 'Failed to generate PDF');
             }
 
             // 4. Download the blob

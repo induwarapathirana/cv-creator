@@ -57,104 +57,55 @@ async function getBrowser() {
 
 export async function POST(req: NextRequest) {
     try {
-        const { html, css } = await req.json();
+        const { resume } = await req.json();
 
-        if (!html) {
-            return NextResponse.json({ error: 'Missing HTML content' }, { status: 400 });
+        if (!resume) {
+            return NextResponse.json({ error: 'Missing resume data' }, { status: 400 });
         }
 
         const browser = await getBrowser();
         const page = await browser.newPage();
 
-        // Ensure we emulate print media for consistent CSS application
-        await page.emulateMediaType('print');
+        // 1. Get the current origin to navigate back to our own site
+        const protocol = req.headers.get('x-forwarded-proto') || 'https';
+        const host = req.headers.get('host');
+        const exportUrl = `${protocol}://${host}/export`;
 
-        // Inject a "Dark Mode Reset" style to ensure light mode variables are used
-        // even if the frontend captured dark mode variables.
-        const darkModeReset = `
-            <style>
-                :root {
-                    color-scheme: light !important;
-                    background-color: white !important;
-                    color: #333 !important;
-                }
-                body {
-                    background-color: white !important;
-                    color: #333 !important;
-                }
-                /* Force standard light theme variables common in Tailwind/Shadcn */
-                .dark {
-                    color-scheme: light !important;
-                }
-                [data-theme='dark'] {
-                    color-scheme: light !important;
-                }
-            </style>
-        `;
+        console.log('Export URL:', exportUrl);
 
-        // Construct the full HTML document
-        const fullContent = `
-            <!DOCTYPE html>
-            <html data-theme="light">
-                <head>
-                    <meta charset="UTF-8">
-                    ${darkModeReset}
-                    <style>
-                        /* Base resets */
-                        * { box-sizing: border-box; }
-                        body { 
-                            margin: 0; 
-                            padding: 0; 
-                            background: white !important; 
-                            color: #333 !important;
-                        }
-                        
-                        /* Injected Global Styles */
-                        ${css}
+        // 2. Inject the data before the page loads
+        // This ensures the client-side code has the data as soon as it mounts
+        await page.evaluateOnNewDocument((data) => {
+            window.__RESUME_DATA__ = data;
+        }, resume);
 
-                        /* Print-specific overrides to ensure exact fidelity */
-                        @media print {
-                            body { -webkit-print-color-adjust: exact !important; }
-                            @page { margin: 0; }
-                            
-                            /* Ensure the injected content is visible even if the "not builder-layout" rule exists */
-                            .builder-layout, .builder-main, .preview-panel {
-                                display: block !important;
-                                visibility: visible !important;
-                                opacity: 1 !important;
-                                background: white !important;
-                            }
-                        }
-                    </style>
-                </head>
-                <body class="builder-layout">
-                    <div class="builder-main">
-                        <div class="preview-panel">
-                            ${html}
-                        </div>
-                    </div>
-                </body>
-            </html>
-        `;
-
-        // Set content and wait for load
-        await page.setContent(fullContent, {
-            waitUntil: 'networkidle0', // Wait for all network connections to finish (fonts, etc.)
+        // 3. Navigate to the export page
+        await page.goto(exportUrl, {
+            waitUntil: 'networkidle0',
             timeout: 30000,
         });
 
-        // Generate PDF
+        // 4. Ensure we emulate print media for consistent CSS application
+        await page.emulateMediaType('print');
+
+        // 5. Wait for the resume to actually be rendered
+        // We look for a common element in all templates
+        try {
+            await page.waitForSelector('.resume-page', { timeout: 10000 });
+        } catch (e) {
+            console.warn('Warning: .resume-page selector not found, attempting PDF anyway');
+        }
+
+        // 6. Generate PDF
         const pdfBuffer = await page.pdf({
             format: 'A4',
             printBackground: true,
-            margin: { top: 0, right: 0, bottom: 0, left: 0 }, // We handle margins in CSS
-            preferCSSPageSize: true, // Respect @page rules
+            margin: { top: 0, right: 0, bottom: 0, left: 0 },
+            preferCSSPageSize: true,
         });
 
-        await browser.close();
+        await page.close();
 
-        // Return PDF as submission
-        // Return PDF as submission
         return new NextResponse(pdfBuffer as any, {
             headers: {
                 'Content-Type': 'application/pdf',

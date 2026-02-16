@@ -14,20 +14,35 @@ export default function ExportPage() {
     const [resume, setResume] = useState<Resume | null>(null);
 
     useEffect(() => {
-        // Read data from global if available (set by Puppeteer)
-        if (window.__RESUME_DATA__) {
-            setResume(window.__RESUME_DATA__);
-        } else {
-            // Fallback: try to read from localStorage just in case
-            try {
-                const saved = localStorage.getItem('resume-export-data');
-                if (saved) {
-                    setResume(JSON.parse(saved));
-                }
-            } catch (e) {
-                console.error('Failed to load resume from localStorage');
+        const checkData = () => {
+            if (window.__RESUME_DATA__) {
+                setResume(window.__RESUME_DATA__);
+                return true;
             }
-        }
+            return false;
+        };
+
+        if (checkData()) return;
+
+        // Poll for a bit if not immediately available
+        const interval = setInterval(() => {
+            if (checkData()) clearInterval(interval);
+        }, 100);
+
+        // Fallback: try to read from localStorage
+        try {
+            const saved = localStorage.getItem('resume-export-data');
+            if (saved) {
+                setResume(JSON.parse(saved));
+                clearInterval(interval);
+            }
+        } catch (e) { }
+
+        const timeout = setTimeout(() => clearInterval(interval), 5000);
+        return () => {
+            clearInterval(interval);
+            clearTimeout(timeout);
+        };
     }, []);
 
     if (!resume) {
