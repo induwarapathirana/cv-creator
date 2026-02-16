@@ -50,29 +50,58 @@ export default function ExportPage() {
     }
 
     return (
-        <div
-            className="export-container"
-            style={{
-                background: 'white',
-                minHeight: '100vh',
-                width: '100%'
-            }}
-            data-theme="light"
-        >
-            <style jsx global>{`
-                body {
-                    background: white !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
-                }
-                .renderer-wrapper {
-                    transform: none !important;
-                    width: 100% !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
-                }
-            `}</style>
-            <TemplateRenderer resume={resume} scale={1} />
+        <div className="builder-layout" data-theme="light">
+            <div className="builder-main">
+                <div className="preview-panel" style={{ background: 'white', padding: 0 }}>
+                    <div
+                        className="export-container"
+                        style={{
+                            background: 'white',
+                            minHeight: '100vh',
+                            width: '100%'
+                        }}
+                    >
+                        <style jsx global>{`
+                            /* Force visibility and light theme in PDF engine */
+                            body {
+                                background: white !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                                visibility: visible !important;
+                                display: block !important;
+                            }
+                            
+                            /* Override the "hide everything" rule in globals.css */
+                            @media print {
+                                body > * {
+                                    display: block !important;
+                                    visibility: visible !important;
+                                }
+                                .builder-layout, .builder-main, .preview-panel {
+                                    display: block !important;
+                                    position: static !important;
+                                    width: 100% !important;
+                                    height: auto !important;
+                                    overflow: visible !important;
+                                    background: white !important;
+                                }
+                                .resume-page {
+                                    box-shadow: none !important;
+                                    margin: 0 !important;
+                                }
+                            }
+
+                            .renderer-wrapper {
+                                transform: none !important;
+                                width: 100% !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                            }
+                        `}</style>
+                        <TemplateRenderer resume={resume} scale={1} />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
