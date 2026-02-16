@@ -62,40 +62,25 @@ export default function ExportPage() {
                         }}
                     >
                         <style jsx global>{`
-                            /* Force visibility and light theme in PDF engine */
+                            /* Ensure the page is visible and background is white */
                             body {
                                 background: white !important;
                                 margin: 0 !important;
                                 padding: 0 !important;
-                                visibility: visible !important;
-                                display: block !important;
                             }
                             
-                            /* Override the "hide everything" rule in globals.css */
+                            /* We rely on globals.css for print layout, but verify visibility */
                             @media print {
-                                body > * {
-                                    display: block !important;
-                                    visibility: visible !important;
-                                }
                                 .builder-layout, .builder-main, .preview-panel {
-                                    display: block !important;
-                                    position: static !important;
-                                    width: 100% !important;
-                                    height: auto !important;
-                                    overflow: visible !important;
                                     background: white !important;
-                                }
-                                .resume-page {
-                                    box-shadow: none !important;
-                                    margin: 0 !important;
                                 }
                             }
 
                             .renderer-wrapper {
                                 transform: none !important;
-                                width: 100% !important;
                                 margin: 0 !important;
                                 padding: 0 !important;
+                                width: 100% !important;
                             }
                         `}</style>
                         <TemplateRenderer resume={resume} scale={1} />

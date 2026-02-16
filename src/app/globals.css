@@ -2054,8 +2054,7 @@ body {
   .resume-page {
     box-shadow: none !important;
     border-radius: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    margin: 0 auto;
     /* Allow user settings to control padding via inline styles */
     width: 100% !important;
     height: auto !important;
@@ -2204,8 +2203,7 @@ body {
     -webkit-print-color-adjust: exact;
     overflow: visible !important;
     page-break-after: always;
-    padding: 0 !important;
-    /* Reset padding, as it's set inline */
+    /* Reset padding removed to allow inline styles */
   }
 
   /* Remove page break from the last page if needed */
