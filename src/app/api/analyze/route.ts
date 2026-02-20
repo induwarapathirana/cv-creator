@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // Initialize Gemini with deterministic settings
+        // Initialize Gemini with deterministic settings and Native JSON Mode
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',
             generationConfig: {
@@ -34,11 +34,13 @@ export async function POST(req: NextRequest) {
                 topP: 0.95,
                 topK: 40,
                 maxOutputTokens: 2048,
+                responseMimeType: 'application/json',
             }
         });
 
         let prompt = `
-Act as a HIGHLY CRITICAL Senior HR Auditor and ATS specialist. Your goal is to provide a rigorous, objective match analysis. Do not be generous; if evidence for a skill is not explicitly stated in the RESUME, assume it is missing.
+Act as a HIGHLY CRITICAL Senior HR Auditor and ATS specialist. Your goal is to provide a rigorous, objective match analysis. 
+Do not be generous; if evidence for a skill is not explicitly stated in the RESUME, assume it is missing.
 
 SCORING RUBRIC (Strictly Weighted):
 1. **Core Hard Skills (40%)**: Direct match of technical skills, tools, and certifications required in the JD.
@@ -53,18 +55,18 @@ JOB DESCRIPTION CONTENT:
 ${finalJobDescription || '[See attached image]'}
 ${jdUrl ? `(Extracted from URL: ${jdUrl})` : ''}
 
-Provide your analysis in EXACTLY the following JSON format:
+You must respond with valid JSON that follows this schema exactly:
 {
-  "score": number (Calculated strictly based on the rubric above),
-  "matchLevel": "Poor" (0-39) | "Fair" (40-59) | "Good" (60-79) | "Excellent" (80-100),
-  "summary": "1-2 sentences. Be direct about why the candidate is or isn't a fit.",
-  "pros": ["List 3-5 specific strengths found based on JD requirements"],
-  "cons": ["List 2-5 SPECIFIC gaps or missing evidence"],
-  "missingSkills": ["List high-priority skills from JD not found in resume"],
-  "improvementSuggestions": ["List actionable, high-impact steps to bridge the gaps"],
+  "score": number,
+  "matchLevel": "Poor" | "Fair" | "Good" | "Excellent",
+  "summary": "string (1-2 sentences)",
+  "pros": ["string"],
+  "cons": ["string"],
+  "missingSkills": ["string"],
+  "improvementSuggestions": ["string"],
   "keywordMatch": {
-    "found": ["Strict keywords matched"],
-    "missing": ["Crucial JD keywords missing from resume"]
+    "found": ["string"],
+    "missing": ["string"]
   }
 }
 `;
@@ -88,25 +90,31 @@ Provide your analysis in EXACTLY the following JSON format:
         const modelResponse = await model.generateContent(contents);
         const responseText = modelResponse.response.text();
 
-        // Robust JSON extraction using Regex to handle "thinking" text or markdown prefixes
+        // In Native JSON mode, response should be pure JSON, but we'll still handle potential edge cases
         let analysis;
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-
-        if (jsonMatch) {
-            try {
-                analysis = JSON.parse(jsonMatch[0]);
-            } catch (e) {
-                console.error('JSON Parse Error:', e, 'Raw:', responseText);
-                throw new Error('AI returned invalid JSON');
+        try {
+            // Remove potential whitespace or stray characters
+            const cleanedText = responseText.trim();
+            analysis = JSON.parse(cleanedText);
+        } catch (e) {
+            console.error('Initial JSON Parse Fail, trying regex fallback:', e);
+            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                try {
+                    analysis = JSON.parse(jsonMatch[0]);
+                } catch (innerE) {
+                    console.error('Regex JSON Parse Error:', innerE, 'Raw:', responseText);
+                    throw new Error('AI returned malformed JSON even in JSON mode');
+                }
+            } else {
+                throw new Error('AI failed to return valid JSON format');
             }
-        } else {
-            throw new Error('AI failed to return valid JSON format');
         }
 
-        // Validate structure before returning to prevent frontend crashes
+        // Validate structure before returning
         const validatedAnalysis = {
             score: typeof analysis.score === 'number' ? analysis.score : 0,
-            matchLevel: analysis.matchLevel || 'Unknown',
+            matchLevel: analysis.matchLevel || 'Fair',
             summary: analysis.summary || 'Summary unavailable',
             pros: Array.isArray(analysis.pros) ? analysis.pros : [],
             cons: Array.isArray(analysis.cons) ? analysis.cons : [],
