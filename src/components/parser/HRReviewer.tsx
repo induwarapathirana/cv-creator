@@ -347,76 +347,161 @@ export default function HRReviewer() {
                         )}
 
                         {result && (
-                            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="results-view">
-                                {/* Score Dashboard */}
-                                <div className="score-card">
-                                    <div className="score-gauge">
-                                        <svg viewBox="0 0 100 100">
-                                            <circle cx="50" cy="50" r="45" fill="none" stroke="var(--bg-primary)" strokeWidth="8" />
-                                            <motion.circle
-                                                cx="50" cy="50" r="45" fill="none"
-                                                stroke={getScoreColor(result.score)}
-                                                strokeWidth="8"
-                                                strokeDasharray="283"
-                                                initial={{ strokeDashoffset: 283 }}
-                                                animate={{ strokeDashoffset: 283 - (283 * result.score) / 100 }}
-                                                transition={{ duration: 1.5 }}
-                                                strokeLinecap="round"
-                                            />
-                                        </svg>
-                                        <div className="score-text">
-                                            <span className="number">{result.score}%</span>
-                                            <span className="label">Match</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="score-summary">
-                                        <div className="match-badge" style={{ backgroundColor: getScoreColor(result.score) }}>
-                                            {result.matchLevel} Match
-                                        </div>
-                                        <p className="summary-text">"{result.summary}"</p>
-                                    </div>
-                                </div>
-
-                                <div className="details-grid">
-                                    <div className="card-glass p-6 border-l-green">
-                                        <h4><FiCheckCircle /> Key Strengths</h4>
-                                        <ul className="list green">
-                                            {(result?.pros || []).map((pro, i) => <li key={i}>{pro}</li>)}
-                                        </ul>
-                                    </div>
-
-                                    <div className="card-glass p-6 border-l-ruby">
-                                        <h4><FiAlertCircle /> Gaps</h4>
-                                        <ul className="list ruby">
-                                            {(result?.cons || []).map((con, i) => <li key={i}>{con}</li>)}
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div className="card-glass p-6">
-                                    <h4><FiStar /> Matching Keywords</h4>
-                                    <div className="skills-tags">
-                                        {(result?.keywordMatch?.found || []).slice(0, 20).map((skill, i) => <span key={i} className="skill-tag green-tag">{skill}</span>)}
-                                        {(result?.keywordMatch?.missing || []).slice(0, 10).map((skill, i) => <span key={i} className="skill-tag ruby-tag">{skill}</span>)}
-                                    </div>
-                                </div>
-
-                                <div className="card-glass p-6 improvement-section">
-                                    <h4><FiTrendingUp /> Actionable Improvements</h4>
-                                    <div className="steps-list">
-                                        {(result?.improvementSuggestions || []).map((tip, i) => (
-                                            <div key={i} className="step-item">
-                                                <div className="step-num">{i + 1}</div>
-                                                <p>{tip}</p>
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="results-view"
+                            >
+                                {/* Results Header / Score */}
+                                <div className="results-header-modern">
+                                    <div className="score-viz">
+                                        <div className="score-circle-outer">
+                                            <svg viewBox="0 0 100 100" className="score-svg-modern">
+                                                <circle cx="50" cy="50" r="46" className="score-bg-track" />
+                                                <motion.circle
+                                                    cx="50" cy="50" r="46"
+                                                    className="score-fill-progress"
+                                                    strokeDasharray="290"
+                                                    initial={{ strokeDashoffset: 290 }}
+                                                    animate={{ strokeDashoffset: 290 - (290 * (result?.score || 0)) / 100 }}
+                                                    transition={{ duration: 2, ease: "easeOut" }}
+                                                    style={{ stroke: getScoreColor(result?.score || 0) }}
+                                                />
+                                            </svg>
+                                            <div className="score-inner-content">
+                                                <span className="score-pct">{result?.score}%</span>
+                                                <span className="score-label-sub">MATCH</span>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="summary-banner">
+                                        <div className="match-status-tag" style={{ background: `linear-gradient(135deg, ${getScoreColor(result?.score || 0)}, rgba(255,255,255,0.1))` }}>
+                                            <FiTarget /> {result?.matchLevel} Matching Accuracy
+                                        </div>
+                                        <h2 className="analysis-summary-heading">HR Analysis Summary</h2>
+                                        <p className="analysis-summary-text">"{result?.summary}"</p>
+                                    </div>
+                                </div>
+
+                                {/* Main Stats Grid */}
+                                <div className="stats-modern-grid">
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.2 }}
+                                        className="analysis-stat-card positive"
+                                    >
+                                        <div className="stat-header">
+                                            <div className="stat-icon-box"><FiCheckCircle /></div>
+                                            <h3>Key Strengths</h3>
+                                        </div>
+                                        <ul className="modern-list positive">
+                                            {(result?.pros || []).map((pro, i) => (
+                                                <motion.li
+                                                    key={i}
+                                                    initial={{ opacity: 0, x: -10 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: 0.3 + (i * 0.1) }}
+                                                >
+                                                    {pro}
+                                                </motion.li>
+                                            ))}
+                                        </ul>
+                                    </motion.div>
+
+                                    <motion.div
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.2 }}
+                                        className="analysis-stat-card negative"
+                                    >
+                                        <div className="stat-header">
+                                            <div className="stat-icon-box"><FiAlertCircle /></div>
+                                            <h3>Areas for Improvement</h3>
+                                        </div>
+                                        <ul className="modern-list negative">
+                                            {(result?.cons || []).map((con, i) => (
+                                                <motion.li
+                                                    key={i}
+                                                    initial={{ opacity: 0, x: 10 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: 0.3 + (i * 0.1) }}
+                                                >
+                                                    {con}
+                                                </motion.li>
+                                            ))}
+                                        </ul>
+                                    </motion.div>
+                                </div>
+
+                                {/* Skills Breakdown */}
+                                <div className="keywords-visualization-modern">
+                                    <div className="vis-header">
+                                        <div className="vis-title">
+                                            <FiZap className="icon-pulse" />
+                                            <h3>ATS Keyword Matching</h3>
+                                        </div>
+                                        <div className="vis-legend">
+                                            <span className="legend-item found">Identified</span>
+                                            <span className="legend-item missing">In-Demand</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="pills-container-modern">
+                                        {(result?.keywordMatch?.found || []).map((skill, i) => (
+                                            <motion.span
+                                                key={`found-${i}`}
+                                                whileHover={{ scale: 1.05 }}
+                                                className="modern-pill pill-found"
+                                            >
+                                                {skill}
+                                            </motion.span>
+                                        ))}
+                                        {(result?.keywordMatch?.missing || []).map((skill, i) => (
+                                            <motion.span
+                                                key={`missing-${i}`}
+                                                whileHover={{ scale: 1.05 }}
+                                                className="modern-pill pill-missing"
+                                            >
+                                                <FiX /> {skill}
+                                            </motion.span>
                                         ))}
                                     </div>
                                 </div>
 
-                                <button onClick={() => { setResult(null); setResumeFile(null); setResumeText(''); setJobDescription(''); setJdUrl(''); setJdImage(null); setQuotaExceeded(false); }} className="btn btn-secondary w-full mt-4">
-                                    New Analysis <FiArrowRight />
-                                </button>
+                                {/* Actionable Roadmap */}
+                                <div className="roadmap-panel">
+                                    <div className="roadmap-header">
+                                        <div className="roadmap-icon"><FiTrendingUp /></div>
+                                        <div>
+                                            <h3>Strategic Roadmap</h3>
+                                            <p>Optimized steps to secure this role</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="roadmap-steps-modern">
+                                        {(result?.improvementSuggestions || []).map((tip, i) => (
+                                            <motion.div
+                                                key={i}
+                                                className="roadmap-step-card"
+                                                initial={{ opacity: 0, y: 20 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true }}
+                                                transition={{ delay: i * 0.1 }}
+                                            >
+                                                <div className="step-badge">{i + 1}</div>
+                                                <p className="step-content-text">{tip}</p>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="results-actions">
+                                    <button onClick={() => { setResult(null); setResumeFile(null); setResumeText(''); setJobDescription(''); setJdUrl(''); setJdImage(null); setQuotaExceeded(false); }} className="btn btn-premium-secondary w-full">
+                                        <FiArrowRight /> Start New Audit
+                                    </button>
+                                </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -427,28 +512,28 @@ export default function HRReviewer() {
                 .reviewer-grid { display: grid; grid-template-columns: 1fr; gap: 32px; }
                 @media (min-width: 1024px) { .reviewer-grid { grid-template-columns: 1fr 1.5fr; } }
                 
-                .section-title-small { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; margin-bottom: 24px; }
+                .section-title-small { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; margin-bottom: 24px; color: var(--text-primary); }
                 .icon-accent { color: var(--accent-primary); }
                 
-                .tabs-strip { display: flex; background: var(--bg-primary); padding: 4px; border-radius: 8px; margin-bottom: 24px; }
+                .tabs-strip { display: flex; background: var(--bg-primary); padding: 4px; border-radius: 12px; margin-bottom: 24px; border: 1px solid var(--border-color); }
                 .tab-btn { 
                     flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; 
-                    padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 600; 
-                    color: var(--text-tertiary); background: none; border: none; cursor: pointer; transition: all 0.2s;
+                    padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600; 
+                    color: var(--text-tertiary); background: none; border: none; cursor: pointer; transition: all 0.3s;
                 }
-                .tab-btn.active { background: var(--accent-primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+                .tab-btn.active { background: var(--accent-primary); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
                 
-                .input-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 8px; display: block; }
+                .input-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 12px; display: block; }
                 .helper-text { font-size: 10px; color: var(--text-tertiary); margin-top: 8px; font-style: italic; }
                 
                 .image-upload-zone { 
-                    border: 2px dashed var(--border-color); border-radius: 16px; padding: 32px; 
-                    text-align: center; cursor: pointer; transition: all 0.2s;
+                    border: 2px dashed var(--border-color); border-radius: 20px; padding: 40px; 
+                    text-align: center; cursor: pointer; transition: all 0.3s; background: var(--bg-primary);
                 }
-                .image-upload-zone:hover { border-color: var(--text-tertiary); }
+                .image-upload-zone:hover { border-color: var(--accent-primary); background: rgba(99, 102, 241, 0.02); }
                 .image-upload-zone.has-image { border-color: var(--accent-primary); background: rgba(99, 102, 241, 0.05); }
                 .image-preview-container { position: relative; }
-                .preview-img { max-height: 200px; margin: 0 auto; border-radius: 8px; box-shadow: var(--shadow-md); }
+                .preview-img { max-height: 220px; margin: 0 auto; border-radius: 12px; box-shadow: var(--shadow-xl); border: 2px solid white; }
                 .image-preview-container .overlay { 
                     position: absolute; inset: 0; background: rgba(0,0,0,0.5); opacity: 0; 
                     display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700;
@@ -463,54 +548,125 @@ export default function HRReviewer() {
                 
                 .empty-state, .loading-state { 
                     height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-                    padding: 48px; text-align: center; background: var(--bg-secondary); border-radius: 24px; border: 1px solid var(--border-color);
+                    padding: 60px; text-align: center; background: var(--bg-secondary); border-radius: 32px; border: 1px solid var(--border-color);
+                    box-shadow: var(--shadow-2xl);
                 }
-                .empty-icon { font-size: 48px; color: var(--text-tertiary); margin-bottom: 24px; }
+                .empty-icon { font-size: 64px; color: var(--text-tertiary); margin-bottom: 24px; opacity: 0.5; }
                 .loading-state h3 { font-size: 24px; font-weight: 700; margin-bottom: 16px; }
                 .loading-state p { font-size: 12px; color: var(--text-tertiary); animation: bounce 1s infinite; }
                 
-                .loader-ring { position: relative; width: 120px; height: 120px; border: 4px solid var(--accent-primary-20); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; animation: ping 2s infinite; }
-                .loader-core { width: 80px; height: 80px; background: var(--accent-primary-10); border: 4px solid var(--accent-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--accent-primary); animation: pulse 2s infinite; }
+                .loader-ring { position: relative; width: 140px; height: 140px; border: 4px solid var(--accent-primary-20); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 40px; animation: ping 2s infinite; }
+                .loader-core { width: 90px; height: 90px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--accent-primary); box-shadow: var(--shadow-xl); animation: pulse 2s infinite; }
                 .progress-bar { width: 100%; max-width: 200px; height: 4px; background: var(--bg-primary); border-radius: 2px; margin-top: 16px; overflow: hidden; }
                 .progress-fill { height: 100%; background: var(--accent-primary); }
                 
-                .score-card { display: flex; flex-direction: column; align-items: center; gap: 32px; padding: 32px; background: var(--bg-secondary); border-radius: 24px; border: 1px solid var(--border-color); margin-bottom: 24px; }
-                @media (min-width: 768px) { .score-card { flex-direction: row; } }
-                .score-gauge { position: relative; width: 140px; height: 140px; flex-shrink: 0; }
-                .score-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-                .score-text .number { font-size: 36px; font-weight: 900; }
-                .score-text .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); }
+                /* MODERN RESULTS VIEW */
+                .results-view { display: flex; flex-direction: column; gap: 32px; padding-bottom: 40px; }
                 
-                .score-summary { flex: 1; }
-                .match-badge { display: inline-block; padding: 6px 16px; border-radius: 99px; color: white; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; box-shadow: var(--shadow-lg); }
-                .summary-text { font-size: 18px; font-weight: 600; line-height: 1.6; }
+                .results-header-modern { 
+                    display: grid; grid-template-columns: 1fr; gap: 32px; padding: 32px; 
+                    background: var(--bg-secondary); border-radius: 24px; border: 1px solid var(--border-color);
+                    box-shadow: var(--shadow-xl); overflow: hidden; position: relative;
+                }
+                @media (min-width: 768px) { .results-header-modern { grid-template-columns: auto 1fr; align-items: center; } }
                 
-                .details-grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px; }
-                @media (min-width: 768px) { .details-grid { grid-template-columns: 1fr 1fr; } }
-                .details-grid h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-                .border-l-green { border-left: 4px solid #10b981; }
-                .border-l-ruby { border-left: 4px solid #ef4444; }
+                .score-viz { width: 140px; height: 140px; }
+                .score-circle-outer { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+                .score-svg-modern { width: 100%; height: 100%; transform: rotate(-90deg); }
+                .score-bg-track { fill: none; stroke: var(--bg-primary); stroke-width: 8; }
+                .score-fill-progress { fill: none; stroke-width: 8; stroke-linecap: round; }
                 
-                .list { list-style: none; display: flex; flex-direction: column; gap: 12px; padding-left: 0; }
-                .list li { font-size: 14px; position: relative; padding-left: 24px; display: flex; align-items: flex-start; }
-                .list.green li::before { content: '✓'; position: absolute; left: 0; font-weight: bold; color: #10b981; font-size: 16px; line-height: 1; }
-                .list.ruby li::before { content: '✕'; position: absolute; left: 0; font-weight: bold; color: #ef4444; font-size: 16px; line-height: 1; }
+                .score-inner-content { position: absolute; display: flex; flex-direction: column; align-items: center; }
+                .score-pct { font-size: 34px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+                .score-label-sub { font-size: 9px; font-weight: 800; opacity: 0.6; letter-spacing: 0.1em; }
                 
-                .skills-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-                .skill-tag { padding: 6px 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; font-size: 12px; font-weight: 500; }
-                .green-tag { color: #10b981; border-color: #10b981; }
-                .ruby-tag { color: #ef4444; border-color: #ef4444; opacity: 0.8; }
+                .summary-banner { flex: 1; }
+                .match-status-tag { 
+                    display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; 
+                    border-radius: 99px; font-size: 11px; font-weight: 800; color: white; margin-bottom: 16px;
+                }
+                .analysis-summary-heading { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
+                .analysis-summary-text { font-size: 16px; font-weight: 500; line-height: 1.6; opacity: 0.9; font-style: italic; }
                 
-                .improvement-section { background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%); }
-                .improvement-section h4 { color: #f59e0b; }
-                .steps-list { display: flex; flex-direction: column; gap: 16px; }
-                .step-item { display: flex; gap: 16px; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; }
-                .step-num { width: 24px; height: 24px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
-                .step-item p { font-size: 14px; font-weight: 500; line-height: 1.5; }
+                .stats-modern-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+                @media (min-width: 768px) { .stats-modern-grid { grid-template-columns: 1fr 1fr; } }
                 
-                .info-badge { padding: 12px; border-radius: 8px; font-size: 12px; display: flex; align-items: flex-start; gap: 12px; }
-                .info-badge.warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
-                .info-badge.error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+                .analysis-stat-card { 
+                    padding: 24px; border-radius: 20px; border: 1px solid var(--border-color);
+                    background: var(--bg-secondary); box-shadow: var(--shadow-md); transition: transform 0.2s;
+                }
+                .analysis-stat-card:hover { transform: translateY(-4px); }
+                .analysis-stat-card.positive { border-left: 6px solid #10b981; border-top: 1px solid rgba(16, 185, 129, 0.1); }
+                .analysis-stat-card.negative { border-left: 6px solid #f43f5e; border-top: 1px solid rgba(244, 63, 94, 0.1); }
+                
+                .stat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+                .stat-icon-box { 
+                    width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+                }
+                .positive .stat-icon-box { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+                .negative .stat-icon-box { background: rgba(244, 63, 94, 0.1); color: #f43f5e; }
+                .stat-header h3 { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+                
+                .modern-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+                .modern-list li { 
+                    font-size: 13px; font-weight: 500; display: flex; align-items: flex-start; gap: 10px;
+                    padding: 10px; border-radius: 10px; background: var(--bg-primary);
+                }
+                .positive li::before { content: '✦'; color: #10b981; font-weight: 900; }
+                .negative li::before { content: '✕'; color: #f43f5e; font-weight: 900; }
+                
+                .keywords-visualization-modern { 
+                    padding: 32px; background: var(--bg-secondary); border-radius: 24px; border: 1px solid var(--border-color);
+                }
+                .vis-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+                .vis-title { display: flex; align-items: center; gap: 12px; }
+                .vis-title h3 { font-size: 15px; font-weight: 800; }
+                .icon-pulse { color: #f59e0b; animation: pulse 2s infinite; }
+                
+                .vis-legend { display: flex; gap: 16px; }
+                .legend-item { font-size: 10px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+                .legend-item::before { content: ''; width: 8px; height: 8px; border-radius: 2px; }
+                .legend-item.found::before { background: #10b981; }
+                .legend-item.missing::before { background: #f43f5e; }
+                
+                .pills-container-modern { display: flex; flex-wrap: wrap; gap: 10px; }
+                .modern-pill { 
+                    padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 600; 
+                    background: var(--bg-primary); border: 1px solid var(--border-color); 
+                    transition: all 0.2s; cursor: default; display: flex; align-items: center; gap: 6px;
+                }
+                .pill-found { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
+                .pill-missing { color: #f43f5e; border-color: rgba(244, 63, 94, 0.2); background: rgba(244, 63, 94, 0.02); }
+                
+                .roadmap-panel { 
+                    padding: 32px; background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(245, 158, 11, 0.05) 100%);
+                    border-radius: 24px; border: 1px solid var(--border-color);
+                }
+                .roadmap-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+                .roadmap-icon { width: 44px; height: 44px; background: #f59e0b; color: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+                .roadmap-header h3 { font-size: 18px; font-weight: 800; }
+                .roadmap-header p { font-size: 12px; opacity: 0.6; font-weight: 600; }
+                
+                .roadmap-steps-modern { display: flex; flex-direction: column; gap: 16px; }
+                .roadmap-step-card { 
+                    display: flex; gap: 20px; padding: 20px; background: white; 
+                    border-radius: 16px; border: 1px solid rgba(245, 158, 11, 0.1);
+                    box-shadow: var(--shadow-sm); transition: transform 0.2s;
+                }
+                .roadmap-step-card:hover { transform: scale(1.02); }
+                .step-badge { 
+                    width: 28px; height: 28px; border-radius: 50%; background: rgba(245, 158, 11, 0.1); 
+                    color: #f59e0b; font-weight: 900; font-size: 12px; display: flex; align-items: center; 
+                    justify-content: center; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.2);
+                }
+                .step-content-text { font-size: 14px; font-weight: 600; line-height: 1.5; color: #1e293b; }
+                
+                .results-actions { margin-top: 8px; }
+                .btn-premium-secondary { 
+                    background: var(--bg-secondary); color: var(--text-primary); border: 2px solid var(--border-color);
+                    padding: 16px; font-size: 14px; letter-spacing: 0.05em; text-transform: uppercase;
+                }
+                .btn-premium-secondary:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
                 
                 .hidden { display: none; }
                 .spin { animation: spin 1s linear infinite; }
@@ -564,14 +720,6 @@ export default function HRReviewer() {
                 .btn-primary:disabled {
                     opacity: 0.5;
                     cursor: not-allowed;
-                }
-                .btn-secondary {
-                    background: transparent;
-                    color: var(--text-primary);
-                    border: 1px solid var(--border-color);
-                }
-                .btn-secondary:hover {
-                    background: var(--bg-secondary);
                 }
                 .btn-lg {
                     padding: 16px 24px;
