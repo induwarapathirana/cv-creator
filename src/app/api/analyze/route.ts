@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
         // Initialize Gemini with deterministic settings and Native JSON Mode
         // Using gemini-1.5-flash for maximum stability and speed
         const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.5-flash',
             generationConfig: {
                 temperature: 0.1,
                 topP: 0.95,
