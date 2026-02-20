@@ -72,29 +72,55 @@ Provide your analysis in EXACTLY the following JSON format:
             });
         }
 
-        const result = await model.generateContent(contents);
-        const responseText = result.response.text();
+        const modelResponse = await model.generateContent(contents);
+        const responseText = modelResponse.response.text();
+
+        // Robust JSON extraction using Regex to handle "thinking" text or markdown prefixes
+        let analysis;
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
 
-        if (!jsonMatch) {
-            throw new Error('Failed to parse AI response as JSON');
+        if (jsonMatch) {
+            try {
+                analysis = JSON.parse(jsonMatch[0]);
+            } catch (e) {
+                console.error('JSON Parse Error:', e, 'Raw:', responseText);
+                throw new Error('AI returned invalid JSON');
+            }
+        } else {
+            throw new Error('AI failed to return valid JSON format');
         }
 
-        const analysis = JSON.parse(jsonMatch[0]);
+        // Validate structure before returning to prevent frontend crashes
+        const validatedAnalysis = {
+            score: typeof analysis.score === 'number' ? analysis.score : 0,
+            matchLevel: analysis.matchLevel || 'Unknown',
+            summary: analysis.summary || 'Summary unavailable',
+            pros: Array.isArray(analysis.pros) ? analysis.pros : [],
+            cons: Array.isArray(analysis.cons) ? analysis.cons : [],
+            missingSkills: Array.isArray(analysis.missingSkills) ? analysis.missingSkills : [],
+            improvementSuggestions: Array.isArray(analysis.improvementSuggestions) ? analysis.improvementSuggestions : [],
+            keywordMatch: {
+                found: (analysis.keywordMatch && Array.isArray(analysis.keywordMatch.found)) ? analysis.keywordMatch.found : [],
+                missing: (analysis.keywordMatch && Array.isArray(analysis.keywordMatch.missing)) ? analysis.keywordMatch.missing : []
+            }
+        };
 
-        return NextResponse.json(analysis);
+        return NextResponse.json(validatedAnalysis);
+
     } catch (error: any) {
         console.error('AI Analysis Error:', error);
 
-        // Detect 429 Quota errors and return 429 status
+        // Detailed error reporting back to UI
         const errorMsg = error.message || '';
-        if (errorMsg.includes('429') || errorMsg.toLowerCase().includes('quota')) {
-            return NextResponse.json(
-                { error: 'AI Quota exceeded. Please try again later or use Local Analysis.', code: 'QUOTA_EXCEEDED' },
-                { status: 429 }
-            );
-        }
+        const isQuota = errorMsg.includes('429') || errorMsg.toLowerCase().includes('quota');
 
-        return NextResponse.json({ error: errorMsg || 'Failed to analyze resume' }, { status: 500 });
+        return NextResponse.json(
+            {
+                error: isQuota ? 'AI Quota exceeded.' : (errorMsg || 'Failed to analyze resume'),
+                code: isQuota ? 'QUOTA_EXCEEDED' : 'ANALYSIS_ERROR',
+                details: error.stack
+            },
+            { status: isQuota ? 429 : 500 }
+        );
     }
 }

@@ -382,14 +382,14 @@ export default function HRReviewer() {
                                     <div className="card-glass p-6 border-l-green">
                                         <h4><FiCheckCircle /> Key Strengths</h4>
                                         <ul className="list green">
-                                            {result.pros.map((pro, i) => <li key={i}>{pro}</li>)}
+                                            {(result?.pros || []).map((pro, i) => <li key={i}>{pro}</li>)}
                                         </ul>
                                     </div>
 
                                     <div className="card-glass p-6 border-l-ruby">
                                         <h4><FiAlertCircle /> Gaps</h4>
                                         <ul className="list ruby">
-                                            {result.cons.map((con, i) => <li key={i}>{con}</li>)}
+                                            {(result?.cons || []).map((con, i) => <li key={i}>{con}</li>)}
                                         </ul>
                                     </div>
                                 </div>
@@ -397,15 +397,15 @@ export default function HRReviewer() {
                                 <div className="card-glass p-6">
                                     <h4><FiStar /> Matching Keywords</h4>
                                     <div className="skills-tags">
-                                        {result.keywordMatch.found.slice(0, 20).map((skill, i) => <span key={i} className="skill-tag green-tag">{skill}</span>)}
-                                        {result.keywordMatch.missing.slice(0, 10).map((skill, i) => <span key={i} className="skill-tag ruby-tag">{skill}</span>)}
+                                        {(result?.keywordMatch?.found || []).slice(0, 20).map((skill, i) => <span key={i} className="skill-tag green-tag">{skill}</span>)}
+                                        {(result?.keywordMatch?.missing || []).slice(0, 10).map((skill, i) => <span key={i} className="skill-tag ruby-tag">{skill}</span>)}
                                     </div>
                                 </div>
 
                                 <div className="card-glass p-6 improvement-section">
                                     <h4><FiTrendingUp /> Actionable Improvements</h4>
                                     <div className="steps-list">
-                                        {result.improvementSuggestions.map((tip, i) => (
+                                        {(result?.improvementSuggestions || []).map((tip, i) => (
                                             <div key={i} className="step-item">
                                                 <div className="step-num">{i + 1}</div>
                                                 <p>{tip}</p>
