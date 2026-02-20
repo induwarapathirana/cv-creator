@@ -27,28 +27,33 @@ export async function POST(req: NextRequest) {
         }
 
         // Initialize Gemini with deterministic settings and Native JSON Mode
-        // Using gemini-1.5-flash for maximum stability and speed
+        // Using gemini-2.5-flash as requested
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',
             generationConfig: {
                 temperature: 0.1,
                 topP: 0.95,
                 topK: 40,
-                maxOutputTokens: 2048,
+                maxOutputTokens: 4096, // Increased to prevent truncation
                 responseMimeType: 'application/json',
             }
         });
 
         const prompt = `
 Act as a HIGHLY CRITICAL Senior HR Auditor. Auditing RESUME against JOB DESCRIPTION.
-RUBRIC: Hard Skills (40%), Experience (30%), Soft Skills (20%), ATS Standards (10%).
-STRICTNESS: No evidence = missing. 
+STRICTNESS: If evidence for a skill/experience is not EXPLICIT, mark as missing.
 
-You MUST respond with a valid JSON object following this schema:
+RUBRIC:
+- Hard Skills (40%): Direct technical/tool match.
+- Experience (30%): Years & relevancy.
+- Soft Skills (20%): Leadership, comms, etc.
+- Format (10%): ATS readability & structure.
+
+Response Schema:
 {
   "score": number,
   "matchLevel": "Poor" | "Fair" | "Good" | "Excellent",
-  "summary": "string",
+  "summary": "string (concise)",
   "pros": ["string"],
   "cons": ["string"],
   "missingSkills": ["string"],
@@ -57,10 +62,10 @@ You MUST respond with a valid JSON object following this schema:
 }
 
 RESUME:
-${resumeText || '[Image]'}
+${resumeText || '[See attached image]'}
 
 JD:
-${finalJobDescription || '[Image]'}
+${finalJobDescription || '[See attached image]'}
 ${jdUrl ? `(URL: ${jdUrl})` : ''}
 `;
 
@@ -91,7 +96,7 @@ ${jdUrl ? `(URL: ${jdUrl})` : ''}
         } catch (e) {
             console.error('JSON Parse Fail:', e, 'Raw:', responseText);
 
-            // Fallback: Find the first { and the last }
+            // Fallback: Boundaried Extraction (Find the first { and the last })
             const startIdx = responseText.indexOf('{');
             const endIdx = responseText.lastIndexOf('}');
 
@@ -103,9 +108,8 @@ ${jdUrl ? `(URL: ${jdUrl})` : ''}
                     throw new Error(`AI returned malformed JSON structure: ${responseText.slice(0, 100)}...`);
                 }
             } else if (startIdx !== -1 && endIdx === -1) {
-                // Potential truncation - try to close it? 
-                // Better to throw a clear error
-                throw new Error("AI analysis was truncated. Please try again.");
+                // Truncation detected - the opening brace exists but no closing brace
+                throw new Error("AI analysis was truncated (response too long). Please try with a shorter JD.");
             } else {
                 throw new Error(`AI failed to return a JSON object. RAW: ${responseText.slice(0, 100)}...`);
             }
