@@ -94,6 +94,16 @@ Provide your analysis in EXACTLY the following JSON format:
         return NextResponse.json(analysis);
     } catch (error: any) {
         console.error('AI Analysis Error:', error);
-        return NextResponse.json({ error: error.message || 'Failed to analyze resume' }, { status: 500 });
+
+        // Detect 429 Quota errors and return 429 status
+        const errorMsg = error.message || '';
+        if (errorMsg.includes('429') || errorMsg.toLowerCase().includes('quota')) {
+            return NextResponse.json(
+                { error: 'AI Quota exceeded. Please try again later or use Local Analysis.', code: 'QUOTA_EXCEEDED' },
+                { status: 429 }
+            );
+        }
+
+        return NextResponse.json({ error: errorMsg || 'Failed to analyze resume' }, { status: 500 });
     }
 }

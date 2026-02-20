@@ -2,9 +2,10 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { HRAnalysisResult } from '@/types/resume';
-import { FiCpu, FiFileText, FiLink, FiImage, FiCheckCircle, FiAlertCircle, FiTrendingUp, FiCheck, FiX, FiArrowRight, FiLoader, FiTarget, FiStar, FiZap, FiUploadCloud } from 'react-icons/fi';
+import { FiCpu, FiFileText, FiLink, FiImage, FiCheckCircle, FiAlertCircle, FiTrendingUp, FiCheck, FiX, FiArrowRight, FiLoader, FiTarget, FiStar, FiZap, FiUploadCloud, FiServer } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { extractTextFromPDF } from '@/utils/parse-resume';
+import { extractTextFromPDF, parseResumeText } from '@/utils/parse-resume';
+import { analyzeResume } from '@/utils/ats-analyzer';
 
 export default function HRReviewer() {
     const [activeTab, setActiveTab] = useState<'text' | 'url' | 'image'>('text');
@@ -24,6 +25,7 @@ export default function HRReviewer() {
     const [extracting, setExtracting] = useState(false);
     const [result, setResult] = useState<HRAnalysisResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [quotaExceeded, setQuotaExceeded] = useState(false);
 
     const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -33,6 +35,7 @@ export default function HRReviewer() {
         setExtracting(true);
         setError(null);
         setResumeText(''); // Clear previous text
+        setQuotaExceeded(false);
 
         try {
             if (file.type === 'application/pdf') {
@@ -77,6 +80,7 @@ export default function HRReviewer() {
         setAnalyzing(true);
         setError(null);
         setResult(null);
+        setQuotaExceeded(false);
 
         // Prepare resume data for the API
         let finalResumeText = resumeText;
@@ -100,12 +104,65 @@ export default function HRReviewer() {
                 }),
             });
 
+            if (response.status === 429) {
+                setQuotaExceeded(true);
+                throw new Error('AI Quota exceeded. Please use Local Analysis fallback.');
+            }
+
             const data = await response.json();
 
             if (data.error) throw new Error(data.error);
             setResult(data);
         } catch (err: any) {
             setError(err.message || 'Something went wrong during analysis.');
+        } finally {
+            setAnalyzing(false);
+        }
+    };
+
+    const runLocalAnalysis = () => {
+        if (!resumeText) return;
+
+        setAnalyzing(true);
+        setError(null);
+        setQuotaExceeded(false);
+
+        try {
+            // 1. Prepare Resume Data (Parse text if it's from PDF/Text)
+            const cleanText = resumeText.startsWith('RESUME_IMAGE_DATA:') ? 'Image-based resume (Text not extracted)' : resumeText;
+            const parsedResume = parseResumeText(cleanText);
+
+            // 2. Run Local ATS Analyzer
+            const finalJD = activeTab === 'text' ? jobDescription : (activeTab === 'url' ? jdUrl : 'Image-based JD');
+            const atsResult = analyzeResume({
+                ...parsedResume,
+                id: 'local',
+                updatedAt: new Date().toISOString(),
+                settings: { template: 'ats', layout: 'standard' }
+            } as any, finalJD);
+
+            // 3. Map to HRAnalysisResult
+            const mappedResult: HRAnalysisResult = {
+                score: atsResult.overall,
+                matchLevel: atsResult.overall >= 80 ? 'Excellent' : atsResult.overall >= 60 ? 'Good' : atsResult.overall >= 40 ? 'Fair' : 'Poor',
+                summary: `Local analysis completed. Found ${atsResult.matchedKeywords.length} matching keywords and ${atsResult.suggestions.length} suggestions for improvement.`,
+                pros: atsResult.suggestions.filter(s => s.severity === 'low').map(s => s.message).slice(0, 5),
+                cons: atsResult.suggestions.filter(s => s.severity === 'high').map(s => s.message).slice(0, 4),
+                missingSkills: atsResult.missingKeywords.slice(0, 10),
+                improvementSuggestions: atsResult.suggestions.map(s => `${s.message}: ${s.action}`).slice(0, 5),
+                keywordMatch: {
+                    found: atsResult.matchedKeywords,
+                    missing: atsResult.missingKeywords
+                }
+            };
+
+            // Ensure pros/cons have fallback values if empty
+            if (mappedResult.pros.length === 0) mappedResult.pros = ['Basic structure present', 'Contact info detected'];
+            if (mappedResult.cons.length === 0 && atsResult.overall < 90) mappedResult.cons = ['Missing industry-specific keywords'];
+
+            setResult(mappedResult);
+        } catch (err: any) {
+            setError('Local analysis failed. Please try again with a different file.');
         } finally {
             setAnalyzing(false);
         }
@@ -118,7 +175,7 @@ export default function HRReviewer() {
                 <div className="side-panel">
                     <section className="card-glass p-6">
                         <h2 className="section-title-small">
-                            <FiUploadCloud className="icon-accent" /> 1. Upload Your Resume
+                            <FiUploadCloud className="icon-accent" /> 1. Your Resume
                         </h2>
 
                         <div
@@ -238,19 +295,33 @@ export default function HRReviewer() {
                             </AnimatePresence>
                         </div>
 
-                        <button
-                            onClick={runAnalysis}
-                            disabled={analyzing || extracting || !resumeText || (activeTab === 'text' && !jobDescription) || (activeTab === 'url' && !jdUrl) || (activeTab === 'image' && !jdImage)}
-                            className="btn btn-primary btn-lg w-full mt-8"
-                        >
-                            {analyzing ? (
-                                <><FiLoader className="spin" /> Analyzing...</>
-                            ) : (
-                                <><FiZap /> Analyze Match</>
-                            )}
-                        </button>
+                        {!quotaExceeded ? (
+                            <button
+                                onClick={runAnalysis}
+                                disabled={analyzing || extracting || !resumeText || (activeTab === 'text' && !jobDescription) || (activeTab === 'url' && !jdUrl) || (activeTab === 'image' && !jdImage)}
+                                className="btn btn-primary btn-lg w-full mt-8"
+                            >
+                                {analyzing ? (
+                                    <><FiLoader className="spin" /> Analyzing...</>
+                                ) : (
+                                    <><FiZap /> Analyze Match</>
+                                )}
+                            </button>
+                        ) : (
+                            <div className="quota-fallback-actions mt-8">
+                                <div className="info-badge warning mb-4">
+                                    <FiAlertCircle /> AI Quota Exceeded. You can use the built-in local analyzer instead.
+                                </div>
+                                <button onClick={runLocalAnalysis} className="btn btn-primary btn-lg w-full">
+                                    <FiServer /> Run Local Analysis
+                                </button>
+                                <button onClick={() => setQuotaExceeded(false)} className="btn btn-ghost w-full mt-2 text-sm">
+                                    Try AI again
+                                </button>
+                            </div>
+                        )}
 
-                        {error && <div className="info-badge error mt-4">{error}</div>}
+                        {error && !quotaExceeded && <div className="info-badge error mt-4">{error}</div>}
                     </section>
                 </div>
 
@@ -270,9 +341,9 @@ export default function HRReviewer() {
                                 <div className="loader-ring">
                                     <div className="loader-core"><FiCpu /></div>
                                 </div>
-                                <h3>AI HR Agent is Reviewing...</h3>
+                                <h3>{quotaExceeded ? 'Running Local Analysis...' : 'AI HR Agent is Reviewing...'}</h3>
                                 <div className="progress-bar">
-                                    <motion.div className="progress-fill" initial={{ width: "0%" }} animate={{ width: "100%" }} transition={{ duration: 15, ease: "linear" }} />
+                                    <motion.div className="progress-fill" initial={{ width: "0%" }} animate={{ width: "100%" }} transition={{ duration: quotaExceeded ? 2 : 15, ease: "linear" }} />
                                 </div>
                             </motion.div>
                         )}
@@ -326,9 +397,10 @@ export default function HRReviewer() {
                                 </div>
 
                                 <div className="card-glass p-6">
-                                    <h4><FiStar /> Missing Critical Skills</h4>
+                                    <h4><FiStar /> Matching Keywords</h4>
                                     <div className="skills-tags">
-                                        {result.missingSkills.map((skill, i) => <span key={i} className="skill-tag">{skill}</span>)}
+                                        {result.keywordMatch.found.slice(0, 20).map((skill, i) => <span key={i} className="skill-tag green-tag">{skill}</span>)}
+                                        {result.keywordMatch.missing.slice(0, 10).map((skill, i) => <span key={i} className="skill-tag ruby-tag">{skill}</span>)}
                                     </div>
                                 </div>
 
@@ -344,7 +416,7 @@ export default function HRReviewer() {
                                     </div>
                                 </div>
 
-                                <button onClick={() => { setResult(null); setResumeFile(null); setResumeText(''); setJobDescription(''); setJdUrl(''); setJdImage(null); }} className="btn btn-secondary w-full mt-4">
+                                <button onClick={() => { setResult(null); setResumeFile(null); setResumeText(''); setJobDescription(''); setJdUrl(''); setJdImage(null); setQuotaExceeded(false); }} className="btn btn-secondary w-full mt-4">
                                     New Analysis <FiArrowRight />
                                 </button>
                             </motion.div>
@@ -420,8 +492,6 @@ export default function HRReviewer() {
                 .details-grid h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
                 .border-l-green { border-left: 4px solid #10b981; }
                 .border-l-ruby { border-left: 4px solid #ef4444; }
-                .details-grid h4 .FiCheckCircle { color: #10b981; }
-                .details-grid h4 .FiAlertCircle { color: #ef4444; }
                 
                 .list { list-style: none; display: flex; flex-direction: column; gap: 12px; padding-left: 0; }
                 .list li { font-size: 14px; position: relative; padding-left: 24px; display: flex; align-items: flex-start; }
@@ -430,6 +500,8 @@ export default function HRReviewer() {
                 
                 .skills-tags { display: flex; flex-wrap: wrap; gap: 8px; }
                 .skill-tag { padding: 6px 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; font-size: 12px; font-weight: 500; }
+                .green-tag { color: #10b981; border-color: #10b981; }
+                .ruby-tag { color: #ef4444; border-color: #ef4444; opacity: 0.8; }
                 
                 .improvement-section { background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%); }
                 .improvement-section h4 { color: #f59e0b; }
@@ -506,6 +578,13 @@ export default function HRReviewer() {
                 .btn-lg {
                     padding: 16px 24px;
                     font-size: 18px;
+                }
+                .btn-ghost {
+                    background: none;
+                    border: none;
+                    color: var(--accent-primary);
+                    text-decoration: underline;
+                    cursor: pointer;
                 }
                 
                 /* Keyframes */
