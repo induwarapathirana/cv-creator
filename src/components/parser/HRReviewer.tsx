@@ -171,75 +171,117 @@ export default function HRReviewer() {
             <div className="reviewer-grid">
                 {/* Left Panel: Configuration */}
                 <div className="side-panel">
-                    <section className="card-glass p-6">
-                        <h2 className="section-title-small">
-                            <FiUploadCloud className="icon-accent" /> 1. Your Resume
-                        </h2>
+                    <motion.section
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="input-card-modern"
+                    >
+                        <div className="card-header-modern">
+                            <div className="step-indicator">01</div>
+                            <div>
+                                <h2 className="card-title-modern">Source Resume</h2>
+                                <p className="card-subtitle-modern">Upload the document you want to audit</p>
+                            </div>
+                        </div>
 
                         <div
                             onClick={() => resumeInputRef.current?.click()}
-                            className={`image-upload-zone ${resumeFile ? 'has-image' : ''}`}
+                            className={`modern-drop-zone ${resumeFile ? 'has-file' : ''} ${extracting ? 'is-loading' : ''}`}
                         >
-                            {extracting ? (
-                                <div className="upload-placeholder">
-                                    <FiLoader className="placeholder-icon spin" />
-                                    <p className="font-semibold">Extracting text...</p>
-                                </div>
-                            ) : resumeFile ? (
-                                <div className="upload-placeholder">
-                                    <FiCheckCircle className="placeholder-icon text-green" />
-                                    <p className="font-semibold">{resumeFile.name}</p>
-                                    <p className="helper-text">Click to change</p>
-                                </div>
-                            ) : (
-                                <div className="upload-placeholder">
-                                    <FiFileText className="placeholder-icon" />
-                                    <p className="font-semibold">Drop your resume here</p>
-                                    <p className="helper-text">PDF or Image (JPG/PNG)</p>
-                                </div>
-                            )}
+                            <AnimatePresence mode="wait">
+                                {extracting ? (
+                                    <motion.div
+                                        key="extracting"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="upload-state-content"
+                                    >
+                                        <div className="spinner-modern"><FiLoader /></div>
+                                        <div className="upload-text-group">
+                                            <span className="primary-upload-text">Processing Document</span>
+                                            <span className="secondary-upload-text">Extracting structure and semantics...</span>
+                                        </div>
+                                    </motion.div>
+                                ) : resumeFile ? (
+                                    <motion.div
+                                        key="file"
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="upload-state-content"
+                                    >
+                                        <div className="file-icon-box"><FiFileText /></div>
+                                        <div className="upload-text-group">
+                                            <span className="primary-upload-text file-name-text">{resumeFile.name}</span>
+                                            <span className="secondary-upload-text success-text">Successfully Analyzed • Click to swap</span>
+                                        </div>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="empty"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="upload-state-content"
+                                    >
+                                        <div className="upload-icon-box"><FiUploadCloud /></div>
+                                        <div className="upload-text-group">
+                                            <span className="primary-upload-text">Upload Resume</span>
+                                            <span className="secondary-upload-text">PDF, DOCX or High-res images</span>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                         <input type="file" ref={resumeInputRef} onChange={handleResumeUpload} accept=".pdf,image/*" className="hidden" />
-                    </section>
+                    </motion.section>
 
-                    <section className="card-glass p-6 mt-6">
-                        <h2 className="section-title-small">
-                            <FiTarget className="icon-accent" /> 2. Job details
-                        </h2>
+                    <motion.section
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="input-card-modern mt-8"
+                    >
+                        <div className="card-header-modern">
+                            <div className="step-indicator">02</div>
+                            <div>
+                                <h2 className="card-title-modern">Target Role</h2>
+                                <p className="card-subtitle-modern">Define the benchmarks for analysis</p>
+                            </div>
+                        </div>
 
-                        {/* Tabs */}
-                        <div className="tabs-strip">
+                        {/* Modern Tabs */}
+                        <div className="tabs-container-modern">
                             {(['text', 'url', 'image'] as const).map(tab => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+                                    className={`modern-tab-item ${activeTab === tab ? 'active' : ''}`}
                                 >
-                                    {tab === 'text' && <FiFileText />}
-                                    {tab === 'url' && <FiLink />}
-                                    {tab === 'image' && <FiImage />}
-                                    <span className="capitalize">{tab}</span>
+                                    <div className="tab-icon">
+                                        {tab === 'text' && <FiFileText />}
+                                        {tab === 'url' && <FiLink />}
+                                        {tab === 'image' && <FiImage />}
+                                    </div>
+                                    <span className="tab-label">{tab}</span>
                                 </button>
                             ))}
                         </div>
 
-                        {/* Tab Content */}
-                        <div className="tab-viewport">
+                        {/* Tab Content Modern */}
+                        <div className="tab-content-container">
                             <AnimatePresence mode="wait">
                                 {activeTab === 'text' && (
                                     <motion.div
                                         key="text"
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 10 }}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="tab-pane-modern"
                                     >
-                                        <label className="input-label">Paste Job Description</label>
                                         <textarea
                                             value={jobDescription}
                                             onChange={(e) => setJobDescription(e.target.value)}
-                                            placeholder="Paste the full job requirements here..."
-                                            className="textarea"
-                                            style={{ height: '200px' }}
+                                            placeholder="Paste the requirements, responsibilities and skills here..."
+                                            className="modern-textarea"
                                         />
                                     </motion.div>
                                 )}
@@ -247,43 +289,46 @@ export default function HRReviewer() {
                                 {activeTab === 'url' && (
                                     <motion.div
                                         key="url"
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 10 }}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="tab-pane-modern"
                                     >
-                                        <label className="input-label">Job Post Link</label>
-                                        <input
-                                            type="url"
-                                            value={jdUrl}
-                                            onChange={(e) => setJdUrl(e.target.value)}
-                                            placeholder="https://linkedin.com/jobs/view/..."
-                                            className="input"
-                                        />
-                                        <p className="helper-text">Works best with public job postings.</p>
+                                        <div className="input-with-icon">
+                                            <FiLink className="field-icon" />
+                                            <input
+                                                type="url"
+                                                value={jdUrl}
+                                                onChange={(e) => setJdUrl(e.target.value)}
+                                                placeholder="https://linkedin.com/jobs/view/..."
+                                                className="modern-input-field"
+                                            />
+                                        </div>
+                                        <p className="field-helper">We'll scan the link for role requirements</p>
                                     </motion.div>
                                 )}
 
                                 {activeTab === 'image' && (
                                     <motion.div
                                         key="image"
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: 10 }}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="tab-pane-modern"
                                     >
                                         <div
                                             onClick={() => jdImageInputRef.current?.click()}
-                                            className={`image-upload-zone ${jdImage ? 'has-image' : ''}`}
+                                            className={`modern-mini-dropzone ${jdImage ? 'has-preview' : ''}`}
                                         >
                                             {jdImage ? (
-                                                <div className="image-preview-container">
-                                                    <img src={jdImage} alt="JD Preview" className="preview-img" />
-                                                    <div className="overlay">Change Image</div>
+                                                <div className="jd-preview-wrapper">
+                                                    <img src={jdImage} alt="JD Preview" className="jd-preview-img" />
+                                                    <div className="jd-preview-hover">Swap Image</div>
                                                 </div>
                                             ) : (
-                                                <div className="upload-placeholder">
-                                                    <FiImage className="placeholder-icon" />
-                                                    <p className="font-semibold">Upload Image</p>
-                                                    <p className="helper-text">Screenshot of job details</p>
+                                                <div className="upload-state-content mini">
+                                                    <FiImage className="upload-icon-mini" />
+                                                    <span className="primary-upload-text small">Snap & Upload</span>
                                                 </div>
                                             )}
                                         </div>
@@ -293,34 +338,44 @@ export default function HRReviewer() {
                             </AnimatePresence>
                         </div>
 
-                        {!quotaExceeded ? (
-                            <button
-                                onClick={runAnalysis}
-                                disabled={analyzing || extracting || !resumeText || (activeTab === 'text' && !jobDescription) || (activeTab === 'url' && !jdUrl) || (activeTab === 'image' && !jdImage)}
-                                className="btn btn-primary btn-lg w-full mt-8"
-                            >
-                                {analyzing ? (
-                                    <><FiLoader className="spin" /> Analyzing...</>
-                                ) : (
-                                    <><FiZap /> Analyze Match</>
-                                )}
-                            </button>
-                        ) : (
-                            <div className="quota-fallback-actions mt-8">
-                                <div className="info-badge warning mb-4">
-                                    <FiAlertCircle /> AI Quota Exceeded. You can use the built-in local analyzer instead.
+                        <div className="action-footer-modern">
+                            {!quotaExceeded ? (
+                                <button
+                                    onClick={runAnalysis}
+                                    disabled={analyzing || extracting || !resumeText || (activeTab === 'text' && !jobDescription) || (activeTab === 'url' && !jdUrl) || (activeTab === 'image' && !jdImage)}
+                                    className={`btn-modern-action ${analyzing ? 'is-analyzing' : ''}`}
+                                >
+                                    {analyzing ? (
+                                        <><FiLoader className="spin-fast" /> Orchestrating Analysis...</>
+                                    ) : (
+                                        <><FiZap /> Launch Audit</>
+                                    )}
+                                </button>
+                            ) : (
+                                <div className="quota-recovery-modern">
+                                    <div className="quota-notice">
+                                        <FiAlertCircle /> <span>AI Capacity Limited</span>
+                                    </div>
+                                    <button onClick={runLocalAnalysis} className="btn-modern-recovery">
+                                        <FiServer /> Switch to Local Engine
+                                    </button>
+                                    <button onClick={() => setQuotaExceeded(false)} className="btn-modern-retry">
+                                        Try Cloud again
+                                    </button>
                                 </div>
-                                <button onClick={runLocalAnalysis} className="btn btn-primary btn-lg w-full">
-                                    <FiServer /> Run Local Analysis
-                                </button>
-                                <button onClick={() => setQuotaExceeded(false)} className="btn btn-ghost w-full mt-2 text-sm">
-                                    Try AI again
-                                </button>
-                            </div>
-                        )}
+                            )}
 
-                        {error && !quotaExceeded && <div className="info-badge error mt-4">{error}</div>}
-                    </section>
+                            {error && !quotaExceeded && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="modern-error-toast"
+                                >
+                                    <FiAlertCircle /> {error}
+                                </motion.div>
+                            )}
+                        </div>
+                    </motion.section>
                 </div>
 
                 {/* Right Panel: Results */}
@@ -509,42 +564,196 @@ export default function HRReviewer() {
             </div>
 
             <style jsx>{`
-                .reviewer-grid { display: grid; grid-template-columns: 1fr; gap: 32px; }
-                @media (min-width: 1024px) { .reviewer-grid { grid-template-columns: 1fr 1.5fr; } }
+                .reviewer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; padding: 20px; }
+                @media (min-width: 1200px) { .reviewer-grid { grid-template-columns: 380px 1fr; gap: 48px; } }
                 
-                .section-title-small { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; margin-bottom: 24px; color: var(--text-primary); }
-                .icon-accent { color: var(--accent-primary); }
+                /* MODERN INPUT CARDS */
+                .input-card-modern {
+                    background: var(--bg-secondary);
+                    border: 1px solid var(--border-color);
+                    border-radius: 28px;
+                    padding: 32px;
+                    box-shadow: var(--shadow-xl);
+                    position: relative;
+                }
                 
-                .tabs-strip { display: flex; background: var(--bg-primary); padding: 4px; border-radius: 12px; margin-bottom: 24px; border: 1px solid var(--border-color); }
-                .tab-btn { 
-                    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; 
-                    padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600; 
-                    color: var(--text-tertiary); background: none; border: none; cursor: pointer; transition: all 0.3s;
+                .card-header-modern {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    margin-bottom: 28px;
                 }
-                .tab-btn.active { background: var(--accent-primary); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
                 
-                .input-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); margin-bottom: 12px; display: block; }
-                .helper-text { font-size: 10px; color: var(--text-tertiary); margin-top: 8px; font-style: italic; }
+                .step-indicator {
+                    width: 32px;
+                    height: 32px;
+                    background: var(--accent-primary);
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    font-weight: 900;
+                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+                }
                 
-                .image-upload-zone { 
-                    border: 2px dashed var(--border-color); border-radius: 20px; padding: 40px; 
-                    text-align: center; cursor: pointer; transition: all 0.3s; background: var(--bg-primary);
+                .card-title-modern { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+                .card-subtitle-modern { font-size: 11px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+                
+                /* MODERN DROP ZONE */
+                .modern-drop-zone {
+                    border: 2px dashed var(--border-color);
+                    border-radius: 20px;
+                    padding: 32px;
+                    cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    background: var(--bg-primary);
+                    min-height: 140px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
-                .image-upload-zone:hover { border-color: var(--accent-primary); background: rgba(99, 102, 241, 0.02); }
-                .image-upload-zone.has-image { border-color: var(--accent-primary); background: rgba(99, 102, 241, 0.05); }
-                .image-preview-container { position: relative; }
-                .preview-img { max-height: 220px; margin: 0 auto; border-radius: 12px; box-shadow: var(--shadow-xl); border: 2px solid white; }
-                .image-preview-container .overlay { 
-                    position: absolute; inset: 0; background: rgba(0,0,0,0.5); opacity: 0; 
-                    display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700;
-                    border-radius: 8px; transition: 0.2s;
+                
+                .modern-drop-zone:hover {
+                    border-color: var(--accent-primary);
+                    background: rgba(99, 102, 241, 0.02);
+                    transform: translateY(-2px);
                 }
-                .image-preview-container:hover .overlay { opacity: 1; }
-                .upload-placeholder {
-                    display: flex; flex-direction: column; align-items: center; justify-content: center;
+                
+                .modern-drop-zone.has-file {
+                    border-style: solid;
+                    border-color: #10b981;
+                    background: rgba(16, 185, 129, 0.03);
                 }
-                .placeholder-icon { font-size: 32px; color: var(--text-tertiary); margin-bottom: 12px; }
-                .text-green { color: #10b981; }
+                
+                .upload-state-content { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+                .upload-state-content.mini { flex-direction: row; gap: 12px; }
+                
+                .upload-icon-box { 
+                    width: 56px; height: 56px; border-radius: 16px; background: rgba(99, 102, 241, 0.1); color: var(--accent-primary);
+                    display: flex; align-items: center; justify-content: center; font-size: 24px;
+                }
+                
+                .file-icon-box {
+                    width: 56px; height: 56px; border-radius: 16px; background: rgba(16, 185, 129, 0.1); color: #10b981;
+                    display: flex; align-items: center; justify-content: center; font-size: 24px;
+                }
+                
+                .spinner-modern { font-size: 32px; color: var(--accent-primary); animation: spin 1s linear infinite; }
+                
+                .upload-text-group { display: flex; flex-direction: column; gap: 4px; }
+                .primary-upload-text { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+                .primary-upload-text.small { font-size: 12px; }
+                .secondary-upload-text { font-size: 11px; font-weight: 500; color: var(--text-tertiary); }
+                .success-text { color: #10b981; font-weight: 700; }
+                .file-name-text { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+                
+                /* MODERN TABS */
+                .tabs-container-modern {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 8px;
+                    background: var(--bg-primary);
+                    padding: 6px;
+                    border-radius: 16px;
+                    border: 1px solid var(--border-color);
+                    margin-bottom: 24px;
+                }
+                
+                .modern-tab-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 12px 4px;
+                    border-radius: 12px;
+                    border: none;
+                    background: none;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    color: var(--text-tertiary);
+                }
+                
+                .modern-tab-item.active { background: white; color: var(--accent-primary); box-shadow: var(--shadow-md); }
+                .tab-icon { font-size: 18px; }
+                .tab-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+                
+                /* MODERN INPUT FIELDS */
+                .tab-pane-modern { position: relative; }
+                .modern-textarea {
+                    width: 100%;
+                    height: 200px;
+                    background: var(--bg-primary);
+                    border: 1px solid var(--border-color);
+                    border-radius: 16px;
+                    padding: 18px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: var(--text-primary);
+                    outline: none;
+                    transition: all 0.2s;
+                    resize: none;
+                }
+                .modern-textarea:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08); }
+                
+                .input-with-icon { position: relative; }
+                .field-icon { position: absolute; left: 18px; top: 18px; color: var(--text-tertiary); font-size: 18px; }
+                .modern-input-field {
+                    width: 100%;
+                    background: var(--bg-primary);
+                    border: 1px solid var(--border-color);
+                    border-radius: 16px;
+                    padding: 18px 18px 18px 48px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    outline: none;
+                }
+                .field-helper { font-size: 10px; color: var(--text-tertiary); margin-top: 10px; font-style: italic; }
+                
+                .modern-mini-dropzone {
+                    border: 1px solid var(--border-color); border-radius: 16px; height: 120px;
+                    display: flex; align-items: center; justify-content: center; background: var(--bg-primary);
+                    cursor: pointer; overflow: hidden;
+                }
+                .jd-preview-wrapper { position: relative; width: 100%; height: 100%; }
+                .jd-preview-img { width: 100%; height: 100%; object-fit: cover; }
+                .jd-preview-hover {
+                    position: absolute; inset: 0; background: rgba(0,0,0,0.6); color: white;
+                    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+                    opacity: 0; transition: 0.2s;
+                }
+                .jd-preview-wrapper:hover .jd-preview-hover { opacity: 1; }
+                .upload-icon-mini { font-size: 20px; color: var(--accent-primary); }
+                
+                /* MODERN ACTIONS */
+                .action-footer-modern { margin-top: 32px; }
+                .btn-modern-action {
+                    width: 100%; padding: 18px; border-radius: 18px; border: none;
+                    background: linear-gradient(135deg, var(--accent-primary) 0%, #4f46e5 100%);
+                    color: white; font-size: 15px; font-weight: 800; letter-spacing: 0.02em;
+                    display: flex; align-items: center; justify-content: center; gap: 10px;
+                    cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+                }
+                .btn-modern-action:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4); }
+                .btn-modern-action:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+                
+                .spin-fast { animation: spin 0.8s linear infinite; }
+                
+                .modern-error-toast {
+                    margin-top: 16px; padding: 12px; border-radius: 12px; background: rgba(244, 63, 94, 0.1);
+                    color: #f43f5e; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px;
+                }
+                
+                .quota-recovery-modern { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+                .quota-notice { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #f59e0b; margin-bottom: 4px; }
+                .btn-modern-recovery {
+                    width: 100%; padding: 14px; border-radius: 14px; border: none;
+                    background: #f59e0b; color: white; font-size: 13px; font-weight: 800;
+                    display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+                }
+                .btn-modern-retry { background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-decoration: underline; cursor: pointer; }
                 
                 .empty-state, .loading-state { 
                     height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; 
@@ -565,28 +774,29 @@ export default function HRReviewer() {
                 
                 .results-header-modern { 
                     display: grid; grid-template-columns: 1fr; gap: 32px; padding: 32px; 
-                    background: var(--bg-secondary); border-radius: 24px; border: 1px solid var(--border-color);
+                    background: #1e293b; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1);
                     box-shadow: var(--shadow-xl); overflow: hidden; position: relative;
+                    color: white;
                 }
                 @media (min-width: 768px) { .results-header-modern { grid-template-columns: auto 1fr; align-items: center; } }
                 
                 .score-viz { width: 140px; height: 140px; }
                 .score-circle-outer { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
                 .score-svg-modern { width: 100%; height: 100%; transform: rotate(-90deg); }
-                .score-bg-track { fill: none; stroke: var(--bg-primary); stroke-width: 8; }
+                .score-bg-track { fill: #0f172a; stroke: rgba(255,255,255,0.05); stroke-width: 8; }
                 .score-fill-progress { fill: none; stroke-width: 8; stroke-linecap: round; }
                 
                 .score-inner-content { position: absolute; display: flex; flex-direction: column; align-items: center; }
-                .score-pct { font-size: 34px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
-                .score-label-sub { font-size: 9px; font-weight: 800; opacity: 0.6; letter-spacing: 0.1em; }
+                .score-pct { font-size: 34px; font-weight: 900; line-height: 1; margin-bottom: 4px; color: white !important; }
+                .score-label-sub { font-size: 9px; font-weight: 800; opacity: 0.6; letter-spacing: 0.1em; color: white; }
                 
                 .summary-banner { flex: 1; }
                 .match-status-tag { 
                     display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; 
                     border-radius: 99px; font-size: 11px; font-weight: 800; color: white; margin-bottom: 16px;
                 }
-                .analysis-summary-heading { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
-                .analysis-summary-text { font-size: 16px; font-weight: 500; line-height: 1.6; opacity: 0.9; font-style: italic; }
+                .analysis-summary-heading { font-size: 20px; font-weight: 800; margin-bottom: 12px; color: white; }
+                .analysis-summary-text { font-size: 16px; font-weight: 500; line-height: 1.6; opacity: 0.9; font-style: italic; color: rgba(255,255,255,0.8); }
                 
                 .stats-modern-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
                 @media (min-width: 768px) { .stats-modern-grid { grid-template-columns: 1fr 1fr; } }
@@ -605,12 +815,12 @@ export default function HRReviewer() {
                 }
                 .positive .stat-icon-box { background: rgba(16, 185, 129, 0.1); color: #10b981; }
                 .negative .stat-icon-box { background: rgba(244, 63, 94, 0.1); color: #f43f5e; }
-                .stat-header h3 { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+                .stat-header h3 { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-primary); }
                 
                 .modern-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 14px; }
                 .modern-list li { 
                     font-size: 13px; font-weight: 500; display: flex; align-items: flex-start; gap: 10px;
-                    padding: 10px; border-radius: 10px; background: var(--bg-primary);
+                    padding: 10px; border-radius: 10px; background: var(--bg-primary); color: var(--text-secondary);
                 }
                 .positive li::before { content: '✦'; color: #10b981; font-weight: 900; }
                 .negative li::before { content: '✕'; color: #f43f5e; font-weight: 900; }
@@ -620,23 +830,25 @@ export default function HRReviewer() {
                 }
                 .vis-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
                 .vis-title { display: flex; align-items: center; gap: 12px; }
-                .vis-title h3 { font-size: 15px; font-weight: 800; }
+                .vis-title h3 { font-size: 15px; font-weight: 800; color: var(--text-primary); }
                 .icon-pulse { color: #f59e0b; animation: pulse 2s infinite; }
                 
                 .vis-legend { display: flex; gap: 16px; }
-                .legend-item { font-size: 10px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+                .legend-item { font-size: 10px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; color: var(--text-tertiary); }
                 .legend-item::before { content: ''; width: 8px; height: 8px; border-radius: 2px; }
                 .legend-item.found::before { background: #10b981; }
                 .legend-item.missing::before { background: #f43f5e; }
                 
-                .pills-container-modern { display: flex; flex-wrap: wrap; gap: 10px; }
+                .pills-container-modern { display: flex; flex-wrap: wrap; gap: 12px; }
                 .modern-pill { 
-                    padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 600; 
+                    padding: 10px 18px; border-radius: 12px; font-size: 12px; font-weight: 600; 
                     background: var(--bg-primary); border: 1px solid var(--border-color); 
-                    transition: all 0.2s; cursor: default; display: flex; align-items: center; gap: 6px;
+                    transition: all 0.2s ease-in-out; cursor: default; display: inline-flex; align-items: center; gap: 8px;
+                    box-shadow: var(--shadow-sm);
                 }
-                .pill-found { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
-                .pill-missing { color: #f43f5e; border-color: rgba(244, 63, 94, 0.2); background: rgba(244, 63, 94, 0.02); }
+                .modern-pill:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+                .pill-found { color: #059669; border: 1.5px solid rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05); }
+                .pill-missing { color: #dc2626; border: 1.5px solid rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.05); }
                 
                 .roadmap-panel { 
                     padding: 32px; background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(245, 158, 11, 0.05) 100%);
@@ -644,14 +856,15 @@ export default function HRReviewer() {
                 }
                 .roadmap-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
                 .roadmap-icon { width: 44px; height: 44px; background: #f59e0b; color: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
-                .roadmap-header h3 { font-size: 18px; font-weight: 800; }
-                .roadmap-header p { font-size: 12px; opacity: 0.6; font-weight: 600; }
+                .roadmap-header h3 { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+                .roadmap-header p { font-size: 12px; opacity: 0.6; font-weight: 600; color: var(--text-tertiary); }
                 
                 .roadmap-steps-modern { display: flex; flex-direction: column; gap: 16px; }
                 .roadmap-step-card { 
-                    display: flex; gap: 20px; padding: 20px; background: white; 
+                    display: flex; gap: 20px; padding: 20px; background: var(--bg-primary); 
                     border-radius: 16px; border: 1px solid rgba(245, 158, 11, 0.1);
                     box-shadow: var(--shadow-sm); transition: transform 0.2s;
+                    color: var(--text-primary);
                 }
                 .roadmap-step-card:hover { transform: scale(1.02); }
                 .step-badge { 
@@ -659,7 +872,7 @@ export default function HRReviewer() {
                     color: #f59e0b; font-weight: 900; font-size: 12px; display: flex; align-items: center; 
                     justify-content: center; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.2);
                 }
-                .step-content-text { font-size: 14px; font-weight: 600; line-height: 1.5; color: #1e293b; }
+                .step-content-text { font-size: 14px; font-weight: 600; line-height: 1.5; color: var(--text-secondary); }
                 
                 .results-actions { margin-top: 8px; }
                 .btn-premium-secondary { 
