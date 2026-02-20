@@ -13,6 +13,7 @@ export default function HRReviewer() {
     // Inputs
     const [resumeFile, setResumeFile] = useState<File | null>(null);
     const [resumeText, setResumeText] = useState<string>('');
+    const [resumeImage, setResumeImage] = useState<string | null>(null);
     const [jobDescription, setJobDescription] = useState('');
     const [jdUrl, setJdUrl] = useState('');
     const [jdImage, setJdImage] = useState<string | null>(null);
@@ -35,6 +36,7 @@ export default function HRReviewer() {
         setExtracting(true);
         setError(null);
         setResumeText(''); // Clear previous text
+        setResumeImage(null);
         setQuotaExceeded(false);
 
         try {
@@ -42,6 +44,16 @@ export default function HRReviewer() {
                 const text = await extractTextFromPDF(file);
                 setResumeText(text);
             } else if (file.type.startsWith('image/')) {
+                // Store base64 for multimodal AI
+                const reader = new FileReader();
+                const base64Promise = new Promise<string>((resolve) => {
+                    reader.onloadend = () => resolve(reader.result as string);
+                });
+                reader.readAsDataURL(file);
+                const base64 = await base64Promise;
+                setResumeImage(base64);
+
+                // Still do OCR for preview or local fallback if needed
                 const text = await extractTextFromImage(file);
                 setResumeText(text);
             } else {
@@ -67,7 +79,7 @@ export default function HRReviewer() {
     };
 
     const runAnalysis = async () => {
-        if (!resumeText) {
+        if (!resumeText && !resumeImage) {
             setError('Please upload your resume first.');
             return;
         }
@@ -96,9 +108,10 @@ export default function HRReviewer() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     resumeText: resumeText,
+                    resumeImage: resumeImage,
                     jobDescription: activeTab === 'text' ? finalJobDescription : (activeTab === 'image' ? finalJobDescription : ''),
                     jdUrl: activeTab === 'url' ? jdUrl : '',
-                    jdImage: activeTab === 'image' ? (finalJobDescription ? '' : jdImage) : null, // Send image only if OCR fails or as fallback
+                    jdImage: activeTab === 'image' ? (finalJobDescription ? '' : jdImage) : null,
                 }),
             });
 
