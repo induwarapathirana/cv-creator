@@ -13,60 +13,76 @@ export async function POST(req: NextRequest) {
 
         let finalJobDescription = jobDescription || '';
 
-        // Handle URL
+        // Handle URL with improved logic and safety
         if (jdUrl && !finalJobDescription) {
             try {
-                const response = await fetch(jdUrl);
+                // Check for LinkedIn-style URLs which are usually blocked
+                if (jdUrl.includes('linkedin.com') || jdUrl.includes('indeed.com')) {
+                    throw new Error('LinkedIn and some job boards block automatic scanning. Please copy and paste the job description text instead.');
+                }
+
+                const response = await fetch(jdUrl, { signal: AbortSignal.timeout(5000) });
                 const html = await response.text();
-                finalJobDescription = html.replace(/<[^>]*>?/gm, ' ')
+
+                // Better HTML to text conversion
+                finalJobDescription = html
+                    .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gim, '')
+                    .replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gim, '')
+                    .replace(/<[^>]*>?/gm, ' ')
                     .replace(/\s+/g, ' ')
                     .trim();
-            } catch (err) {
+
+            } catch (err: any) {
                 console.error('Error fetching JD from URL:', err);
+                throw new Error(err.message || 'Failed to scan URL. Please copy/paste the JD text.');
             }
         }
 
+        // Global Input Protection: Prevent token drowning in any mode (Text, URL, or Image)
+        // 1. Cap Resume text (10k chars is plenty for any resume)
+        let processedResumeText = resumeText || '';
+        if (processedResumeText.length > 10000) {
+            processedResumeText = processedResumeText.substring(0, 10000) + '... [Resume truncated for token efficiency]';
+        }
+
+        // 2. Cap JD text (5k chars is plenty for a job post)
+        if (finalJobDescription.length > 5000) {
+            finalJobDescription = finalJobDescription.substring(0, 5000) + '... [JD truncated for token efficiency]';
+        }
+
         // Initialize Gemini with deterministic settings and Native JSON Mode
-        // Using gemini-2.5-flash as requested
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',
             generationConfig: {
                 temperature: 0.1,
                 topP: 0.95,
                 topK: 40,
-                maxOutputTokens: 4096, // Increased to prevent truncation
+                maxOutputTokens: 2048,
                 responseMimeType: 'application/json',
             }
         });
 
         const prompt = `
-Act as a HIGHLY CRITICAL Senior HR Auditor. Auditing RESUME against JOB DESCRIPTION.
-STRICTNESS: If evidence for a skill/experience is not EXPLICIT, mark as missing.
+Act as a CRITICAL HR Auditor. Resume vs JD match.
+STRICT: Only explicit evidence counts.
 
-RUBRIC:
-- Hard Skills (40%): Direct technical/tool match.
-- Experience (30%): Years & relevancy.
-- Soft Skills (20%): Leadership, comms, etc.
-- Format (10%): ATS readability & structure.
-
-Response Schema:
+Schema:
 {
-  "score": number,
-  "matchLevel": "Poor" | "Fair" | "Good" | "Excellent",
-  "summary": "string (concise)",
-  "pros": ["string"],
-  "cons": ["string"],
-  "missingSkills": ["string"],
-  "improvementSuggestions": ["string"],
-  "keywordMatch": { "found": ["string"], "missing": ["string"] }
+  "score": 0-100,
+  "matchLevel": "Poor"|"Fair"|"Good"|"Excellent",
+  "summary": "1 sentence",
+  "pros": ["bullet"],
+  "cons": ["bullet"],
+  "missingSkills": ["skill"],
+  "improvementSuggestions": ["action"],
+  "keywordMatch": { "found": [], "missing": [] }
 }
 
 RESUME:
-${resumeText || '[See attached image]'}
+${processedResumeText || '[See image]'}
 
 JD:
-${finalJobDescription || '[See attached image]'}
-${jdUrl ? `(URL: ${jdUrl})` : ''}
+${finalJobDescription || '[See image]'}
 `;
 
         const contents: any[] = [prompt];
