@@ -510,7 +510,7 @@ export default function HRReviewer() {
                                                 whileHover={{ scale: 1.05 }}
                                                 className="modern-pill pill-found"
                                             >
-                                                {skill}
+                                                <FiCheck /> {skill}
                                             </motion.span>
                                         ))}
                                         {(result?.keywordMatch?.missing || []).map((skill, i) => (
@@ -826,53 +826,76 @@ export default function HRReviewer() {
                 .negative li::before { content: '✕'; color: #f43f5e; font-weight: 900; }
                 
                 .keywords-visualization-modern { 
-                    padding: 32px; background: var(--bg-secondary); border-radius: 24px; border: 1px solid var(--border-color);
+                    padding: 32px; background: var(--bg-secondary); border-radius: 28px; border: 1px solid var(--border-color);
+                    background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(255,255,255,0.03) 100%);
+                    box-shadow: var(--shadow-xl);
                 }
-                .vis-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+                .vis-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
                 .vis-title { display: flex; align-items: center; gap: 12px; }
-                .vis-title h3 { font-size: 15px; font-weight: 800; color: var(--text-primary); }
-                .icon-pulse { color: #f59e0b; animation: pulse 2s infinite; }
+                .vis-title h3 { font-size: 16px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.01em; }
+                .icon-pulse { color: #f59e0b; animation: pulse 2s infinite; font-size: 20px; }
                 
-                .vis-legend { display: flex; gap: 16px; }
-                .legend-item { font-size: 10px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; color: var(--text-tertiary); }
-                .legend-item::before { content: ''; width: 8px; height: 8px; border-radius: 2px; }
-                .legend-item.found::before { background: #10b981; }
-                .legend-item.missing::before { background: #f43f5e; }
+                .vis-legend { display: flex; gap: 20px; background: var(--bg-primary); padding: 8px 16px; border-radius: 12px; border: 1px solid var(--border-color); }
+                .legend-item { font-size: 10px; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; gap: 8px; color: var(--text-tertiary); letter-spacing: 0.05em; }
+                .legend-item::before { content: ''; width: 10px; height: 10px; border-radius: 3px; }
+                .legend-item.found::before { background: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+                .legend-item.missing::before { background: #f43f5e; box-shadow: 0 0 10px rgba(244, 63, 94, 0.4); }
                 
-                .pills-container-modern { display: flex; flex-wrap: wrap; gap: 12px; }
+                .pills-container-modern { display: flex; flex-wrap: wrap; gap: 10px; }
                 .modern-pill { 
-                    padding: 10px 18px; border-radius: 12px; font-size: 12px; font-weight: 600; 
-                    background: var(--bg-primary); border: 1px solid var(--border-color); 
-                    transition: all 0.2s ease-in-out; cursor: default; display: inline-flex; align-items: center; gap: 8px;
-                    box-shadow: var(--shadow-sm);
+                    padding: 8px 14px; border-radius: 14px; font-size: 13px; font-weight: 700; 
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: default; 
+                    display: inline-flex; align-items: center; gap: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
                 }
-                .modern-pill:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-                .pill-found { color: #059669; border: 1.5px solid rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05); }
-                .pill-missing { color: #dc2626; border: 1.5px solid rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.05); }
+                .modern-pill:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+                
+                .pill-found { 
+                    color: #065f46; 
+                    background: rgba(16, 185, 129, 0.1); 
+                    border: 1.5px solid rgba(16, 185, 129, 0.25);
+                }
+                .pill-found:hover {
+                    background: #10b981;
+                    color: white;
+                    border-color: #10b981;
+                }
+                
+                .pill-missing { 
+                    color: #9f1239; 
+                    background: rgba(244, 63, 94, 0.08); 
+                    border: 1.5px solid rgba(244, 63, 94, 0.2);
+                }
+                .pill-missing:hover {
+                    background: #f43f5e;
+                    color: white;
+                    border-color: #f43f5e;
+                }
                 
                 .roadmap-panel { 
                     padding: 32px; background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(245, 158, 11, 0.05) 100%);
-                    border-radius: 24px; border: 1px solid var(--border-color);
+                    border-radius: 28px; border: 1px solid var(--border-color);
+                    box-shadow: var(--shadow-xl);
                 }
-                .roadmap-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
-                .roadmap-icon { width: 44px; height: 44px; background: #f59e0b; color: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
-                .roadmap-header h3 { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+                .roadmap-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+                .roadmap-icon { width: 48px; height: 48px; background: #f59e0b; color: white; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3); }
+                .roadmap-header h3 { font-size: 20px; font-weight: 800; color: var(--text-primary); }
                 .roadmap-header p { font-size: 12px; opacity: 0.6; font-weight: 600; color: var(--text-tertiary); }
                 
-                .roadmap-steps-modern { display: flex; flex-direction: column; gap: 16px; }
+                .roadmap-steps-modern { display: flex; flex-direction: column; gap: 20px; }
                 .roadmap-step-card { 
-                    display: flex; gap: 20px; padding: 20px; background: var(--bg-primary); 
-                    border-radius: 16px; border: 1px solid rgba(245, 158, 11, 0.1);
-                    box-shadow: var(--shadow-sm); transition: transform 0.2s;
+                    display: flex; gap: 20px; padding: 24px; background: var(--bg-primary); 
+                    border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.1);
+                    box-shadow: var(--shadow-sm); transition: all 0.3s;
                     color: var(--text-primary);
                 }
-                .roadmap-step-card:hover { transform: scale(1.02); }
+                .roadmap-step-card:hover { transform: translateX(8px); border-color: #f59e0b; background: rgba(245, 158, 11, 0.02); }
                 .step-badge { 
-                    width: 28px; height: 28px; border-radius: 50%; background: rgba(245, 158, 11, 0.1); 
-                    color: #f59e0b; font-weight: 900; font-size: 12px; display: flex; align-items: center; 
-                    justify-content: center; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.2);
+                    width: 32px; height: 32px; border-radius: 50%; background: #f59e0b; 
+                    color: white; font-weight: 900; font-size: 14px; display: flex; align-items: center; 
+                    justify-content: center; flex-shrink: 0; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
                 }
-                .step-content-text { font-size: 14px; font-weight: 600; line-height: 1.5; color: var(--text-secondary); }
+                .step-content-text { font-size: 15px; font-weight: 600; line-height: 1.6; color: var(--text-secondary); }
                 
                 .results-actions { margin-top: 8px; }
                 .btn-premium-secondary { 
