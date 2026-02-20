@@ -5,10 +5,10 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
 
 export async function POST(req: NextRequest) {
     try {
-        const { resumeText, jobDescription, jdUrl, jdImage } = await JSON.parse(await req.text());
+        const { resumeText, resumeImage, jobDescription, jdUrl, jdImage } = await JSON.parse(await req.text());
 
-        if (!resumeText) {
-            return NextResponse.json({ error: 'Resume text is required' }, { status: 400 });
+        if (!resumeText && !resumeImage) {
+            return NextResponse.json({ error: 'Resume (text or image) is required' }, { status: 400 });
         }
 
         let finalJobDescription = jobDescription || '';
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
             try {
                 const response = await fetch(jdUrl);
                 const html = await response.text();
-                // Simple text extraction from HTML (very basic, can be improved)
+                // Simple text extraction from HTML
                 finalJobDescription = html.replace(/<[^>]*>?/gm, ' ')
                     .replace(/\s+/g, ' ')
                     .trim();
@@ -35,10 +35,11 @@ Act as an expert HR Reviewer and Applicant Tracking System (ATS).
 Analyze the provided RESUME against the JOB DESCRIPTION.
 
 RESUME:
-${resumeText}
+${resumeText === 'IMAGE_UPLOADED' ? '[Resume provided as an image below]' : resumeText}
 
 JOB DESCRIPTION:
 ${finalJobDescription || 'General career review (no specific job provided)'}
+${jdImage ? '[Job Description also provided as an image below]' : ''}
 
 Provide your analysis in EXACTLY the following JSON format:
 {
@@ -56,23 +57,31 @@ Provide your analysis in EXACTLY the following JSON format:
 }
 `;
 
-        let result;
-        if (jdImage) {
-            // Handle Image (Base64)
-            const imageData = jdImage.split(',')[1] || jdImage;
-            result = await model.generateContent([
-                prompt,
-                {
-                    inlineData: {
-                        data: imageData,
-                        mimeType: 'image/jpeg', // Assume jpeg for now, should ideally check
-                    },
+        const contents: any[] = [prompt];
+
+        // Add Resume Image if present
+        if (resumeImage) {
+            const imageData = resumeImage.split(',')[1] || resumeImage;
+            contents.push({
+                inlineData: {
+                    data: imageData,
+                    mimeType: 'image/jpeg',
                 },
-            ]);
-        } else {
-            result = await model.generateContent(prompt);
+            });
         }
 
+        // Add JD Image if present
+        if (jdImage) {
+            const imageData = jdImage.split(',')[1] || jdImage;
+            contents.push({
+                inlineData: {
+                    data: imageData,
+                    mimeType: 'image/jpeg',
+                },
+            });
+        }
+
+        const result = await model.generateContent(contents);
         const responseText = result.response.text();
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
 

@@ -1,28 +1,63 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { useResumeStore } from '@/stores/resume-store';
-import { HRAnalysisResult, Resume } from '@/types/resume';
-import { FiCpu, FiFileText, FiLink, FiImage, FiCheckCircle, FiAlertCircle, FiTrendingUp, FiCheck, FiX, FiArrowRight, FiLoader, FiTarget, FiStar, FiZap } from 'react-icons/fi';
+import { HRAnalysisResult } from '@/types/resume';
+import { FiCpu, FiFileText, FiLink, FiImage, FiCheckCircle, FiAlertCircle, FiTrendingUp, FiCheck, FiX, FiArrowRight, FiLoader, FiTarget, FiStar, FiZap, FiUploadCloud } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { extractTextFromPDF } from '@/utils/parse-resume';
 
 export default function HRReviewer() {
-    const resumes = useResumeStore((s) => s.resumes);
-    const [selectedResumeId, setSelectedResumeId] = useState<string>(resumes[0]?.id || '');
     const [activeTab, setActiveTab] = useState<'text' | 'url' | 'image'>('text');
 
     // Inputs
+    const [resumeFile, setResumeFile] = useState<File | null>(null);
+    const [resumeText, setResumeText] = useState<string>('');
     const [jobDescription, setJobDescription] = useState('');
     const [jdUrl, setJdUrl] = useState('');
     const [jdImage, setJdImage] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const resumeInputRef = useRef<HTMLInputElement>(null);
+    const jdImageInputRef = useRef<HTMLInputElement>(null);
 
     // State
     const [analyzing, setAnalyzing] = useState(false);
+    const [extracting, setExtracting] = useState(false);
     const [result, setResult] = useState<HRAnalysisResult | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setResumeFile(file);
+        setExtracting(true);
+        setError(null);
+        setResumeText(''); // Clear previous text
+
+        try {
+            if (file.type === 'application/pdf') {
+                const text = await extractTextFromPDF(file);
+                setResumeText(text);
+            } else if (file.type.startsWith('image/')) {
+                // For images, we'll send the image itself to Gemini for processing
+                // But for the sake of the analysis call, we'll indicate it's an image
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setResumeText(`RESUME_IMAGE_DATA:${reader.result as string}`);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                throw new Error('Please upload a PDF or Image file.');
+            }
+        } catch (err: any) {
+            setError('Failed to extract text from resume. Please try a different file.');
+            console.error(err);
+        } finally {
+            setExtracting(false);
+        }
+    };
+
+    const handleJDImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
@@ -34,27 +69,31 @@ export default function HRReviewer() {
     };
 
     const runAnalysis = async () => {
-        if (!selectedResumeId) {
-            setError('Please select a resume first.');
+        if (!resumeText) {
+            setError('Please upload your resume first.');
             return;
         }
-
-        const selectedResume = resumes.find(r => r.id === selectedResumeId);
-        if (!selectedResume) return;
-
-        // Extract full text from resume (simplified for now, ideally we'd use a utility)
-        const resumeText = getResumeFullText(selectedResume);
 
         setAnalyzing(true);
         setError(null);
         setResult(null);
+
+        // Prepare resume data for the API
+        let finalResumeText = resumeText;
+        let resumeImage = null;
+
+        if (resumeText.startsWith('RESUME_IMAGE_DATA:')) {
+            resumeImage = resumeText.split('RESUME_IMAGE_DATA:')[1];
+            finalResumeText = 'IMAGE_UPLOADED'; // Placeholder for text if image is sent
+        }
 
         try {
             const response = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    resumeText,
+                    resumeText: finalResumeText,
+                    resumeImage, // Backend needs to be updated to handle resumeImage if we want to support resume OCR via AI
                     jobDescription: activeTab === 'text' ? jobDescription : '',
                     jdUrl: activeTab === 'url' ? jdUrl : '',
                     jdImage: activeTab === 'image' ? jdImage : null,
@@ -79,27 +118,33 @@ export default function HRReviewer() {
                 <div className="side-panel">
                     <section className="card-glass p-6">
                         <h2 className="section-title-small">
-                            <FiFileText className="icon-accent" /> 1. Select Resume
+                            <FiUploadCloud className="icon-accent" /> 1. Upload Your Resume
                         </h2>
 
-                        <div className="resume-list">
-                            {resumes.length === 0 ? (
-                                <div className="info-badge warning">
-                                    No resumes found. Please create one in the builder first.
+                        <div
+                            onClick={() => resumeInputRef.current?.click()}
+                            className={`image-upload-zone ${resumeFile ? 'has-image' : ''}`}
+                        >
+                            {extracting ? (
+                                <div className="upload-placeholder">
+                                    <FiLoader className="placeholder-icon spin" />
+                                    <p className="font-semibold">Extracting text...</p>
+                                </div>
+                            ) : resumeFile ? (
+                                <div className="upload-placeholder">
+                                    <FiCheckCircle className="placeholder-icon text-green" />
+                                    <p className="font-semibold">{resumeFile.name}</p>
+                                    <p className="helper-text">Click to change</p>
                                 </div>
                             ) : (
-                                resumes.map(r => (
-                                    <button
-                                        key={r.id}
-                                        onClick={() => setSelectedResumeId(r.id)}
-                                        className={`resume-item ${selectedResumeId === r.id ? 'active' : ''}`}
-                                    >
-                                        <div className="resume-name">{r.title || 'Untitled Resume'}</div>
-                                        <div className="resume-meta">Updated {new Date(r.updatedAt).toLocaleDateString()}</div>
-                                    </button>
-                                ))
+                                <div className="upload-placeholder">
+                                    <FiFileText className="placeholder-icon" />
+                                    <p className="font-semibold">Drop your resume here</p>
+                                    <p className="helper-text">PDF or Image (JPG/PNG)</p>
+                                </div>
                             )}
                         </div>
+                        <input type="file" ref={resumeInputRef} onChange={handleResumeUpload} accept=".pdf,image/*" className="hidden" />
                     </section>
 
                     <section className="card-glass p-6 mt-6">
@@ -171,7 +216,7 @@ export default function HRReviewer() {
                                         exit={{ opacity: 0, x: 10 }}
                                     >
                                         <div
-                                            onClick={() => fileInputRef.current?.click()}
+                                            onClick={() => jdImageInputRef.current?.click()}
                                             className={`image-upload-zone ${jdImage ? 'has-image' : ''}`}
                                         >
                                             {jdImage ? (
@@ -187,7 +232,7 @@ export default function HRReviewer() {
                                                 </div>
                                             )}
                                         </div>
-                                        <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
+                                        <input type="file" ref={jdImageInputRef} onChange={handleJDImageUpload} accept="image/*" className="hidden" />
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -195,7 +240,7 @@ export default function HRReviewer() {
 
                         <button
                             onClick={runAnalysis}
-                            disabled={analyzing || !selectedResumeId || (activeTab === 'text' && !jobDescription) || (activeTab === 'url' && !jdUrl) || (activeTab === 'image' && !jdImage)}
+                            disabled={analyzing || extracting || !resumeText || (activeTab === 'text' && !jobDescription) || (activeTab === 'url' && !jdUrl) || (activeTab === 'image' && !jdImage)}
                             className="btn btn-primary btn-lg w-full mt-8"
                         >
                             {analyzing ? (
@@ -216,7 +261,7 @@ export default function HRReviewer() {
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="empty-state">
                                 <div className="empty-icon"><FiCpu /></div>
                                 <h3>Ready for Analysis</h3>
-                                <p>Provide a job description to get AI feedback.</p>
+                                <p>Upload your resume and provide a job description to get AI feedback.</p>
                             </motion.div>
                         )}
 
@@ -299,7 +344,7 @@ export default function HRReviewer() {
                                     </div>
                                 </div>
 
-                                <button onClick={() => setResult(null)} className="btn btn-secondary w-full mt-4">
+                                <button onClick={() => { setResult(null); setResumeFile(null); setResumeText(''); setJobDescription(''); setJdUrl(''); setJdImage(null); }} className="btn btn-secondary w-full mt-4">
                                     New Analysis <FiArrowRight />
                                 </button>
                             </motion.div>
@@ -311,41 +356,31 @@ export default function HRReviewer() {
             <style jsx>{`
                 .reviewer-grid { display: grid; grid-template-columns: 1fr; gap: 32px; }
                 @media (min-width: 1024px) { .reviewer-grid { grid-template-columns: 1fr 1.5fr; } }
-
+                
                 .section-title-small { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; margin-bottom: 24px; }
                 .icon-accent { color: var(--accent-primary); }
-
-                .resume-list { display: flex; flex-direction: column; gap: 12px; }
-                .resume-item {
-                    width: 100%; text-align: left; padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);
-                    background: var(--bg-secondary); cursor: pointer; transition: all 0.2s;
-                }
-                .resume-item:hover { border-color: var(--text-tertiary); }
-                .resume-item.active { background: rgba(99, 102, 241, 0.1); border-color: var(--accent-primary); box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
-                .resume-name { font-weight: 600; font-size: 14px; }
-                .resume-meta { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
-
+                
                 .tabs-strip { display: flex; background: var(--bg-primary); padding: 4px; border-radius: 8px; margin-bottom: 24px; }
-                .tab-btn {
-                    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
-                    padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 600;
+                .tab-btn { 
+                    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; 
+                    padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 600; 
                     color: var(--text-tertiary); background: none; border: none; cursor: pointer; transition: all 0.2s;
                 }
                 .tab-btn.active { background: var(--accent-primary); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-
+                
                 .input-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 8px; display: block; }
                 .helper-text { font-size: 10px; color: var(--text-tertiary); margin-top: 8px; font-style: italic; }
-
-                .image-upload-zone {
-                    border: 2px dashed var(--border-color); border-radius: 16px; padding: 32px;
+                
+                .image-upload-zone { 
+                    border: 2px dashed var(--border-color); border-radius: 16px; padding: 32px; 
                     text-align: center; cursor: pointer; transition: all 0.2s;
                 }
                 .image-upload-zone:hover { border-color: var(--text-tertiary); }
                 .image-upload-zone.has-image { border-color: var(--accent-primary); background: rgba(99, 102, 241, 0.05); }
                 .image-preview-container { position: relative; }
                 .preview-img { max-height: 200px; margin: 0 auto; border-radius: 8px; box-shadow: var(--shadow-md); }
-                .image-preview-container .overlay {
-                    position: absolute; inset: 0; background: rgba(0,0,0,0.5); opacity: 0;
+                .image-preview-container .overlay { 
+                    position: absolute; inset: 0; background: rgba(0,0,0,0.5); opacity: 0; 
                     display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700;
                     border-radius: 8px; transition: 0.2s;
                 }
@@ -354,31 +389,32 @@ export default function HRReviewer() {
                     display: flex; flex-direction: column; align-items: center; justify-content: center;
                 }
                 .placeholder-icon { font-size: 32px; color: var(--text-tertiary); margin-bottom: 12px; }
-
-                .empty-state, .loading-state {
-                    height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+                .text-green { color: #10b981; }
+                
+                .empty-state, .loading-state { 
+                    height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; 
                     padding: 48px; text-align: center; background: var(--bg-secondary); border-radius: 24px; border: 1px solid var(--border-color);
                 }
                 .empty-icon { font-size: 48px; color: var(--text-tertiary); margin-bottom: 24px; }
                 .loading-state h3 { font-size: 24px; font-weight: 700; margin-bottom: 16px; }
                 .loading-state p { font-size: 12px; color: var(--text-tertiary); animation: bounce 1s infinite; }
-
+                
                 .loader-ring { position: relative; width: 120px; height: 120px; border: 4px solid var(--accent-primary-20); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; animation: ping 2s infinite; }
                 .loader-core { width: 80px; height: 80px; background: var(--accent-primary-10); border: 4px solid var(--accent-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--accent-primary); animation: pulse 2s infinite; }
                 .progress-bar { width: 100%; max-width: 200px; height: 4px; background: var(--bg-primary); border-radius: 2px; margin-top: 16px; overflow: hidden; }
                 .progress-fill { height: 100%; background: var(--accent-primary); }
-
+                
                 .score-card { display: flex; flex-direction: column; align-items: center; gap: 32px; padding: 32px; background: var(--bg-secondary); border-radius: 24px; border: 1px solid var(--border-color); margin-bottom: 24px; }
                 @media (min-width: 768px) { .score-card { flex-direction: row; } }
                 .score-gauge { position: relative; width: 140px; height: 140px; flex-shrink: 0; }
                 .score-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
                 .score-text .number { font-size: 36px; font-weight: 900; }
                 .score-text .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); }
-
+                
                 .score-summary { flex: 1; }
                 .match-badge { display: inline-block; padding: 6px 16px; border-radius: 99px; color: white; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; box-shadow: var(--shadow-lg); }
                 .summary-text { font-size: 18px; font-weight: 600; line-height: 1.6; }
-
+                
                 .details-grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px; }
                 @media (min-width: 768px) { .details-grid { grid-template-columns: 1fr 1fr; } }
                 .details-grid h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
@@ -386,29 +422,29 @@ export default function HRReviewer() {
                 .border-l-ruby { border-left: 4px solid #ef4444; }
                 .details-grid h4 .FiCheckCircle { color: #10b981; }
                 .details-grid h4 .FiAlertCircle { color: #ef4444; }
-
+                
                 .list { list-style: none; display: flex; flex-direction: column; gap: 12px; padding-left: 0; }
                 .list li { font-size: 14px; position: relative; padding-left: 24px; display: flex; align-items: flex-start; }
                 .list.green li::before { content: '✓'; position: absolute; left: 0; font-weight: bold; color: #10b981; font-size: 16px; line-height: 1; }
                 .list.ruby li::before { content: '✕'; position: absolute; left: 0; font-weight: bold; color: #ef4444; font-size: 16px; line-height: 1; }
-
+                
                 .skills-tags { display: flex; flex-wrap: wrap; gap: 8px; }
                 .skill-tag { padding: 6px 12px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; font-size: 12px; font-weight: 500; }
-
+                
                 .improvement-section { background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%); }
                 .improvement-section h4 { color: #f59e0b; }
                 .steps-list { display: flex; flex-direction: column; gap: 16px; }
                 .step-item { display: flex; gap: 16px; padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; }
                 .step-num { width: 24px; height: 24px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
                 .step-item p { font-size: 14px; font-weight: 500; line-height: 1.5; }
-
+                
                 .info-badge { padding: 12px; border-radius: 8px; font-size: 12px; display: flex; align-items: flex-start; gap: 12px; }
                 .info-badge.warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
                 .info-badge.error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
-
+                
                 .hidden { display: none; }
                 .spin { animation: spin 1s linear infinite; }
-
+                
                 /* Utility classes */
                 .card-glass {
                     background: var(--bg-secondary);
@@ -432,7 +468,7 @@ export default function HRReviewer() {
                     border-color: var(--accent-primary);
                 }
                 .textarea { resize: vertical; }
-
+                
                 .btn {
                     display: inline-flex;
                     align-items: center;
@@ -471,7 +507,7 @@ export default function HRReviewer() {
                     padding: 16px 24px;
                     font-size: 18px;
                 }
-
+                
                 /* Keyframes */
                 @keyframes fadeIn {
                     from { opacity: 0; transform: translateY(10px); }
@@ -509,29 +545,4 @@ function getScoreColor(score: number): string {
     if (score >= 60) return '#f59e0b'; // amber-500
     if (score >= 40) return '#ef4444'; // red-500
     return '#6b7280'; // gray-500
-}
-
-function getResumeFullText(resume: Resume): string {
-    const parts: string[] = [
-        `Name: ${resume.personalInfo.fullName}`,
-        `Job Title: ${resume.personalInfo.jobTitle}`,
-        `Summary: ${resume.personalInfo.summary}`,
-        "EXPERIENCE:",
-        ...resume.experience.map(exp =>
-            `- ${exp.position} at ${exp.company} (${exp.startDate} - ${exp.endDate})\n  ${exp.description}\n  Highlights: ${exp.highlights.join(', ')}`
-        ),
-        "EDUCATION:",
-        ...resume.education.map(edu =>
-            `- ${edu.degree} in ${edu.field} from ${edu.institution} (${edu.endDate})`
-        ),
-        "SKILLS:",
-        resume.skills.map(s => `${s.name} (${s.category})`).join(', '),
-        "PROJECTS:",
-        ...resume.projects.map(p =>
-            `- ${p.name}: ${p.description} (Tech: ${p.technologies.join(', ')})`
-        ),
-        "CERTIFICATIONS:",
-        resume.certifications.map(c => c.name).join(', ')
-    ];
-    return parts.join('\n\n');
 }
