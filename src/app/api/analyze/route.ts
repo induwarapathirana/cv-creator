@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Initialize Gemini with deterministic settings and Native JSON Mode
+        // Using gemini-1.5-flash for maximum stability and speed
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',
             generationConfig: {
@@ -38,37 +39,29 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        let prompt = `
-Act as a HIGHLY CRITICAL Senior HR Auditor and ATS specialist. Your goal is to provide a rigorous, objective match analysis. 
-Do not be generous; if evidence for a skill is not explicitly stated in the RESUME, assume it is missing.
+        const prompt = `
+Act as a HIGHLY CRITICAL Senior HR Auditor. Auditing RESUME against JOB DESCRIPTION.
+RUBRIC: Hard Skills (40%), Experience (30%), Soft Skills (20%), ATS Standards (10%).
+STRICTNESS: No evidence = missing. 
 
-SCORING RUBRIC (Strictly Weighted):
-1. **Core Hard Skills (40%)**: Direct match of technical skills, tools, and certifications required in the JD.
-2. **Relevant Experience (30%)**: Years of experience in the specific role, industry relevance, and seniority level match.
-3. **Soft Skills & Context (20%)**: Behavioral traits and auxiliary requirements mentioned in the JD.
-4. **ATS Standards (10%)**: Professionalism of the resume structure, keyword optimization, and clarity.
-
-RESUME CONTENT:
-${resumeText || '[See attached image]'}
-
-JOB DESCRIPTION CONTENT:
-${finalJobDescription || '[See attached image]'}
-${jdUrl ? `(Extracted from URL: ${jdUrl})` : ''}
-
-You must respond with valid JSON that follows this schema exactly:
+Schema:
 {
   "score": number,
   "matchLevel": "Poor" | "Fair" | "Good" | "Excellent",
-  "summary": "string (1-2 sentences)",
+  "summary": "string",
   "pros": ["string"],
   "cons": ["string"],
   "missingSkills": ["string"],
   "improvementSuggestions": ["string"],
-  "keywordMatch": {
-    "found": ["string"],
-    "missing": ["string"]
-  }
+  "keywordMatch": { "found": ["string"], "missing": ["string"] }
 }
+
+RESUME:
+${resumeText || '[Image]'}
+
+JD:
+${finalJobDescription || '[Image]'}
+${jdUrl ? `(URL: ${jdUrl})` : ''}
 `;
 
         const contents: any[] = [prompt];
@@ -90,32 +83,30 @@ You must respond with valid JSON that follows this schema exactly:
         const modelResponse = await model.generateContent(contents);
         const responseText = modelResponse.response.text();
 
-        // In Native JSON mode, response should be pure JSON, but we'll still handle potential edge cases
         let analysis;
         try {
-            // Remove potential whitespace or stray characters
-            const cleanedText = responseText.trim();
+            const cleanedText = responseText.trim().replace(/^```json/, '').replace(/```$/, '').trim();
             analysis = JSON.parse(cleanedText);
         } catch (e) {
-            console.error('Initial JSON Parse Fail, trying regex fallback:', e);
+            console.error('JSON Parse Fail:', e, 'Raw:', responseText);
+            // Try regex extraction as fallback
             const jsonMatch = responseText.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
                 try {
                     analysis = JSON.parse(jsonMatch[0]);
                 } catch (innerE) {
-                    console.error('Regex JSON Parse Error:', innerE, 'Raw:', responseText);
-                    throw new Error('AI returned malformed JSON even in JSON mode');
+                    throw new Error(`AI returned malformed JSON: ${responseText.slice(0, 100)}...`);
                 }
             } else {
-                throw new Error('AI failed to return valid JSON format');
+                throw new Error(`AI failed to return JSON. Response started with: ${responseText.slice(0, 100)}...`);
             }
         }
 
         // Validate structure before returning
         const validatedAnalysis = {
             score: typeof analysis.score === 'number' ? analysis.score : 0,
-            matchLevel: analysis.matchLevel || 'Fair',
-            summary: analysis.summary || 'Summary unavailable',
+            matchLevel: typeof analysis.matchLevel === 'string' ? analysis.matchLevel : 'Fair',
+            summary: typeof analysis.summary === 'string' ? analysis.summary : 'Summary unavailable',
             pros: Array.isArray(analysis.pros) ? analysis.pros : [],
             cons: Array.isArray(analysis.cons) ? analysis.cons : [],
             missingSkills: Array.isArray(analysis.missingSkills) ? analysis.missingSkills : [],
@@ -130,9 +121,7 @@ You must respond with valid JSON that follows this schema exactly:
 
     } catch (error: any) {
         console.error('AI Analysis Error:', error);
-
-        // Detailed error reporting back to UI
-        const errorMsg = error.message || '';
+        const errorMsg = error.message || 'Failed to analyze resume';
         const isQuota = errorMsg.includes('429') || errorMsg.toLowerCase().includes('quota');
 
         return NextResponse.json(
