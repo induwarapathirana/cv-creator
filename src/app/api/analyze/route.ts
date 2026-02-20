@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
         // Initialize Gemini with deterministic settings and Native JSON Mode
         // Using gemini-1.5-flash for maximum stability and speed
         const model = genAI.getGenerativeModel({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             generationConfig: {
                 temperature: 0.1,
                 topP: 0.95,
@@ -44,7 +44,7 @@ Act as a HIGHLY CRITICAL Senior HR Auditor. Auditing RESUME against JOB DESCRIPT
 RUBRIC: Hard Skills (40%), Experience (30%), Soft Skills (20%), ATS Standards (10%).
 STRICTNESS: No evidence = missing. 
 
-Schema:
+You MUST respond with a valid JSON object following this schema:
 {
   "score": number,
   "matchLevel": "Poor" | "Fair" | "Good" | "Excellent",
@@ -85,20 +85,29 @@ ${jdUrl ? `(URL: ${jdUrl})` : ''}
 
         let analysis;
         try {
-            const cleanedText = responseText.trim().replace(/^```json/, '').replace(/```$/, '').trim();
+            // Native JSON mode should return pure JSON, but we clean it just in case
+            const cleanedText = responseText.trim().replace(/^```json\s*/i, '').replace(/\s*```$/i, '');
             analysis = JSON.parse(cleanedText);
         } catch (e) {
             console.error('JSON Parse Fail:', e, 'Raw:', responseText);
-            // Try regex extraction as fallback
-            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
+
+            // Fallback: Find the first { and the last }
+            const startIdx = responseText.indexOf('{');
+            const endIdx = responseText.lastIndexOf('}');
+
+            if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
                 try {
-                    analysis = JSON.parse(jsonMatch[0]);
+                    const extractedJson = responseText.substring(startIdx, endIdx + 1);
+                    analysis = JSON.parse(extractedJson);
                 } catch (innerE) {
-                    throw new Error(`AI returned malformed JSON: ${responseText.slice(0, 100)}...`);
+                    throw new Error(`AI returned malformed JSON structure: ${responseText.slice(0, 100)}...`);
                 }
+            } else if (startIdx !== -1 && endIdx === -1) {
+                // Potential truncation - try to close it? 
+                // Better to throw a clear error
+                throw new Error("AI analysis was truncated. Please try again.");
             } else {
-                throw new Error(`AI failed to return JSON. Response started with: ${responseText.slice(0, 100)}...`);
+                throw new Error(`AI failed to return a JSON object. RAW: ${responseText.slice(0, 100)}...`);
             }
         }
 
