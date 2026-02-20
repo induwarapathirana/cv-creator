@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Initialize Gemini
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
         let prompt = `
 Act as an expert HR Reviewer and Applicant Tracking System (ATS).
