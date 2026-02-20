@@ -166,3 +166,17 @@ export interface ATSSuggestion {
   message: string;
   action?: string;
 }
+
+export interface HRAnalysisResult {
+  score: number;
+  matchLevel: 'Poor' | 'Fair' | 'Good' | 'Excellent';
+  summary: string;
+  pros: string[];
+  cons: string[];
+  missingSkills: string[];
+  improvementSuggestions: string[];
+  keywordMatch: {
+    found: string[];
+    missing: string[];
+  };
+}

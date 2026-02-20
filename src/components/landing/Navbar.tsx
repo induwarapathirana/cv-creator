@@ -2,7 +2,7 @@
 
 import { useTheme } from '@/hooks/use-theme';
 import Link from 'next/link';
-import { FiSun, FiMoon, FiFileText } from 'react-icons/fi';
+import { FiSun, FiMoon, FiFileText, FiCpu } from 'react-icons/fi';
 
 export default function Navbar() {
     const { theme, toggleTheme } = useTheme();
@@ -15,10 +15,10 @@ export default function Navbar() {
                     CV Creator
                 </Link>
                 <div className="navbar-actions">
-                    <Link href="/parser" className="btn btn-ghost btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <FiFileText /> Resume Parser
+                    <Link href="/analyzer" className="btn btn-ghost btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <FiCpu /> AI HR Audit
                     </Link>
-                    <button className="btn-icon" onClick={toggleTheme} aria-label="Toggle theme">
+                    <button className="btn-icon" onClick={theme === 'dark' ? () => toggleTheme() : () => toggleTheme()} aria-label="Toggle theme">
                         {theme === 'dark' ? <FiSun /> : <FiMoon />}
                     </button>
                     <Link href="/builder" className="btn btn-primary btn-sm">
