@@ -51,6 +51,7 @@ export interface ParsedProject {
 // ═══════════════════════════════════
 // PDF TEXT EXTRACTION (Improved)
 // ═══════════════════════════════════
+import Tesseract from 'tesseract.js';
 
 export async function extractTextFromPDF(file: File): Promise<string> {
     const pdfjsLib = await import('pdfjs-dist');
@@ -123,6 +124,11 @@ export async function extractTextFromPDF(file: File): Promise<string> {
     }
 
     return fullText;
+}
+
+export async function extractTextFromImage(fileOrUrl: File | string): Promise<string> {
+    const result = await Tesseract.recognize(fileOrUrl, 'eng');
+    return result.data.text;
 }
 
 // ═══════════════════════════════════

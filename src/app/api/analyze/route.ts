@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
             try {
                 const response = await fetch(jdUrl);
                 const html = await response.text();
-                // Simple text extraction from HTML
                 finalJobDescription = html.replace(/<[^>]*>?/gm, ' ')
                     .replace(/\s+/g, ' ')
                     .trim();
@@ -28,18 +27,18 @@ export async function POST(req: NextRequest) {
         }
 
         // Initialize Gemini
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
         let prompt = `
 Act as an expert HR Reviewer and Applicant Tracking System (ATS).
 Analyze the provided RESUME against the JOB DESCRIPTION.
 
-RESUME:
-${resumeText === 'IMAGE_UPLOADED' ? '[Resume provided as an image below]' : resumeText}
+RESUME CONTENT:
+${resumeText || '[See attached image]'}
 
-JOB DESCRIPTION:
-${finalJobDescription || 'General career review (no specific job provided)'}
-${jdImage ? '[Job Description also provided as an image below]' : ''}
+JOB DESCRIPTION CONTENT:
+${finalJobDescription || '[See attached image]'}
+${jdUrl ? `(Extracted from URL: ${jdUrl})` : ''}
 
 Provide your analysis in EXACTLY the following JSON format:
 {
@@ -59,25 +58,17 @@ Provide your analysis in EXACTLY the following JSON format:
 
         const contents: any[] = [prompt];
 
-        // Add Resume Image if present
         if (resumeImage) {
             const imageData = resumeImage.split(',')[1] || resumeImage;
             contents.push({
-                inlineData: {
-                    data: imageData,
-                    mimeType: 'image/jpeg',
-                },
+                inlineData: { data: imageData, mimeType: 'image/jpeg' },
             });
         }
 
-        // Add JD Image if present
         if (jdImage) {
             const imageData = jdImage.split(',')[1] || jdImage;
             contents.push({
-                inlineData: {
-                    data: imageData,
-                    mimeType: 'image/jpeg',
-                },
+                inlineData: { data: imageData, mimeType: 'image/jpeg' },
             });
         }
 

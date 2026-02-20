@@ -4,7 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import { HRAnalysisResult } from '@/types/resume';
 import { FiCpu, FiFileText, FiLink, FiImage, FiCheckCircle, FiAlertCircle, FiTrendingUp, FiCheck, FiX, FiArrowRight, FiLoader, FiTarget, FiStar, FiZap, FiUploadCloud, FiServer } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { extractTextFromPDF, parseResumeText } from '@/utils/parse-resume';
+import { extractTextFromPDF, parseResumeText, extractTextFromImage } from '@/utils/parse-resume';
 import { analyzeResume } from '@/utils/ats-analyzer';
 
 export default function HRReviewer() {
@@ -42,13 +42,8 @@ export default function HRReviewer() {
                 const text = await extractTextFromPDF(file);
                 setResumeText(text);
             } else if (file.type.startsWith('image/')) {
-                // For images, we'll send the image itself to Gemini for processing
-                // But for the sake of the analysis call, we'll indicate it's an image
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setResumeText(`RESUME_IMAGE_DATA:${reader.result as string}`);
-                };
-                reader.readAsDataURL(file);
+                const text = await extractTextFromImage(file);
+                setResumeText(text);
             } else {
                 throw new Error('Please upload a PDF or Image file.');
             }
@@ -82,25 +77,28 @@ export default function HRReviewer() {
         setResult(null);
         setQuotaExceeded(false);
 
-        // Prepare resume data for the API
-        let finalResumeText = resumeText;
-        let resumeImage = null;
-
-        if (resumeText.startsWith('RESUME_IMAGE_DATA:')) {
-            resumeImage = resumeText.split('RESUME_IMAGE_DATA:')[1];
-            finalResumeText = 'IMAGE_UPLOADED'; // Placeholder for text if image is sent
-        }
-
         try {
+            let finalJobDescription = jobDescription;
+
+            // OCR for JD Image if active
+            if (activeTab === 'image' && jdImage) {
+                // Convert base64 to Blob/File for extractTextFromImage
+                const response = await fetch(jdImage);
+                const blob = await response.blob();
+                const file = new File([blob], "jd_image.png", { type: blob.type });
+
+                const extractedJD = await extractTextFromImage(file);
+                finalJobDescription = extractedJD;
+            }
+
             const response = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    resumeText: finalResumeText,
-                    resumeImage, // Backend needs to be updated to handle resumeImage if we want to support resume OCR via AI
-                    jobDescription: activeTab === 'text' ? jobDescription : '',
+                    resumeText: resumeText,
+                    jobDescription: activeTab === 'text' ? finalJobDescription : (activeTab === 'image' ? finalJobDescription : ''),
                     jdUrl: activeTab === 'url' ? jdUrl : '',
-                    jdImage: activeTab === 'image' ? jdImage : null,
+                    jdImage: activeTab === 'image' ? (finalJobDescription ? '' : jdImage) : null, // Send image only if OCR fails or as fallback
                 }),
             });
 
