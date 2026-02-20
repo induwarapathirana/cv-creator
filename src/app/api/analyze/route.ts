@@ -26,12 +26,25 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // Initialize Gemini
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        // Initialize Gemini with deterministic settings
+        const model = genAI.getGenerativeModel({
+            model: 'gemini-2.5-flash',
+            generationConfig: {
+                temperature: 0.1,
+                topP: 0.95,
+                topK: 40,
+                maxOutputTokens: 2048,
+            }
+        });
 
         let prompt = `
-Act as an expert HR Reviewer and Applicant Tracking System (ATS).
-Analyze the provided RESUME against the JOB DESCRIPTION.
+Act as a HIGHLY CRITICAL Senior HR Auditor and ATS specialist. Your goal is to provide a rigorous, objective match analysis. Do not be generous; if evidence for a skill is not explicitly stated in the RESUME, assume it is missing.
+
+SCORING RUBRIC (Strictly Weighted):
+1. **Core Hard Skills (40%)**: Direct match of technical skills, tools, and certifications required in the JD.
+2. **Relevant Experience (30%)**: Years of experience in the specific role, industry relevance, and seniority level match.
+3. **Soft Skills & Context (20%)**: Behavioral traits and auxiliary requirements mentioned in the JD.
+4. **ATS Standards (10%)**: Professionalism of the resume structure, keyword optimization, and clarity.
 
 RESUME CONTENT:
 ${resumeText || '[See attached image]'}
@@ -42,16 +55,16 @@ ${jdUrl ? `(Extracted from URL: ${jdUrl})` : ''}
 
 Provide your analysis in EXACTLY the following JSON format:
 {
-  "score": number (0-100),
-  "matchLevel": "Poor" | "Fair" | "Good" | "Excellent",
-  "summary": "Short 2-3 sentence overview of the match",
-  "pros": ["List of 3-5 strengths relative to the JD"],
-  "cons": ["List of 2-4 gaps or weaknesses"],
-  "missingSkills": ["List of key missing skills mentioned in JD"],
-  "improvementSuggestions": ["List of actionable steps to improve the resume for this role"],
+  "score": number (Calculated strictly based on the rubric above),
+  "matchLevel": "Poor" (0-39) | "Fair" (40-59) | "Good" (60-79) | "Excellent" (80-100),
+  "summary": "1-2 sentences. Be direct about why the candidate is or isn't a fit.",
+  "pros": ["List 3-5 specific strengths found based on JD requirements"],
+  "cons": ["List 2-5 SPECIFIC gaps or missing evidence"],
+  "missingSkills": ["List high-priority skills from JD not found in resume"],
+  "improvementSuggestions": ["List actionable, high-impact steps to bridge the gaps"],
   "keywordMatch": {
-    "found": ["List of matched keywords"],
-    "missing": ["List of important missing keywords"]
+    "found": ["Strict keywords matched"],
+    "missing": ["Crucial JD keywords missing from resume"]
   }
 }
 `;
