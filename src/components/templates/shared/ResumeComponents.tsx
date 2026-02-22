@@ -17,16 +17,20 @@ interface SectionTitleProps {
 }
 
 export const SectionTitle = ({ title, color, variant = 'modern', centered, style }: SectionTitleProps) => {
+    const textColor = variant === 'elegant' ? '#9ca3af' : (variant === 'classic' ? 'inherit' : color);
+    const borderColor = variant === 'classic' ? 'currentColor' : color;
+
     if (variant === 'classic') {
         return (
             <h2 style={{
-                color: '#1a1a2e',
-                borderBottom: '1px solid #ccc',
+                color: 'inherit',
+                borderBottom: `1px solid ${borderColor}`,
                 fontSize: '1.2em',
                 fontVariant: 'small-caps',
                 marginBottom: '10px',
                 marginTop: '15px',
                 paddingBottom: '2px',
+                opacity: 0.9,
                 ...style
             }}>
                 {title}
@@ -40,7 +44,7 @@ export const SectionTitle = ({ title, color, variant = 'modern', centered, style
                 fontSize: '0.9em',
                 fontWeight: 600,
                 textTransform: 'uppercase',
-                color: '#9ca3af', // gray-400
+                color: textColor,
                 letterSpacing: '0.25em',
                 textAlign: 'center',
                 marginBottom: '32px',
@@ -91,15 +95,15 @@ export const EntryHeader = ({ title, subtitle, date, color, centered }: EntryHea
             alignItems: centered ? 'center' : 'baseline',
             gap: centered ? '2px' : '12px'
         }}>
-            <h3 style={{ fontSize: '1em', fontWeight: 700, margin: 0, color: '#1a1a2e' }}>{title}</h3>
+            <h3 style={{ fontSize: '1em', fontWeight: 700, margin: 0, color: 'inherit' }}>{title}</h3>
             {date && (
-                <span style={{ fontSize: '0.85em', color: '#666', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: '0.85em', color: 'inherit', opacity: 0.6, fontWeight: 500, whiteSpace: 'nowrap' }}>
                     {date}
                 </span>
             )}
         </div>
         {subtitle && (
-            <div style={{ fontSize: '0.9em', fontWeight: 600, color: '#4b5563', marginTop: '1px' }}>
+            <div style={{ fontSize: '0.9em', fontWeight: 600, color: color || 'inherit', opacity: color ? 1 : 0.8, marginTop: '1px' }}>
                 {subtitle}
             </div>
         )}
@@ -107,14 +111,14 @@ export const EntryHeader = ({ title, subtitle, date, color, centered }: EntryHea
 );
 
 export const ResumeHtmlContent = ({ html }: { html?: string }) => (
-    <div style={{ fontSize: 'inherit', color: '#374151', lineHeight: 'inherit' }}>
+    <div style={{ fontSize: 'inherit', color: 'inherit', opacity: 0.9, lineHeight: 'inherit' }}>
         <HtmlRenderer html={html || ''} className="html-content" />
     </div>
 );
 
 export const SkillBadge = ({ name, color }: { name: string, color: string }) => (
     <span style={{
-        backgroundColor: `${color}10`, // 10% opacity
+        backgroundColor: `${color}15`, // 15% opacity
         color: color,
         padding: '2px 10px',
         borderRadius: '5px',
@@ -130,17 +134,52 @@ export const SkillBadge = ({ name, color }: { name: string, color: string }) => 
     </span>
 );
 
+export const SkillsGrouped = ({ skills, color, categoryColor }: { skills: any[], color: string, categoryColor?: string }) => {
+    const skillsByCategory: Record<string, any[]> = skills.reduce((acc, skill) => {
+        const cat = skill.category || 'General';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(skill);
+        return acc;
+    }, {} as Record<string, any[]>);
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {Object.keys(skillsByCategory).map((category) => {
+                const catSkills = skillsByCategory[category];
+                return (
+                    <div key={category}>
+                        <div style={{
+                            fontWeight: 700,
+                            color: categoryColor || 'inherit',
+                            opacity: categoryColor ? 1 : 0.6,
+                            fontSize: '0.8em',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            marginBottom: '6px'
+                        }}>
+                            {category}
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                            {catSkills.map((s: any) => <SkillBadge key={s.id} name={s.name} color={color} />)}
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
 export const ContactItem = ({ icon, text, href, color }: { icon?: React.ReactNode, text: string, href?: string, color: string }) => {
     const content = (
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#4b5563', fontSize: '0.85em', fontWeight: 500 }}>
-            {icon && <span style={{ color: color, fontSize: '0.8em' }}>{icon}</span>}
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'inherit', opacity: 0.9, fontSize: '0.85em', fontWeight: 500 }}>
+            {icon && <span style={{ color: color, fontSize: '0.9em' }}>{icon}</span>}
             {text}
         </span>
     );
 
     if (href) {
         return (
-            <a href={href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+            <a href={href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
                 {content}
             </a>
         );

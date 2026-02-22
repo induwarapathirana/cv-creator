@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -36,7 +36,7 @@ export default function TechTemplate({ resume }: TemplateProps) {
             <div key={section.id} style={{ marginBottom: '24px' }}>
                 <SectionTitle
                     title={dynamicTitle || section.title}
-                    color="#374151"
+                    color="inherit"
                     variant="modern"
                     style={{ borderLeft: `4px solid ${primaryColor}`, paddingLeft: '12px', background: 'transparent' }}
                 />
@@ -44,11 +44,7 @@ export default function TechTemplate({ resume }: TemplateProps) {
                 {section.type === 'summary' && personalInfo.summary ? (
                     <ResumeHtmlContent html={personalInfo.summary} />
                 ) : section.type === 'skills' ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                        {skills.map(skill => (
-                            <SkillBadge key={skill.id} name={skill.name} color={primaryColor} />
-                        ))}
-                    </div>
+                    <SkillsGrouped skills={skills} color={primaryColor} />
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         {items.map((item: any) => (
@@ -86,7 +82,7 @@ export default function TechTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: '"Inter", sans-serif',
                 padding: 'var(--page-margin)',
-                color: '#1f2937',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >

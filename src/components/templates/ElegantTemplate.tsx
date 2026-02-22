@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -22,14 +22,14 @@ export default function ElegantTemplate({ resume }: TemplateProps) {
                 // Elegant adds a bit more line height for that premium feel
                 lineHeight: 'calc(var(--line-height) + 0.2)',
                 padding: 'calc(var(--page-margin) + 20px)',
-                color: '#333',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >
             <div className="resume-template">
                 {/* Header - Minimalist Center Aligned */}
                 <div style={{ textAlign: 'center', marginBottom: 60 }}>
-                    <h1 style={{ fontSize: '2.5em', fontWeight: 400, color: '#111827', margin: '0 0 12px 0', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                    <h1 style={{ fontSize: '2.5em', fontWeight: 400, color: 'inherit', margin: '0 0 12px 0', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                         {personalInfo.fullName || 'Your Name'}
                     </h1>
                     {personalInfo.jobTitle && (
@@ -72,7 +72,7 @@ export default function ElegantTemplate({ resume }: TemplateProps) {
                                                         {formatDate(exp.startDate)} —<br />{exp.current ? 'Present' : formatDate(exp.endDate)}
                                                     </div>
                                                     <div>
-                                                        <h3 style={{ fontSize: '1.1em', fontWeight: 500, color: '#111827', margin: '0 0 2px 0' }}>{exp.position}</h3>
+                                                        <h3 style={{ fontSize: '1.1em', fontWeight: 500, color: 'inherit', margin: '0 0 2px 0' }}>{exp.position}</h3>
                                                         <div style={{ fontSize: '0.9em', fontWeight: 500, color: primaryColor, marginBottom: 12 }}>{exp.company}</div>
                                                         {exp.description && <ResumeHtmlContent html={exp.description} />}
                                                         {exp.highlights && exp.highlights.length > 0 && (
@@ -100,7 +100,7 @@ export default function ElegantTemplate({ resume }: TemplateProps) {
                                                         {formatDate(edu.endDate)}
                                                     </div>
                                                     <div>
-                                                        <div style={{ fontSize: '1.1em', fontWeight: 500, color: '#111827' }}>{edu.institution}</div>
+                                                        <div style={{ fontSize: '1.1em', fontWeight: 500, color: 'inherit' }}>{edu.institution}</div>
                                                         <div style={{ fontSize: '0.9em', fontStyle: 'italic', color: '#6b7280' }}>
                                                             {edu.degree} in {edu.field}
                                                             {edu.gpa && ` • GPA: ${edu.gpa}`}
@@ -116,12 +116,8 @@ export default function ElegantTemplate({ resume }: TemplateProps) {
                                 return skills.length > 0 ? (
                                     <div key={section.id}>
                                         <SectionTitle title={section.title} color={primaryColor} variant="elegant" />
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '12px 24px' }}>
-                                            {skills.map((s: any) => (
-                                                <span key={s.id} style={{ fontSize: '0.9em', color: '#374151', letterSpacing: '0.02em' }}>
-                                                    {s.name}
-                                                </span>
-                                            ))}
+                                        <div style={{ textAlign: 'center' }}>
+                                            <SkillsGrouped skills={skills} color={primaryColor} />
                                         </div>
                                     </div>
                                 ) : null;

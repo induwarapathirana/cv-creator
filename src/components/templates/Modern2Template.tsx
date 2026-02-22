@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -23,14 +23,14 @@ export default function Modern2Template({ resume }: TemplateProps) {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 30,
-                color: '#333',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >
             {/* Header - Modern Left Aligned */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: `2px solid ${primaryColor}1a`, paddingBottom: 24 }}>
                 <div style={{ flex: 1 }}>
-                    <h1 style={{ fontSize: '2em', fontWeight: 800, color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>
+                    <h1 style={{ fontSize: '2em', fontWeight: 800, color: 'inherit', margin: 0, letterSpacing: '-0.02em' }}>
                         {personalInfo.fullName || 'Your Name'}
                     </h1>
                     {personalInfo.jobTitle && (
@@ -184,9 +184,7 @@ export default function Modern2Template({ resume }: TemplateProps) {
                                 return skills.length > 0 ? (
                                     <div key={section.id}>
                                         <SectionTitle title={section.title} color={primaryColor} />
-                                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                            {skills.map((s: any) => <SkillBadge key={s.id} name={s.name} color={primaryColor} />)}
-                                        </div>
+                                        <SkillsGrouped skills={skills} color={primaryColor} />
                                     </div>
                                 ) : null;
 

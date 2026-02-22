@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -71,20 +71,7 @@ export default function BoldTemplate({ resume }: TemplateProps) {
                 return skills.length > 0 ? (
                     <div key={section.id} style={{ marginBottom: '40px' }}>
                         <SectionTitle title={section.title} {...commonProps} />
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                            {skills.map(skill => (
-                                <span key={skill.id} style={{
-                                    background: '#000',
-                                    color: '#fff',
-                                    padding: '8px 16px',
-                                    fontWeight: 900,
-                                    fontSize: '0.9em',
-                                    textTransform: 'uppercase'
-                                }}>
-                                    {skill.name}
-                                </span>
-                            ))}
-                        </div>
+                        <SkillsGrouped skills={skills} color={primaryColor || '#000'} />
                     </div>
                 ) : null;
 
@@ -148,11 +135,11 @@ export default function BoldTemplate({ resume }: TemplateProps) {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '40px', marginBottom: '40px' }}>
                     <div style={{ borderRight: '4px solid #000', paddingRight: '24px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <ContactItem icon={<FiMail />} text={personalInfo.email} color="#000" />
-                            <ContactItem icon={<FiPhone />} text={personalInfo.phone} color="#000" />
-                            <ContactItem icon={<FiMapPin />} text={personalInfo.location} color="#000" />
-                            <ContactItem icon={<FiLinkedin />} text={personalInfo.linkedin?.replace('https://', '')} color="#000" />
-                            <ContactItem icon={<FiGithub />} text={personalInfo.github?.replace('https://', '')} color="#000" />
+                            <ContactItem icon={<FiMail />} text={personalInfo.email} color="inherit" />
+                            <ContactItem icon={<FiPhone />} text={personalInfo.phone} color="inherit" />
+                            <ContactItem icon={<FiMapPin />} text={personalInfo.location} color="inherit" />
+                            <ContactItem icon={<FiLinkedin />} text={personalInfo.linkedin?.replace('https://', '')} color="inherit" />
+                            <ContactItem icon={<FiGithub />} text={personalInfo.github?.replace('https://', '')} color="inherit" />
                         </div>
                     </div>
                     <div>

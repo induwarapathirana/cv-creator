@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -35,20 +35,18 @@ export default function TimelineTemplate({ resume }: TemplateProps) {
         if (isSidebar) {
             return (
                 <div key={section.id} style={{ marginBottom: '32px' }}>
-                    <SectionTitle title={dynamicTitle || section.title} color="#888" variant="minimal" />
+                    <SectionTitle title={dynamicTitle || section.title} color="inherit" variant="minimal" />
                     {section.type === 'summary' && personalInfo.summary ? (
                         <ResumeHtmlContent html={personalInfo.summary} />
+                    ) : section.type === 'skills' ? (
+                        <SkillsGrouped skills={skills} color={primaryColor} />
                     ) : (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                             {items.map((item: any) => (
-                                section.type === 'skills' ? (
-                                    <SkillBadge key={item.id} name={item.name} color={primaryColor} />
-                                ) : (
-                                    <div key={item.id} style={{ fontSize: '0.9em', width: '100%' }}>
-                                        <strong>{item.name || item.title || item.institution}</strong>
-                                        {item.proficiency && <div style={{ color: '#888', fontSize: '0.85em' }}>{item.proficiency}</div>}
-                                    </div>
-                                )
+                                <div key={item.id} style={{ fontSize: '0.9em', width: '100%' }}>
+                                    <strong>{item.name || item.title || item.institution}</strong>
+                                    {item.proficiency && <div style={{ color: 'inherit', opacity: 0.6, fontSize: '0.85em' }}>{item.proficiency}</div>}
+                                </div>
                             ))}
                         </div>
                     )}
@@ -108,7 +106,7 @@ export default function TimelineTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: '"Lato", "Inter", sans-serif',
                 padding: 'var(--page-margin)',
-                color: '#333',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >
@@ -119,7 +117,7 @@ export default function TimelineTemplate({ resume }: TemplateProps) {
                         <h1 style={{ fontSize: '2.5em', fontWeight: 800, margin: '0 0 8px 0', color: primaryColor, letterSpacing: '-0.03em' }}>
                             {personalInfo.fullName}
                         </h1>
-                        <div style={{ fontSize: '1em', fontWeight: 600, letterSpacing: '0.1em', color: '#666' }}>{personalInfo.jobTitle.toUpperCase()}</div>
+                        <div style={{ fontSize: '1em', fontWeight: 600, letterSpacing: '0.1em', color: 'inherit', opacity: 0.6 }}>{personalInfo.jobTitle.toUpperCase()}</div>
                     </div>
                     <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <ContactItem icon={<FiMail />} text={personalInfo.email} color={primaryColor} />

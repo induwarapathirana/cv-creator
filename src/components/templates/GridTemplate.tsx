@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -20,19 +20,19 @@ export default function GridTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: '"Inter", sans-serif',
                 padding: 'var(--page-margin)',
-                color: '#333',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >
             <div className="resume-template" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
                 {/* Card Header */}
-                <div style={{ background: '#fff', padding: '24px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '32px' }}>
+                <div style={{ background: 'inherit', border: '1px solid rgba(0,0,0,0.05)', padding: '24px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '32px' }}>
                     {personalInfo.photo && (
                         <img src={personalInfo.photo} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '16px', objectFit: 'cover' }} />
                     )}
                     <div style={{ flex: 1 }}>
-                        <h1 style={{ fontSize: '1.8em', fontWeight: 800, margin: 0, color: '#111', letterSpacing: '-0.02em' }}>{personalInfo.fullName}</h1>
+                        <h1 style={{ fontSize: '1.8em', fontWeight: 800, margin: 0, color: 'inherit', letterSpacing: '-0.02em' }}>{personalInfo.fullName}</h1>
                         <p style={{ fontSize: '1.1em', color: primaryColor, fontWeight: 600, margin: '4px 0 0 0' }}>{personalInfo.jobTitle}</p>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -82,11 +82,7 @@ export default function GridTemplate({ resume }: TemplateProps) {
                                 <SectionTitle title={dynamicTitle} color={primaryColor} variant="minimal" />
 
                                 {section.type === 'skills' ? (
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                        {skills.map(skill => (
-                                            <SkillBadge key={skill.id} name={skill.name} color={primaryColor} />
-                                        ))}
-                                    </div>
+                                    <SkillsGrouped skills={skills} color={primaryColor} />
                                 ) : (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                                         {items.map((item: any) => (

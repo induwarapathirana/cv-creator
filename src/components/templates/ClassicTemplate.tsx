@@ -2,7 +2,7 @@
 
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 
 interface TemplateProps {
     resume: Resume;
@@ -20,7 +20,7 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: settings.font + ', serif',
-                color: '#333',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
                 padding: 'var(--page-margin)',
             }}
@@ -105,9 +105,7 @@ export default function ClassicTemplate({ resume, scale = 1 }: TemplateProps) {
                             return skills.length > 0 ? (
                                 <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
                                     <SectionTitle title={section.title} color={primaryColor} variant="classic" />
-                                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                        {skills.map((s: any) => <SkillBadge key={s.id} name={s.name} color={primaryColor} />)}
-                                    </div>
+                                    <SkillsGrouped skills={skills} color={primaryColor} />
                                 </div>
                             ) : null;
 

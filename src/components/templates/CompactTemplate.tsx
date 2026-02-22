@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -49,11 +49,7 @@ export default function CompactTemplate({ resume }: TemplateProps) {
                 return skills.length > 0 ? (
                     <div key={section.id} style={{ marginBottom: '12px', breakInside: 'avoid' }}>
                         <SectionTitle title={section.title} color={primaryColor} variant="minimal" />
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                            {skills.map(skill => (
-                                <SkillBadge key={skill.id} name={skill.name} color={primaryColor} />
-                            ))}
-                        </div>
+                        <SkillsGrouped skills={skills} color={primaryColor} />
                     </div>
                 ) : null;
 
@@ -96,7 +92,7 @@ export default function CompactTemplate({ resume }: TemplateProps) {
                 fontSize: 'calc(var(--font-size) - 2px)',
                 lineHeight: 'var(--line-height)',
                 padding: 'var(--page-margin)',
-                color: '#111',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >
@@ -111,7 +107,7 @@ export default function CompactTemplate({ resume }: TemplateProps) {
                     paddingBottom: '8px'
                 }}>
                     <div>
-                        <h1 style={{ fontSize: '1.5em', fontWeight: 800, margin: 0, textTransform: 'uppercase', color: '#000' }}>
+                        <h1 style={{ fontSize: '1.5em', fontWeight: 800, margin: 0, textTransform: 'uppercase', color: 'inherit' }}>
                             {personalInfo.fullName}
                         </h1>
                         <div style={{ fontSize: '0.9em', fontWeight: 700, color: primaryColor }}>{personalInfo.jobTitle}</div>

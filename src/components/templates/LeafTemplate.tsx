@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -20,7 +20,7 @@ export default function LeafTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: '"Quicksand", "Nunito", sans-serif',
                 padding: 'var(--page-margin)',
-                color: '#444',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >
@@ -43,7 +43,7 @@ export default function LeafTemplate({ resume }: TemplateProps) {
                     }}>
                         {personalInfo.fullName?.charAt(0) || '?'}
                     </div>
-                    <h1 style={{ fontSize: '2.2em', fontWeight: 700, color: '#111827', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
+                    <h1 style={{ fontSize: '2.2em', fontWeight: 700, color: 'inherit', margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
                         {personalInfo.fullName || 'Your Name'}
                     </h1>
                     {personalInfo.jobTitle && (
@@ -127,8 +127,8 @@ export default function LeafTemplate({ resume }: TemplateProps) {
                             return skills.length > 0 ? (
                                 <div key={section.id} style={{ marginBottom: 40 }}>
                                     <SectionTitle title={section.title} color={primaryColor} centered />
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-                                        {skills.map((s: any) => <SkillBadge key={s.id} name={s.name} color={primaryColor} />)}
+                                    <div style={{ textAlign: 'center' }}>
+                                        <SkillsGrouped skills={skills} color={primaryColor} />
                                     </div>
                                 </div>
                             ) : null;

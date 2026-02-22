@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -34,12 +34,14 @@ export default function SplitTemplate({ resume }: TemplateProps) {
 
         return (
             <div key={section.id} style={{ marginBottom: '32px' }}>
-                <SectionTitle title={dynamicTitle || section.title} color="rgba(255,255,255,0.8)" variant="minimal" />
+                <SectionTitle title={dynamicTitle || section.title} color="inherit" variant="minimal" />
                 {section.type === 'summary' && personalInfo.summary ? (
-                    <div style={{ color: 'rgba(255,255,255,0.9)' }}>
+                    <div style={{ color: 'inherit' }}>
                         <ResumeHtmlContent html={personalInfo.summary} />
                     </div>
-                ) : section.type === 'skills' || section.type === 'languages' ? (
+                ) : section.type === 'skills' ? (
+                    <SkillsGrouped skills={skills} color={primaryColor} />
+                ) : section.type === 'languages' ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {items.map((item: any) => (
                             <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9em' }}>
@@ -82,10 +84,12 @@ export default function SplitTemplate({ resume }: TemplateProps) {
 
         return (
             <div key={section.id} style={{ marginBottom: '40px' }}>
-                <SectionTitle title={dynamicTitle || section.title} color="#222" variant="modern" style={{ borderBottom: `2px solid ${primaryColor}` }} />
+                <SectionTitle title={dynamicTitle || section.title} color="inherit" variant="modern" style={{ borderBottom: `2px solid ${primaryColor}` }} />
 
                 {section.type === 'summary' && personalInfo.summary ? (
                     <ResumeHtmlContent html={personalInfo.summary} />
+                ) : section.type === 'skills' ? (
+                    <SkillsGrouped skills={skills} color={primaryColor} />
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                         {items.map((item: any) => (
@@ -111,7 +115,7 @@ export default function SplitTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: '"Roboto", sans-serif',
                 padding: 0,
-                color: '#333',
+                color: '#1a1a2e',
                 backgroundColor: '#fff',
                 minHeight: '297mm'
             }}

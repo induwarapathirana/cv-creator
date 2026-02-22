@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -20,14 +20,14 @@ export default function ExecutiveTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: 'Georgia, Cambria, "Times New Roman", serif',
                 padding: 'var(--page-margin)',
-                color: '#1f2937',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >
             <div className="resume-template">
                 {/* Header - Centered, Classic */}
                 <div style={{ textAlign: 'center', marginBottom: settings.sectionSpacing + 'px', borderBottom: '1px double #e5e7eb', paddingBottom: '1.5em' }}>
-                    <h1 style={{ fontSize: '2.5em', fontWeight: 700, margin: '0 0 8px 0', letterSpacing: '-0.01em', color: '#111827', textTransform: 'uppercase' }}>
+                    <h1 style={{ fontSize: '2.5em', fontWeight: 700, margin: '0 0 8px 0', letterSpacing: '-0.01em', color: 'inherit', textTransform: 'uppercase' }}>
                         {personalInfo.fullName}
                     </h1>
                     <div style={{ fontSize: '1.2em', color: primaryColor, marginBottom: '16px', fontWeight: 500, fontStyle: 'italic' }}>
@@ -106,19 +106,15 @@ export default function ExecutiveTemplate({ resume }: TemplateProps) {
                             case 'skills':
                                 return skills.length > 0 ? (
                                     <div key={section.id}>
-                                        <SectionTitle title={section.title} color="#111827" variant="modern" />
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                            {skills.map(skill => (
-                                                <SkillBadge key={skill.id} name={skill.name} color={primaryColor} />
-                                            ))}
-                                        </div>
+                                        <SectionTitle title={section.title} color="inherit" variant="modern" />
+                                        <SkillsGrouped skills={skills} color={primaryColor} />
                                     </div>
                                 ) : null;
 
                             case 'projects':
                                 return projects.length > 0 ? (
                                     <div key={section.id}>
-                                        <SectionTitle title={section.title} color="#111827" variant="modern" />
+                                        <SectionTitle title={section.title} color="inherit" variant="modern" />
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                             {projects.map(proj => (
                                                 <div key={proj.id}>

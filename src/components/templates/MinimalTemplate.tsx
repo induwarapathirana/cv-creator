@@ -2,7 +2,7 @@
 
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -21,7 +21,7 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: settings.font + ', sans-serif',
-                color: '#333',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
                 padding: 'var(--page-margin)',
             }}
@@ -29,7 +29,7 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
             <div className="resume-template">
                 {/* Header - Left Aligned */}
                 <div style={{ marginBottom: settings.sectionSpacing * 1.5 + 'px' }}>
-                    <h1 style={{ fontSize: '2.5em', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 6, color: '#111827' }}>
+                    <h1 style={{ fontSize: '2.5em', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 6, color: 'inherit' }}>
                         {personalInfo.fullName || 'Your Name'}
                     </h1>
                     {personalInfo.jobTitle && (
@@ -107,10 +107,8 @@ export default function MinimalTemplate({ resume, scale = 1 }: TemplateProps) {
                         case 'skills':
                             return skills.length > 0 ? (
                                 <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
-                                    <SectionTitle title={section.title} color="#9ca3af" />
-                                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                        {skills.map((s: any) => <SkillBadge key={s.id} name={s.name} color={primaryColor} />)}
-                                    </div>
+                                    <SectionTitle title={section.title} color="inherit" />
+                                    <SkillsGrouped skills={skills} color={primaryColor} />
                                 </div>
                             ) : null;
 

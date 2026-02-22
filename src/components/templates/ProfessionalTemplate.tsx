@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -20,14 +20,14 @@ export default function ProfessionalTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: settings.font + ', serif',
                 padding: 'var(--page-margin)',
-                color: '#333',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >
             <div className="resume-template">
                 {/* Header - Traditional Center Aligned */}
                 <div style={{ textAlign: 'center', marginBottom: 32 }}>
-                    <h1 style={{ fontSize: '2.2em', fontWeight: 700, color: '#111827', margin: '0 0 4px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <h1 style={{ fontSize: '2.2em', fontWeight: 700, color: 'inherit', margin: '0 0 4px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         {personalInfo.fullName || 'Your Name'}
                     </h1>
                     {personalInfo.jobTitle && (
@@ -106,10 +106,8 @@ export default function ProfessionalTemplate({ resume }: TemplateProps) {
                             case 'skills':
                                 return skills.length > 0 ? (
                                     <div key={section.id}>
-                                        <SectionTitle title={section.title} color="#111827" />
-                                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                            {skills.map((s: any) => <SkillBadge key={s.id} name={s.name} color={primaryColor} />)}
-                                        </div>
+                                        <SectionTitle title={section.title} color="inherit" />
+                                        <SkillsGrouped skills={skills} color={primaryColor} />
                                     </div>
                                 ) : null;
 

@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -33,10 +33,10 @@ export default function GlitchTemplate({ resume }: TemplateProps) {
             <div key={section.id} style={{ marginBottom: '32px' }}>
                 <SectionTitle
                     title={`> ${dynamicTitle || section.title}_`}
-                    color="#000"
+                    color="inherit"
                     variant="minimal"
                     style={{
-                        border: '2px solid #000',
+                        border: '2px solid currentColor',
                         padding: '4px 12px',
                         boxShadow: `4px 4px 0px ${primaryColor}`,
                         display: 'inline-block',
@@ -50,12 +50,8 @@ export default function GlitchTemplate({ resume }: TemplateProps) {
                         <ResumeHtmlContent html={personalInfo.summary} />
                     </div>
                 ) : section.type === 'skills' ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
-                        {skills.map(skill => (
-                            <div key={skill.id} style={{ border: '1px solid #000', padding: '4px 8px', fontSize: '0.85em', fontWeight: 700 }}>
-                                {skill.name.toUpperCase()} <span style={{ color: primaryColor }}>:: {skill.level || 5}/5</span>
-                            </div>
-                        ))}
+                    <div style={{ marginTop: '16px' }}>
+                        <SkillsGrouped skills={skills} color={primaryColor} />
                     </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '16px' }}>
@@ -87,7 +83,7 @@ export default function GlitchTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: '"Courier New", Courier, monospace',
                 padding: 'var(--page-margin)',
-                color: '#111',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >

@@ -2,7 +2,7 @@
 
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -24,13 +24,6 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
     const visibleSections = sections.filter(s => s.visible).sort((a, b) => a.order - b.order);
     const primaryColor = settings.colors.primary;
 
-    const skillsByCategory = skills.reduce((acc, skill) => {
-        const cat = skill.category || 'General';
-        if (!acc[cat]) acc[cat] = [];
-        acc[cat].push(skill);
-        return acc;
-    }, {} as Record<string, typeof skills>);
-
     const leftSections = visibleSections.filter(s => s.column === 'left');
     const rightSections = visibleSections.filter(s => s.column !== 'left');
 
@@ -43,7 +36,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                             {personalInfo.fullName || 'Your Name'}
                         </h1>
                         {personalInfo.jobTitle && (
-                            <p style={{ fontSize: '1.2em', color: '#4b5563', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
+                            <p style={{ fontSize: '1.2em', color: 'inherit', opacity: 0.7, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
                                 {personalInfo.jobTitle}
                             </p>
                         )}
@@ -112,18 +105,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
                 return skills.length > 0 ? (
                     <div key={section.id} style={{ marginBottom: settings.sectionSpacing + 'px' }}>
                         <SectionTitle title={section.title} color={primaryColor} />
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            {Object.entries(skillsByCategory).map(([category, catSkills]) => (
-                                <div key={category}>
-                                    <div style={{ fontWeight: 700, color: '#1a1a2e', fontSize: '0.85em', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
-                                        {category}
-                                    </div>
-                                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                        {catSkills.map(s => <SkillBadge key={s.id} name={s.name} color={primaryColor} />)}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                        <SkillsGrouped skills={skills} color={primaryColor} />
                     </div>
                 ) : null;
 
@@ -228,7 +210,7 @@ export default function ModernTemplate({ resume, scale = 1 }: TemplateProps) {
             className="resume-page"
             style={{
                 fontFamily: settings.font + ', sans-serif',
-                color: '#333',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
                 padding: 'var(--page-margin)',
             }}

@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -20,7 +20,7 @@ export default function AcademicTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: '"Times New Roman", Times, serif',
                 padding: 'var(--page-margin)',
-                color: '#000',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >
@@ -111,12 +111,8 @@ export default function AcademicTemplate({ resume }: TemplateProps) {
                             case 'skills':
                                 return skills.length > 0 ? (
                                     <div key={section.id}>
-                                        <SectionTitle title="Skills" color="#000" variant="academic" />
-                                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                                            {skills.map(skill => (
-                                                <SkillBadge key={skill.id} name={skill.name} color="#000" />
-                                            ))}
-                                        </div>
+                                        <SectionTitle title="Skills" color="inherit" variant="academic" />
+                                        <SkillsGrouped skills={skills} color={primaryColor} />
                                     </div>
                                 ) : null;
 
@@ -134,7 +130,7 @@ export default function AcademicTemplate({ resume }: TemplateProps) {
 
                                 return (
                                     <div key={section.id}>
-                                        <SectionTitle title={dynamicTitle || section.title} color="#000" variant="academic" />
+                                        <SectionTitle title={dynamicTitle || section.title} color="inherit" variant="academic" />
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             {items.map((item: any) => (
                                                 <div key={item.id}>

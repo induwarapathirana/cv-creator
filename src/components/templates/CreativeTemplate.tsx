@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -71,12 +71,8 @@ export default function CreativeTemplate({ resume }: TemplateProps) {
             case 'skills':
                 return skills.length > 0 ? (
                     <div key={section.id} style={{ marginBottom: '32px' }}>
-                        <SectionTitle title={section.title} color={isSidebar ? '#000' : primaryColor} variant={titleVariant} />
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                            {skills.map(skill => (
-                                <SkillBadge key={skill.id} name={skill.name} color={primaryColor} />
-                            ))}
-                        </div>
+                        <SectionTitle title={section.title} color={isSidebar ? 'inherit' : primaryColor} variant={titleVariant} />
+                        <SkillsGrouped skills={skills} color={primaryColor} />
                     </div>
                 ) : null;
 
@@ -117,7 +113,7 @@ export default function CreativeTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: '"Poppins", "Inter", sans-serif',
                 padding: 0,
-                color: '#333',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
                 minHeight: '297mm'
             }}

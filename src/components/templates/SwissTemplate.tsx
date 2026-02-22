@@ -1,6 +1,6 @@
 import { Resume } from '@/types/resume';
 import { defaultSettings } from '@/utils/sample-data';
-import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, ContactItem, formatDate } from './shared/ResumeComponents';
+import { SectionTitle, EntryHeader, ResumeHtmlContent, SkillBadge, SkillsGrouped, ContactItem, formatDate } from './shared/ResumeComponents';
 import { FiMail, FiPhone, FiMapPin, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
 
 interface TemplateProps {
@@ -30,12 +30,12 @@ export default function SwissTemplate({ resume }: TemplateProps) {
             case 'experience':
                 return experience.length > 0 ? (
                     <div key={section.id}>
-                        <SectionTitle title={section.title} color="#000" variant={titleVariant} />
+                        <SectionTitle title={section.title} color="inherit" variant={titleVariant} />
                         <div style={{ display: 'flex', flexDirection: 'column', gap: isSidebar ? '16px' : '32px' }}>
                             {experience.map(exp => (
                                 <div key={exp.id} style={{ display: isSidebar ? 'block' : 'grid', gridTemplateColumns: isSidebar ? 'none' : '120px 1fr', gap: '24px' }}>
                                     {!isSidebar && (
-                                        <div style={{ fontSize: '1em', fontWeight: 700, color: '#000' }}>
+                                        <div style={{ fontSize: '1em', fontWeight: 700, color: 'inherit' }}>
                                             {formatDate(exp.startDate)} —<br />{exp.current ? 'Now' : formatDate(exp.endDate)}
                                         </div>
                                     )}
@@ -57,7 +57,7 @@ export default function SwissTemplate({ resume }: TemplateProps) {
             case 'skills':
                 return skills.length > 0 ? (
                     <div key={section.id}>
-                        <SectionTitle title={section.title} color="#000" variant={titleVariant} />
+                        <SectionTitle title={section.title} color="inherit" variant={titleVariant} />
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                             {skills.map(skill => (
                                 <SkillBadge key={skill.id} name={skill.name} color={primaryColor} />
@@ -110,7 +110,7 @@ export default function SwissTemplate({ resume }: TemplateProps) {
             style={{
                 fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
                 padding: 'var(--page-margin)',
-                color: '#000',
+                color: '#1a1a2e',
                 backgroundColor: 'white',
             }}
         >
@@ -130,7 +130,7 @@ export default function SwissTemplate({ resume }: TemplateProps) {
                     )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '48px', borderTop: '4px solid #000', paddingTop: '32px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '48px', borderTop: '4px solid currentColor', paddingTop: '32px' }}>
                     {/* Left Column (Sidebar) */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                         <div>
