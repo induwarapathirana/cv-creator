@@ -112,6 +112,8 @@ export default function SwissTemplate({ resume }: TemplateProps) {
                 padding: 'var(--page-margin)',
                 color: '#1a1a2e',
                 backgroundColor: 'white',
+                minHeight: '297mm',
+                boxSizing: 'border-box'
             }}
         >
             <div className="resume-template">
@@ -148,7 +150,7 @@ export default function SwissTemplate({ resume }: TemplateProps) {
                     </div>
 
                     {/* Right Column (Main) */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', boxSizing: 'border-box' }}>
                         {visibleSections.filter(s => (s.column === 'right' || !s.column)).map(s => renderSection(s, false))}
                     </div>
                 </div>

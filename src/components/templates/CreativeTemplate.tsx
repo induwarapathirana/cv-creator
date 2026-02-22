@@ -115,7 +115,8 @@ export default function CreativeTemplate({ resume }: TemplateProps) {
                 padding: 0,
                 color: '#1a1a2e',
                 backgroundColor: 'white',
-                minHeight: '297mm'
+                minHeight: '297mm',
+                boxSizing: 'border-box'
             }}
         >
             <div className="resume-template" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -131,7 +132,7 @@ export default function CreativeTemplate({ resume }: TemplateProps) {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '32% 68%', flex: 1 }}>
                     {/* Sidebar */}
-                    <div style={{ background: '#f9fafb', padding: '48px 32px', borderRight: '1px solid #eee' }}>
+                    <div style={{ background: '#f9fafb', padding: '48px 32px', borderRight: '1px solid #eee', boxSizing: 'border-box' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '48px' }}>
                             <ContactItem icon={<FiMail />} text={personalInfo.email} color={primaryColor} />
                             <ContactItem icon={<FiPhone />} text={personalInfo.phone} color={primaryColor} />
@@ -145,7 +146,7 @@ export default function CreativeTemplate({ resume }: TemplateProps) {
                     </div>
 
                     {/* Main Content */}
-                    <div style={{ padding: '48px 64px' }}>
+                    <div style={{ padding: '48px 64px', boxSizing: 'border-box' }}>
                         {rightColumnSections.map(s => renderSection(s, false))}
                     </div>
                 </div>

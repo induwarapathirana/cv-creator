@@ -23,8 +23,10 @@ export default function Modern2Template({ resume }: TemplateProps) {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 30,
-                color: '#1a1a2e',
+                color: '#1e293b',
                 backgroundColor: 'white',
+                minHeight: '297mm',
+                boxSizing: 'border-box'
             }}
         >
             {/* Header - Modern Left Aligned */}
@@ -49,9 +51,10 @@ export default function Modern2Template({ resume }: TemplateProps) {
                 </div>
             </div>
 
-            <div className="resume-template" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 40 }}>
+            {/* Content Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '48px', paddingTop: '16px', boxSizing: 'border-box' }}>
                 {/* Main Column */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: settings.sectionSpacing + 'px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: settings.sectionSpacing + 'px', boxSizing: 'border-box' }}>
                     {visibleSections.filter(s => !s.column || s.column === 'right').map(section => {
                         if (section.type === 'personalInfo') return null;
 
@@ -161,7 +164,7 @@ export default function Modern2Template({ resume }: TemplateProps) {
                 </div>
 
                 {/* Sidebar Column */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: settings.sectionSpacing + 'px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: settings.sectionSpacing + 'px', boxSizing: 'border-box' }}>
                     {visibleSections.filter(s => s.column === 'left').map(section => {
                         switch (section.type) {
                             case 'education':

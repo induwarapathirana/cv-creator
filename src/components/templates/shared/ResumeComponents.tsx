@@ -171,15 +171,15 @@ export const SkillsGrouped = ({ skills, color, categoryColor }: { skills: any[],
 
 export const ContactItem = ({ icon, text, href, color }: { icon?: React.ReactNode, text: string, href?: string, color: string }) => {
     const content = (
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'inherit', opacity: 0.9, fontSize: '0.85em', fontWeight: 500 }}>
-            {icon && <span style={{ color: color, fontSize: '0.9em' }}>{icon}</span>}
-            {text}
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'inherit', opacity: 0.9, fontSize: '0.85em', fontWeight: 500, wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+            {icon && <span style={{ color: color, fontSize: '0.9em', flexShrink: 0 }}>{icon}</span>}
+            <span style={{ flex: 1 }}>{text}</span>
         </span>
     );
 
     if (href) {
         return (
-            <a href={href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <a href={href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
                 {content}
             </a>
         );

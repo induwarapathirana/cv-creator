@@ -80,13 +80,13 @@ export default function TechTemplate({ resume }: TemplateProps) {
         <div
             className="resume-page"
             style={{
-                fontFamily: '"Inter", sans-serif',
+                fontFamily: 'Roboto, -apple-system, sans-serif',
                 padding: 'var(--page-margin)',
-                color: '#1a1a2e',
+                color: '#333',
                 backgroundColor: 'white',
             }}
         >
-            <div className="resume-template">
+            <div className="resume-template" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 {/* Modern Tech Header */}
                 <div style={{ marginBottom: '40px' }}>
                     <h1 style={{ fontSize: '2.5em', fontWeight: 900, lineHeight: 1, marginBottom: '8px', letterSpacing: '-0.03em' }}>

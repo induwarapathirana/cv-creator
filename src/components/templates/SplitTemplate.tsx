@@ -117,7 +117,8 @@ export default function SplitTemplate({ resume }: TemplateProps) {
                 padding: 0,
                 color: '#1a1a2e',
                 backgroundColor: '#fff',
-                minHeight: '297mm'
+                minHeight: '297mm',
+                boxSizing: 'border-box'
             }}
         >
             <div className="resume-template" style={{ display: 'flex', height: '100%' }}>
@@ -128,7 +129,8 @@ export default function SplitTemplate({ resume }: TemplateProps) {
                     color: '#fff',
                     padding: '40px 30px',
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    boxSizing: 'border-box'
                 }}>
                     <div style={{ marginBottom: '40px' }}>
                         <h1 style={{ fontSize: '2em', fontWeight: 800, lineHeight: 1.1, marginBottom: '12px', letterSpacing: '-0.02em' }}>
@@ -151,7 +153,7 @@ export default function SplitTemplate({ resume }: TemplateProps) {
                 </div>
 
                 {/* Main Content - 65% width */}
-                <div style={{ width: '65%', padding: '40px' }}>
+                <div style={{ width: '65%', padding: '40px', boxSizing: 'border-box' }}>
                     {rightColumnSections.map(renderMainSection)}
                 </div>
             </div>

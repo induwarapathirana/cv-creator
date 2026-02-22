@@ -108,6 +108,7 @@ export default function TimelineTemplate({ resume }: TemplateProps) {
                 padding: 'var(--page-margin)',
                 color: '#1a1a2e',
                 backgroundColor: 'white',
+                boxSizing: 'border-box'
             }}
         >
             <div className="resume-template">
@@ -129,12 +130,12 @@ export default function TimelineTemplate({ resume }: TemplateProps) {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '64px' }}>
                     {/* Left Sidebar */}
-                    <div>
+                    <div style={{ boxSizing: 'border-box' }}>
                         {leftColumnSections.map(s => renderSection(s, true))}
                     </div>
 
                     {/* Right Main Content (Timeline) */}
-                    <div style={{ paddingLeft: '20px', borderLeft: '2px solid #eee' }}>
+                    <div style={{ paddingLeft: '20px', borderLeft: '2px solid #eee', boxSizing: 'border-box' }}>
                         {rightColumnSections.map(s => renderSection(s, false))}
                     </div>
                 </div>

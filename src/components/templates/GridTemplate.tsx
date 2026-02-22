@@ -22,6 +22,7 @@ export default function GridTemplate({ resume }: TemplateProps) {
                 padding: 'var(--page-margin)',
                 color: '#1a1a2e',
                 backgroundColor: 'white',
+                boxSizing: 'border-box'
             }}
         >
             <div className="resume-template" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

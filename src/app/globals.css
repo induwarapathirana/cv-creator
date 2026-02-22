@@ -2137,12 +2137,17 @@ body {
 
 .html-content ul,
 .html-content ol {
-  margin-left: 1.25rem;
+  padding-left: 1.2rem;
   margin-bottom: 0.5em;
+  list-style-position: outside;
 }
 
 .html-content li {
   margin-bottom: 0.25em;
+}
+
+.html-content li:last-child {
+  margin-bottom: 0;
 }
 
 .html-content a {
@@ -2155,10 +2160,12 @@ body {
 .resume-template .entry {
   max-width: 100%;
   overflow: hidden;
+  word-wrap: break-word;
 }
 
 .resume-template ul {
   list-style-position: outside;
+  padding-left: 1.2rem;
 }
 
 /* ═══════════════════════════════════
