@@ -38,19 +38,20 @@ export default function TemplateRenderer({ resume: rawResume, scale = 1 }: Templ
     }
 
     useEffect(() => {
-        if (!settings.useSinglePage || settings.usePaging) return;
+        if (!settings.useSinglePage || settings.usePaging) {
+            const styleEl = document.getElementById('dynamic-print-style');
+            if (styleEl) styleEl.remove();
+            return;
+        }
 
-        const handleBeforePrint = () => {
+        const applyStyle = () => {
             if (containerRef.current) {
                 const heightPx = containerRef.current.scrollHeight;
                 const widthPx = containerRef.current.scrollWidth;
-                // Convert to mm assuming standard 96dpi or relative to 210mm width
-                // A4 width is 210mm.
-                // Ratio = height / width
                 const ratio = heightPx / widthPx;
                 const heightMm = Math.ceil(210 * ratio);
+                const finalHeight = Math.max(heightMm, 297);
 
-                // Create or update dynamic style
                 let styleEl = document.getElementById('dynamic-print-style');
                 if (!styleEl) {
                     styleEl = document.createElement('style');
@@ -58,27 +59,36 @@ export default function TemplateRenderer({ resume: rawResume, scale = 1 }: Templ
                     document.head.appendChild(styleEl);
                 }
 
-                // Check if height is less than A4 (297mm), if so enforce at least A4 to avoid issues
-                const finalHeight = Math.max(heightMm, 297);
-
                 styleEl.innerHTML = `
                     @media print {
                         @page {
-                            size: 210mm ${finalHeight + 20}mm !important; /* +20mm buffer */
+                            size: 210mm ${finalHeight + 10}mm !important;
                             margin: 0 !important;
                         }
                         .resume-page {
-                            min-height: ${finalHeight + 20}mm !important;
-                            height: ${finalHeight + 20}mm !important;
+                            min-height: ${finalHeight + 10}mm !important;
+                            height: auto !important;
+                            margin: 0 !important;
+                            box-shadow: none !important;
                         }
                     }
                 `;
             }
         };
 
+        // Apply immediately for export context or if already rendered
+        applyStyle();
+
+        const handleBeforePrint = () => {
+            applyStyle();
+        };
+
         const handleAfterPrint = () => {
-            const styleEl = document.getElementById('dynamic-print-style');
-            if (styleEl) styleEl.remove();
+            // Only remove if not on export page
+            if (window.location.pathname !== '/export') {
+                const styleEl = document.getElementById('dynamic-print-style');
+                if (styleEl) styleEl.remove();
+            }
         };
 
         window.addEventListener('beforeprint', handleBeforePrint);
@@ -87,6 +97,8 @@ export default function TemplateRenderer({ resume: rawResume, scale = 1 }: Templ
         return () => {
             window.removeEventListener('beforeprint', handleBeforePrint);
             window.removeEventListener('afterprint', handleAfterPrint);
+            const styleEl = document.getElementById('dynamic-print-style');
+            if (styleEl) styleEl.remove();
         };
     }, [settings.useSinglePage, settings.usePaging, resume]);
 

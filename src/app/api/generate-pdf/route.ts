@@ -89,20 +89,62 @@ export async function POST(req: NextRequest) {
         await page.emulateMediaType('print');
 
         // 5. Wait for the resume to actually be rendered
-        // We look for a common element in all templates
         try {
             await page.waitForSelector('.resume-page', { timeout: 10000 });
+            // Small delay for layout to settle
+            await new Promise(r => setTimeout(r, 500));
         } catch (e) {
             console.warn('Warning: .resume-page selector not found, attempting PDF anyway');
         }
 
+        // 5.5 If Single Page mode, calculate height and set @page size
+        const useSinglePage = resume.settings?.useSinglePage && !resume.settings?.usePaging;
+
+        if (useSinglePage) {
+            await page.evaluate(() => {
+                const wrapper = document.querySelector('.renderer-wrapper') as HTMLElement;
+                if (wrapper) {
+                    const heightPx = wrapper.scrollHeight;
+                    const widthPx = wrapper.scrollWidth;
+                    // A4 width is 210mm.
+                    const ratio = heightPx / widthPx;
+                    const heightMm = Math.ceil(210 * ratio);
+                    const finalHeight = Math.max(heightMm, 297);
+
+                    const style = document.createElement('style');
+                    style.id = 'puppeteer-single-page-style';
+                    style.innerHTML = `
+                        @page {
+                            size: 210mm ${finalHeight + 2}mm !important;
+                            margin: 0 !important;
+                        }
+                        .resume-page {
+                            min-height: ${finalHeight + 2}mm !important;
+                            height: auto !important;
+                            margin: 0 !important;
+                            box-shadow: none !important;
+                        }
+                        body {
+                            margin: 0 !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            });
+        }
+
         // 6. Generate PDF
-        const pdfBuffer = await page.pdf({
-            format: 'A4',
+        const pdfOptions: any = {
             printBackground: true,
             margin: { top: 0, right: 0, bottom: 0, left: 0 },
             preferCSSPageSize: true,
-        });
+        };
+
+        if (!useSinglePage) {
+            pdfOptions.format = 'A4';
+        }
+
+        const pdfBuffer = await page.pdf(pdfOptions);
 
         await page.close();
 
