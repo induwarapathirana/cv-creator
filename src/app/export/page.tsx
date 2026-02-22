@@ -70,10 +70,11 @@ export default function ExportPage() {
                             }
                             
                             @media print {
+                                ${(!resume.settings.useSinglePage || resume.settings.usePaging) ? `
                                 @page {
                                     margin: ${resume.settings.pageMargin}px !important;
                                     size: auto;
-                                }
+                                }` : ''}
 
                                 .builder-layout, .builder-main, .preview-panel {
                                     background: white !important;

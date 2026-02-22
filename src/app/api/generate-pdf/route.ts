@@ -97,39 +97,37 @@ export async function POST(req: NextRequest) {
             console.warn('Warning: .resume-page selector not found, attempting PDF anyway');
         }
 
-        // 5.5 If Single Page mode, calculate height and set @page size
+        // 5.5 If Single Page mode, calculate height and set explicit dimensions
         const useSinglePage = resume.settings?.useSinglePage && !resume.settings?.usePaging;
+        let pdfDimensions: { width: number; height: number } | null = null;
 
         if (useSinglePage) {
+            // 1. Inject CSS enforcing single continuous page, no breaks, A4 width
             await page.evaluate(() => {
-                const wrapper = document.querySelector('.renderer-wrapper') as HTMLElement;
-                if (wrapper) {
-                    const heightPx = wrapper.scrollHeight;
-                    const widthPx = wrapper.scrollWidth;
-                    // A4 width is 210mm.
-                    const ratio = heightPx / widthPx;
-                    const heightMm = Math.ceil(210 * ratio);
-                    const finalHeight = Math.max(heightMm, 297);
+                const style = document.createElement('style');
+                style.id = 'puppeteer-single-page-style';
+                style.innerHTML = `
+                    @media print {
+                        @page { margin: 0 !important; }
+                        * { page-break-after: auto !important; page-break-before: auto !important; page-break-inside: avoid !important; }
+                        .resume-page { width: 210mm !important; min-height: 297mm !important; height: auto !important; margin: 0 auto !important; box-shadow: none !important; border: none !important; overflow: visible !important; }
+                        .export-container, .renderer-wrapper { width: 210mm !important; margin: 0 auto !important; overflow: visible !important; }
+                        body, html, .builder-layout, .builder-main, .preview-panel { width: auto !important; height: auto !important; min-height: 0 !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; background: white !important; }
+                    }
+                `;
+                document.head.appendChild(style);
+            });
 
-                    const style = document.createElement('style');
-                    style.id = 'puppeteer-single-page-style';
-                    style.innerHTML = `
-                        @page {
-                            size: 210mm ${finalHeight + 2}mm !important;
-                            margin: 0 !important;
-                        }
-                        .resume-page {
-                            min-height: ${finalHeight + 2}mm !important;
-                            height: auto !important;
-                            margin: 0 !important;
-                            box-shadow: none !important;
-                        }
-                        body {
-                            margin: 0 !important;
-                        }
-                    `;
-                    document.head.appendChild(style);
+            // 2. Wait for layout settling
+            await new Promise(r => setTimeout(r, 250));
+
+            // 3. Measure the exact height in px
+            pdfDimensions = await page.evaluate(() => {
+                const wrapper = document.querySelector('.resume-page') as HTMLElement || document.querySelector('.renderer-wrapper') as HTMLElement;
+                if (wrapper) {
+                    return { width: 794, height: wrapper.scrollHeight };
                 }
+                return null;
             });
         }
 
@@ -137,11 +135,15 @@ export async function POST(req: NextRequest) {
         const pdfOptions: any = {
             printBackground: true,
             margin: { top: 0, right: 0, bottom: 0, left: 0 },
-            preferCSSPageSize: true,
         };
 
-        if (!useSinglePage) {
+        if (useSinglePage && pdfDimensions && pdfDimensions.height > 0) {
+            pdfOptions.width = '210mm';
+            pdfOptions.height = `${pdfDimensions.height + 10}px`; // Add a small trailing buffer
+            pdfOptions.preferCSSPageSize = false;
+        } else {
             pdfOptions.format = 'A4';
+            pdfOptions.preferCSSPageSize = true;
         }
 
         const pdfBuffer = await page.pdf(pdfOptions);
