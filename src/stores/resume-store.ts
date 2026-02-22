@@ -92,7 +92,7 @@ interface ResumeState {
 
     // Section Management
     updateSectionConfig: (id: string, config: Partial<SectionConfig>) => void;
-    reorderSections: (startIndex: number, endIndex: number) => void;
+    reorderSections: (sourceId: string, destinationIndex: number) => void;
 
     // Settings
     updateSettings: (settings: Partial<ResumeSettings>) => void;
@@ -555,11 +555,17 @@ export const useResumeStore = create<ResumeState>()(
                 })));
             },
 
-            reorderSections: (startIndex, endIndex) => {
+            reorderSections: (sourceId, destinationIndex) => {
                 set((state) => updateActiveResume(state, (r) => {
-                    const reordered = reorder(r.sections, startIndex, endIndex);
+                    const sections = [...r.sections];
+                    const sourceIndex = sections.findIndex(s => s.id === sourceId);
+                    if (sourceIndex === -1) return {};
+
+                    const [removed] = sections.splice(sourceIndex, 1);
+                    sections.splice(destinationIndex, 0, removed);
+
                     return {
-                        sections: reordered.map((s, i) => ({ ...s, order: i })),
+                        sections: sections.map((s, i) => ({ ...s, order: i })),
                     };
                 }));
             },

@@ -93,7 +93,7 @@ export default function EditorSidebar() {
         if (result.destination.index === result.source.index) return;
 
         pushUndoState();
-        reorderSections(result.source.index, result.destination.index);
+        reorderSections(result.draggableId, result.destination.index);
     };
 
     return (

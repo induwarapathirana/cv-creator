@@ -149,6 +149,18 @@ export default function TemplateRenderer({ resume: rawResume, scale = 1 }: Templ
                 } as any}
             >
                 {/* For now, we render as one big "page" that can be breaked by CSS print rules or just viewed as a sequence */}
+                {/* Dynamic Page Markers for visual guide in editor */}
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+                    {[0, 1, 2, 3, 4].map(i => (
+                        <div
+                            key={i}
+                            className="page-marker"
+                            style={{ top: `${(i * 297) + 10}mm` }}
+                        >
+                            P. {i + 1}
+                        </div>
+                    ))}
+                </div>
                 {renderTemplate()}
             </div>
         );

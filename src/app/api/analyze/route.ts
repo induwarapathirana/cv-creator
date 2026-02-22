@@ -52,12 +52,12 @@ export async function POST(req: NextRequest) {
 
         // Initialize Gemini with deterministic settings and Native JSON Mode
         const model = genAI.getGenerativeModel({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-2.0-flash', // Updated to current stable model
             generationConfig: {
                 temperature: 0.1,
                 topP: 0.95,
                 topK: 40,
-                maxOutputTokens: 2048,
+                maxOutputTokens: 4096, // Increased to prevent truncation
                 responseMimeType: 'application/json',
             }
         });
